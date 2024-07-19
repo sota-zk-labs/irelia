@@ -1,15 +1,17 @@
+use std::str::FromStr;
 use std::time::SystemTime;
 use aptos_sdk::crypto::HashValue;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::serialize_values;
-use aptos_sdk::rest_client::aptos_api_types::ViewFunction;
+use aptos_sdk::rest_client::aptos_api_types::{MoveType, ViewFunction};
 use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::AptosClient;
 use crate::config::AptosVerifierConfig;
+use crate::contracts::event_tracker::EventTracker;
 use crate::contracts::types::Verify;
 
 pub async fn verify_fri(data: Verify) -> anyhow::Result<()> {
@@ -50,7 +52,18 @@ pub async fn verify_fri(data: Verify) -> anyhow::Result<()> {
     let txd = client.submit(&txn).await?.into_inner().hash;
 
     let tx = client.get_transaction_by_hash(HashValue::from(txd)).await?.into_inner();
-    let event = client.get_account_events(account.address(), &"", &"", None, None).await.unwrap().into_inner();
-    event.iter().for_each(|e| { println!("{:?}", e);});
+    eprintln!("txd = {:#?}", txd);
+    eprintln!("account.address() = {:#?}", account.address());
+
+    let mut e = EventTracker::new(
+        client,
+        account.address(),
+        MoveType::from_str("0xa3ef536178c53b3c989a7f9b2750d91ad5c753975467d6d01eb2aef4bd7945ec::fri_statement::FriCtx").unwrap(),
+        3,
+    );
+
+    let event = e.latest_event().await.unwrap();
+    eprintln!("event = {:#?}", event);
+    eprintln!("event.data = {:#?}", event.data);
     Ok(())
 }
