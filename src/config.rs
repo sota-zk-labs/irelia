@@ -1,17 +1,32 @@
+use dotenv::dotenv;
+use color_eyre::Result;
 pub struct AptosVerifierConfig {
     pub node_url: String,
     pub private_key: String,
     pub account_address: String,
+    pub module_address: String,
 }
+
+pub fn get_env_var(key: &str) -> Result<String> {
+    std::env::var(key).map_err(|e| e.into())
+}
+
+pub fn get_env_var_or_panic(key: &str) -> String {
+    get_env_var(key).unwrap_or_else(|e| panic!("Failed to get env var {}: {}", key, e))
+}
+
 impl AptosVerifierConfig {
     pub fn new() -> Self {
-        let node_url = std::env::var("APTOS_NODE_URL").unwrap_or("https://fullnode.devnet.aptoslabs.com".to_string());
-        let private_key = std::env::var("APTOS_PRIVATE_KEY").unwrap();
-        let account_address = std::env::var("APTOS_ACCOUNT_ADDRESS").unwrap();
+        dotenv().ok().expect("Failed to load .env file");
+        let node_url = get_env_var_or_panic("APTOS_NODE_URL");
+        let private_key = get_env_var_or_panic("APTOS_PRIVATE_KEY");
+        let account_address = get_env_var_or_panic("APTOS_ACCOUNT_ADDRESS");
+        let module_address = get_env_var_or_panic("APTOS_MODULE_ADDRESS");
         AptosVerifierConfig {
             node_url,
             private_key,
             account_address,
+            module_address,
         }
     }
 }
