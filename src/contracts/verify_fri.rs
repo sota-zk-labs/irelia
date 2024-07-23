@@ -1,25 +1,27 @@
+use std::str::FromStr;
 use std::time::SystemTime;
 use aptos_sdk::crypto::HashValue;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::serialize_values;
-use aptos_sdk::rest_client::aptos_api_types::ViewFunction;
+use aptos_sdk::rest_client::aptos_api_types::{MoveType, VersionedEvent, ViewFunction};
 use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::AptosClient;
 use crate::config::AptosVerifierConfig;
+use crate::contracts::event_tracker::EventTracker;
+use crate::contracts::helper::init_config;
 use crate::contracts::types::Verify;
 
-pub async fn verify_fri(data: Verify) -> anyhow::Result<()> {
+pub async fn verify_fri(data: Verify) -> anyhow::Result<(VersionedEvent,VersionedEvent)> {
     let config = AptosClient::from(AptosVerifierConfig::new());
     let client = config.client;
     let account = config.account;
     let module_address = config.module_address;
     let account_sequence =  client.get_account(account.address()).await?.into_inner().sequence_number;
     account.set_sequence_number(account_sequence);
-
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
             ModuleId::new(module_address, Identifier::new("fri_statement").unwrap()),
@@ -48,9 +50,24 @@ pub async fn verify_fri(data: Verify) -> anyhow::Result<()> {
 
     let txn = account.sign_transaction(tx);
     let txd = client.submit(&txn).await?.into_inner().hash;
+    println!("Verify FRI: {}", txd);
 
-    let tx = client.get_transaction_by_hash(HashValue::from(txd)).await?.into_inner();
-    let event = client.get_account_events(account.address(), &"", &"", None, None).await.unwrap().into_inner();
-    event.iter().for_each(|e| { println!("{:?}", e);});
-    Ok(())
+
+    let mut fri_ctx = EventTracker::new(
+        client.clone(),
+        account.address(),
+        MoveType::from_str(&(module_address.to_string()+"::fri_statement::FriCtx")).unwrap(),
+        3,
+    );
+
+    let mut compute_next_layer = EventTracker::new(
+        client.clone(),
+        account.address(),
+        MoveType::from_str(&(module_address.to_string()+"::fri_statement::ComputeNextLayer")).unwrap(),
+        4
+    );
+    let event = fri_ctx.latest_event().await.unwrap();
+    let event_compute = compute_next_layer.latest_event().await.unwrap();
+
+    Ok((event, event_compute))
 }
