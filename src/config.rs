@@ -17,7 +17,7 @@ pub fn get_env_var_or_panic(key: &str) -> String {
 
 impl AptosVerifierConfig {
     pub fn new() -> Self {
-        dotenv().ok().expect("Failed to load .env file");
+        dotenv().ok().expect("Failed to load .env.example file");
         let node_url = get_env_var_or_panic("APTOS_NODE_URL");
         let private_key = get_env_var_or_panic("APTOS_PRIVATE_KEY");
         let account_address = get_env_var_or_panic("APTOS_ACCOUNT_ADDRESS");

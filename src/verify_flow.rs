@@ -1,10 +1,16 @@
+use std::hash::Hash;
 use std::str::FromStr;
 
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
+use aptos_sdk::rest_client::aptos_api_types::VersionedEvent;
 
-use crate::contracts::types::Verify;
+use crate::contracts::compute_next_layer::{compute_next_layer, compute_next_layer_view};
+use crate::contracts::helper::str_to_u256;
+use crate::contracts::init_fri_group::init_fri_group;
+use crate::contracts::types::{ComputeNextLayer, InitFriGroup, Verify, VerifyMerkle};
 use crate::contracts::verify_fri::verify_fri;
+use crate::contracts::verify_merkle::{verify_merkle, verify_merkle_view};
 
 #[tokio::test]
 pub async fn test_a() -> anyhow::Result<()> {
@@ -257,13 +263,54 @@ pub async fn test_a() -> anyhow::Result<()> {
         MoveValue::U256(U256::from_str("0").unwrap()),
     ]);
 
-    let data = Verify {
+
+    let input_fri = Verify {
         proof: proof_data,
         fri_queue,
         evaluation_point: MoveValue::U256(U256::from_str("1127319757609087129328200675198280716580310204088624481346247862057464086751").unwrap()),
         fri_step_size: MoveValue::U256(U256::from_str("3").unwrap()),
         expected_root: MoveValue::U256(U256::from_str("9390404794146759926609078012164974184924937654759657766410025620812402262016").unwrap()),
     };
-    verify_fri(data).await.expect("E");
+    let (event_init, event_compute) = verify_fri(input_fri).await.expect("E");
+    let fri_ctx = MoveValue::U256(U256::from_str(event_init.data.get("fri_ctx").unwrap().as_str().unwrap()).unwrap());
+    let input_init = InitFriGroup {
+        fri_ctx
+    };
+
+    let input_compute = ComputeNextLayer {
+        channel_ptr: str_to_u256(event_compute.data.get("channel_ptr").unwrap().as_str().unwrap()),
+        evaluation_point: str_to_u256(event_compute.data.get("evaluation_point").unwrap().as_str().unwrap()),
+        fri_coset_size: str_to_u256(event_compute.data.get("fri_coset_size").unwrap().as_str().unwrap()),
+        fri_ctx: str_to_u256(event_compute.data.get("fri_ctx").unwrap().as_str().unwrap()),
+        fri_queue_ptr: str_to_u256(event_compute.data.get("fri_queue_ptr").unwrap().as_str().unwrap()),
+        merkle_queue_ptr: str_to_u256(event_compute.data.get("merkle_queue_ptr").unwrap().as_str().unwrap()),
+        n_queries: str_to_u256(event_compute.data.get("n_queries").unwrap().as_str().unwrap()),
+    };
+
+    init_fri_group(input_init).await.expect("E");
+    let mut i = true;
+    let mut n_queries: Option<VersionedEvent> = None;
+    while i {
+        n_queries = Some(compute_next_layer(&input_compute).await.expect("E"));
+        i = compute_next_layer_view().await.unwrap();
+        println!("{}", i);
+    }
+    let input_verify_merkle = if let Some(n_queries) = &n_queries {
+        VerifyMerkle {
+            channel_ptr: str_to_u256(event_compute.data.get("channel_ptr").unwrap().as_str().unwrap()),
+            merkle_queue_ptr: str_to_u256(event_compute.data.get("merkle_queue_ptr").unwrap().as_str().unwrap()),
+            root: MoveValue::U256(U256::from_str("9390404794146759926609078012164974184924937654759657766410025620812402262016").unwrap()),
+            n_queries: str_to_u256(n_queries.data.get("n_queries").unwrap().as_str().unwrap()),
+        }
+    } else {
+        // Handle the case where n_queries is None
+        panic!("n_queries is None");
+    };
+    i = true;
+    while i {
+        verify_merkle(&input_verify_merkle).await.expect("E");
+        i = verify_merkle_view().await.unwrap();
+        println!("merkle_verifier {}", i);
+    }
     Ok(())
 }

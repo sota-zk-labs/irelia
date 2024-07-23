@@ -1,5 +1,6 @@
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
+use aptos_sdk::rest_client::aptos_api_types::MoveType;
 
 pub struct Verify {
     pub proof: MoveValue,
@@ -10,7 +11,22 @@ pub struct Verify {
 }
 
 pub struct InitFriGroup {
-    fri_ctx: U256,
+    pub(crate) fri_ctx: MoveValue,
 }
 
-pub struct ComputeNextLayer {}
+pub struct ComputeNextLayer {
+    pub channel_ptr: MoveValue,
+    pub evaluation_point: MoveValue,
+    pub fri_coset_size: MoveValue,
+    pub fri_ctx: MoveValue,
+    pub fri_queue_ptr: MoveValue,
+    pub merkle_queue_ptr: MoveValue,
+    pub n_queries: MoveValue,
+}
+
+pub struct VerifyMerkle {
+    pub channel_ptr: MoveValue,
+    pub merkle_queue_ptr: MoveValue,
+    pub root: MoveValue,
+    pub n_queries: MoveValue,
+}
