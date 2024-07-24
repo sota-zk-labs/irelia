@@ -1,6 +1,4 @@
-use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
-use aptos_sdk::rest_client::aptos_api_types::MoveType;
 
 pub struct Verify {
     pub proof: MoveValue,
