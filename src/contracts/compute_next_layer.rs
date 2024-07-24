@@ -1,11 +1,8 @@
 use std::str::FromStr;
-
-use aptos_sdk::crypto::HashValue;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::{MoveValue, serialize_values};
 use aptos_sdk::rest_client::aptos_api_types::{MoveType, VersionedEvent, ViewFunction};
-use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use crate::AptosClient;
 use crate::config::AptosVerifierConfig;
@@ -13,7 +10,7 @@ use crate::contracts::event_tracker::EventTracker;
 use crate::contracts::helper::{init_config, str_to_bool, transaction_builder};
 use crate::contracts::types::ComputeNextLayer;
 
-pub async fn compute_next_layer(data: &ComputeNextLayer) -> anyhow::Result<(VersionedEvent)> {
+pub async fn compute_next_layer(data: &ComputeNextLayer) -> anyhow::Result<VersionedEvent> {
     let config = AptosClient::from(AptosVerifierConfig::new());
     let client = config.client;
     let account = config.account;
@@ -37,21 +34,21 @@ pub async fn compute_next_layer(data: &ComputeNextLayer) -> anyhow::Result<(Vers
                 ]
             ),
         ));
-    let tx = transaction_builder(payload, &account, ChainId::testnet());
+    let tx = transaction_builder(payload, &account, config.chain_id);
     let txn = account.sign_transaction(tx);
     let txd = client.submit(&txn).await?.into_inner().hash;
     println!("Compute Next Layer {}", txd);
     let mut n_queries = EventTracker::new(
         client.clone(),
         account.address(),
-        MoveType::from_str(&(module_address.to_string() + "::fri_layer::NQueries")).unwrap(),
+        MoveType::from_str(&format!("{module_address}::fri_statement::NQueries")).unwrap(),
         3,
     );
     let event = n_queries.latest_event().await.unwrap();
-    Ok((event))
+    Ok(event)
 }
 
-pub async fn compute_next_layer_view() -> anyhow::Result<(bool)> {
+pub async fn compute_next_layer_view() -> anyhow::Result<bool> {
     let (client, account, module_address) = init_config().await.expect("Error initializing config");
     let view_payload = ViewFunction {
         module: ModuleId::new(module_address, Identifier::new("fri_layer").unwrap()),

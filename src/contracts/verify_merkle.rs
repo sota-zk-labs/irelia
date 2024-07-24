@@ -2,7 +2,6 @@ use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::{MoveValue, serialize_values};
 use aptos_sdk::rest_client::aptos_api_types::ViewFunction;
-use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::AptosClient;
@@ -31,7 +30,7 @@ pub async fn verify_merkle(data: &VerifyMerkle) -> anyhow::Result<()> {
                 ]
             ),
         ));
-    let tx = transaction_builder(payload, &account, ChainId::testnet());
+    let tx = transaction_builder(payload, &account, config.chain_id);
     let txn = account.sign_transaction(tx);
     let txd = client.submit(&txn).await?.into_inner().hash;
     println!("Verify Merkle {}", txd);
