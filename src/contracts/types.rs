@@ -1,6 +1,6 @@
 use aptos_sdk::move_types::value::MoveValue;
 
-pub struct Verify {
+pub struct VerifyTransactionInput {
     pub proof: MoveValue,
     pub fri_queue: MoveValue,
     pub evaluation_point: MoveValue,
@@ -9,7 +9,7 @@ pub struct Verify {
 }
 
 pub struct InitFriGroup {
-    pub(crate) fri_ctx: MoveValue,
+    pub fri_ctx: MoveValue,
 }
 
 pub struct ComputeNextLayer {
