@@ -51,9 +51,6 @@ async fn main() {
 
     loop {
         verify_merkle(&config, &input_verify_merkle).await.expect("E");
-        if !verify_merkle_view(&config).await.unwrap() {
-            break;
-        }
         println!("merkle_verifier {}", true);
     }
     eprintln!("done");

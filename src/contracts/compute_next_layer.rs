@@ -28,7 +28,7 @@ pub async fn compute_next_layer(config: &AppConfig, data: &ComputeNextLayer) -> 
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
-
+    eprintln!("transaction.transaction_info().unwrap().hash = {:#?}", transaction.transaction_info().unwrap().hash);
     let event_type = MoveType::from_str(&format!("{}::fri_layer::NQueries", config.module_address)).unwrap();
     get_event_from_transaction(transaction, event_type).await
 }

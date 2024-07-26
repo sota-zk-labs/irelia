@@ -6,7 +6,7 @@ use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts::helper::{str_to_bool, build_simulated_transaction};
+use crate::contracts::helper::{str_to_bool, build_simulated_transaction, build_transaction, get_error_code};
 use crate::contracts::types::VerifyMerkle;
 
 pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<()> {
@@ -24,30 +24,19 @@ pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::R
                 ]
             ),
         ));
-    let tx = build_simulated_transaction(payload, &config.account, config.chain_id);
-    let txd = loop {
-        let response = config.client.simulate(&tx).await;
-        match response {
-            Ok(res) => {
-                break Ok(res.into_inner());
-            }
-            Err(e) => {
-                let err_string = e.to_string();
-                if let RestError::Api(z) = e {
-                    match z.error.error_code {
-                        AptosErrorCode::MempoolIsFull => {
-                            eprintln!("hit");
-                            continue;
-                        }
-                        _ => {}
-                    }
-                }
-                break Err(err_string);
-            }
-        }
-    }.unwrap();
-
-    println!("verify_merkle {}", txd.get(0).unwrap().info.hash);
+    let tx = build_simulated_transaction(payload.clone(), &config.account, config.chain_id);
+    let simulate = config.client.simulate(&tx).await.unwrap().into_inner();
+    let vm_status = simulate.get(0).unwrap().info.vm_status.as_str();
+    eprintln!("get_error_code(vm_status) = {:#?}", get_error_code(vm_status));
+    if (simulate.get(0).unwrap().info.success ) {
+        let tx = build_transaction(payload, &config.account, config.chain_id);
+        let txd = config.client.submit_and_wait(&tx).await?.into_inner();
+        println!("verify_merkle {:?}", txd);
+    } else if  { get_error_code(vm_status) == 3  } {
+        println!("Verify Merkle Success");
+    } else {
+        println!("Verify Merkle Failed with error code: {:#?}", get_error_code(vm_status));
+    }
     Ok(())
 }
 
@@ -59,6 +48,9 @@ pub async fn verify_merkle_view(config: &AppConfig) -> anyhow::Result<bool> {
         args: serialize_values(&vec![MoveValue::Address(config.account.address())]),
     };
     let data = config.client.view_bcs_with_json_response(&view_payload, None).await.unwrap().into_inner();
+
+
+
     let data_str = format!("{:?}", data[0]);
     eprintln!("data_str = {:#?}", data_str);
     Ok(str_to_bool(&data_str))

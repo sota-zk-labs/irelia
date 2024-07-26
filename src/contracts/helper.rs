@@ -23,8 +23,14 @@ pub fn str_to_bool(s: &str) -> bool {
     bool::from_str(bool_str).unwrap()
 }
 
+pub fn get_error_code(s: &str) -> u64 {
+    let error_code = s.trim_start_matches("merkle_verifier: 0x");
+    eprintln!("error_code = {:#?}", error_code);
+    u64::from_str(error_code).unwrap()
+}
 pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, chain_id: ChainId) -> SignedTransaction {
     let i = sender.increment_sequence_number();
+    eprintln!("i_transaction = {:#?}", i);
     let tx = TransactionBuilder::new(
         payload,
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + 60,
@@ -39,7 +45,8 @@ pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, cha
 }
 
 pub fn build_simulated_transaction(payload: TransactionPayload, sender: &LocalAccount, chain_id: ChainId) -> SignedTransaction {
-    let i = sender.increment_sequence_number();
+    let i = sender.sequence_number();
+    eprintln!("i_simulate = {:#?}", i);
     let tx = TransactionBuilder::new(
         payload,
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + 60,
