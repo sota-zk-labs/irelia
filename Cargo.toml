@@ -13,6 +13,7 @@ async-trait = { version = "0.1.81" }
 dotenv = { version = "0.15.0" }
 color-eyre = { version = "0.6.1" }
 thiserror = { version = "1.0.63" }
+rand_core = { version = "0.5.1" }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
