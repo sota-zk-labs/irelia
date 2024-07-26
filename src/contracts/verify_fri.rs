@@ -1,4 +1,5 @@
 use std::str::FromStr;
+
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::serialize_values;
@@ -27,10 +28,8 @@ pub async fn verify_fri(config: &AppConfig, data: VerifyTransactionInput) -> any
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
-
     let event_type = MoveType::from_str(&format!("{}::fri_statement::FriCtx", config.module_address)).unwrap();
     let fri_ctx_data = get_event_from_transaction(transaction.clone(), event_type).await?;
-
     let compute_next_layer_event_type = MoveType::from_str(&format!("{}::fri_statement::ComputeNextLayer", config.module_address)).unwrap();
     let compute_next_layer_data = get_event_from_transaction(
         transaction,

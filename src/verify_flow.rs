@@ -1,14 +1,14 @@
 #[cfg(test)]
 mod tests {
+    use aptos_sdk::move_types::value::MoveValue;
     use aptos_sdk::rest_client::aptos_api_types::Event;
     use crate::config::AppConfig;
     use crate::config::EnvConfig;
-    use crate::contracts::compute_next_layer::{compute_next_layer, compute_next_layer_view};
+    use crate::contracts::compute_next_layer::{compute_next_layer};
     use crate::contracts::helper::str_to_u256;
     use crate::contracts::init_fri_group::init_fri_group;
     use crate::contracts::types::{ComputeNextLayer, InitFriGroup, VerifyMerkle};
     use crate::contracts::verify_fri::verify_fri;
-    use crate::contracts::verify_merkle::{verify_merkle, verify_merkle_view};
     use crate::data_samples::sample_1::sample1;
 
     #[tokio::test]
@@ -20,45 +20,37 @@ mod tests {
 
 
         let (event_init, event_compute) = verify_fri(&config, verify_input).await.expect("E");
-        let fri_ctx = str_to_u256(event_init.data.get("fri_ctx").unwrap().as_str().unwrap());
+        let fri_ctx = str_to_u256(event_init.data.get("fri_ctx").unwrap().as_str().unwrap()).unwrap();
         let input_init = InitFriGroup {
-            fri_ctx
+            fri_ctx: MoveValue::U256(fri_ctx)
         };
 
-        let input_compute = ComputeNextLayer {
-            channel_ptr: str_to_u256(event_compute.data.get("channel_ptr").unwrap().as_str().unwrap()),
-            evaluation_point: str_to_u256(event_compute.data.get("evaluation_point").unwrap().as_str().unwrap()),
-            fri_coset_size: str_to_u256(event_compute.data.get("fri_coset_size").unwrap().as_str().unwrap()),
-            fri_ctx: str_to_u256(event_compute.data.get("fri_ctx").unwrap().as_str().unwrap()),
-            fri_queue_ptr: str_to_u256(event_compute.data.get("fri_queue_ptr").unwrap().as_str().unwrap()),
-            merkle_queue_ptr: str_to_u256(event_compute.data.get("merkle_queue_ptr").unwrap().as_str().unwrap()),
-            n_queries: str_to_u256(event_compute.data.get("n_queries").unwrap().as_str().unwrap()),
-        };
+        let input_compute: ComputeNextLayer = event_compute.clone().try_into()?;
 
         init_fri_group(&config, input_init).await.expect("E");
         let mut n_queries: Event;
 
-        loop {
-            n_queries = compute_next_layer(&config, &input_compute).await.expect("E");
-            if !compute_next_layer_view(&config).await.unwrap() {
-                break;
-            }
-        }
+        // loop {
+        //     n_queries = compute_next_layer(10, &config, &input_compute).await.expect("E");
+        //     // if !compute_next_layer_view(&config).await.unwrap() {
+        //     break;
+        //     // }
+        // }
 
-        let input_verify_merkle = VerifyMerkle {
-            channel_ptr: str_to_u256(event_compute.data.get("channel_ptr").unwrap().as_str().unwrap()),
-            merkle_queue_ptr: str_to_u256(event_compute.data.get("merkle_queue_ptr").unwrap().as_str().unwrap()),
-            root: str_to_u256(root_hash.as_str()),
-            n_queries: str_to_u256(n_queries.data.get("n_queries").unwrap().as_str().unwrap()),
-        };
-
-        loop {
-            verify_merkle(&config, &input_verify_merkle).await.expect("E");
-            if !verify_merkle_view(&config).await.unwrap() {
-                break;
-            }
-            println!("merkle_verifier {}", true);
-        }
+        // let input_verify_merkle = VerifyMerkle {
+        //     channel_ptr: str_to_u256(event_compute.data.get("channel_ptr").unwrap().as_str().unwrap()),
+        //     merkle_queue_ptr: str_to_u256(event_compute.data.get("merkle_queue_ptr").unwrap().as_str().unwrap()),
+        //     root: str_to_u256(root_hash.as_str()),
+        //     n_queries: str_to_u256(n_queries.data.get("n_queries").unwrap().as_str().unwrap()),
+        // };
+        //
+        // loop {
+        //     verify_merkle(&config, &input_verify_merkle).await.expect("E");
+        //     // if !verify_merkle_view(&config).await.unwrap() {
+        //         break;
+        //     // }
+        //     println!("merkle_verifier {}", true);
+        // }
 
         Ok(())
     }

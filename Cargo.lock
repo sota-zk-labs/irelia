@@ -7712,6 +7712,8 @@ dependencies = [
  "dotenv",
  "once_cell",
  "rand_core 0.5.1",
+ "regex",
+ "serde_json",
  "thiserror",
  "tokio",
  "url",

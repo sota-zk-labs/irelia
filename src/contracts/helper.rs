@@ -3,7 +3,6 @@ use std::time::SystemTime;
 
 use anyhow::Error;
 use aptos_sdk::move_types::u256::U256;
-use aptos_sdk::move_types::value::MoveValue;
 use aptos_sdk::rest_client::aptos_api_types::{Event, MoveType};
 use aptos_sdk::rest_client::Transaction;
 use aptos_sdk::transaction_builder::TransactionBuilder;
@@ -11,16 +10,11 @@ use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::LocalAccount;
 use aptos_sdk::types::transaction::{SignedTransaction, TransactionPayload};
 use rand_core::OsRng;
+
 use crate::error::CoreError;
 
-pub fn str_to_u256(s: &str) -> MoveValue {
-    let u256_value = U256::from_str(s).unwrap();
-    MoveValue::U256(u256_value)
-}
-
-pub fn str_to_bool(s: &str) -> bool {
-    let bool_str = s.trim_start_matches("Bool(").trim_end_matches(")");
-    bool::from_str(bool_str).unwrap()
+pub fn str_to_u256(s: &str) -> Result<U256, CoreError> {
+    U256::from_str(s).map_err(|e| e.into())
 }
 
 pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, chain_id: ChainId) -> SignedTransaction {
@@ -32,14 +26,14 @@ pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, cha
     )
         .sender(sender.address())
         .sequence_number(i)
-        .max_gas_amount(10000)
+        .max_gas_amount(100000)
         .gas_unit_price(100)
         .build();
     sender.sign_transaction(tx)
 }
 
 pub fn build_simulated_transaction(payload: TransactionPayload, sender: &LocalAccount, chain_id: ChainId) -> SignedTransaction {
-    let i = sender.increment_sequence_number();
+    let i = sender.sequence_number();
     let tx = TransactionBuilder::new(
         payload,
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + 60,
