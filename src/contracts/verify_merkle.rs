@@ -6,7 +6,7 @@ use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts::helper::{str_to_bool, build_transaction};
+use crate::contracts::helper::{str_to_bool, build_simulated_transaction};
 use crate::contracts::types::VerifyMerkle;
 
 pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<()> {
@@ -24,9 +24,9 @@ pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::R
                 ]
             ),
         ));
-    let tx = build_transaction(payload, &config.account, config.chain_id);
+    let tx = build_simulated_transaction(payload, &config.account, config.chain_id);
     let txd = loop {
-        let response = config.client.submit_and_wait(&tx).await;
+        let response = config.client.simulate(&tx).await;
         match response {
             Ok(res) => {
                 break Ok(res.into_inner());
@@ -37,7 +37,7 @@ pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::R
                     match z.error.error_code {
                         AptosErrorCode::MempoolIsFull => {
                             eprintln!("hit");
-                            continue
+                            continue;
                         }
                         _ => {}
                     }
@@ -47,7 +47,7 @@ pub async fn verify_merkle(config: &AppConfig, data: &VerifyMerkle) -> anyhow::R
         }
     }.unwrap();
 
-    println!("verify_merkle {}", txd.transaction_info().unwrap().hash);
+    println!("verify_merkle {}", txd.get(0).unwrap().info.hash);
     Ok(())
 }
 

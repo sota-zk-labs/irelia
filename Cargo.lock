@@ -7711,6 +7711,7 @@ dependencies = [
  "color-eyre",
  "dotenv",
  "once_cell",
+ "rand_core 0.5.1",
  "thiserror",
  "tokio",
  "url",

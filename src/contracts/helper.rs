@@ -10,7 +10,7 @@ use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::LocalAccount;
 use aptos_sdk::types::transaction::{SignedTransaction, TransactionPayload};
-
+use rand_core::OsRng;
 use crate::error::CoreError;
 
 pub fn str_to_u256(s: &str) -> MoveValue {
@@ -38,6 +38,25 @@ pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, cha
     sender.sign_transaction(tx)
 }
 
+pub fn build_simulated_transaction(payload: TransactionPayload, sender: &LocalAccount, chain_id: ChainId) -> SignedTransaction {
+    let i = sender.increment_sequence_number();
+    let tx = TransactionBuilder::new(
+        payload,
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() + 60,
+        chain_id,
+    )
+        .sender(sender.address())
+        .sequence_number(i)
+        .max_gas_amount(10000)
+        .gas_unit_price(100)
+        .build();
+    let mut r = OsRng::default();
+    tx
+        .sign(LocalAccount::generate(&mut r).private_key(), sender.public_key().clone())
+        .expect("signing a txn can't fail")
+        .into_inner()
+}
+
 pub async fn get_event_from_transaction(
     transaction: Transaction,
     event_type: MoveType,
@@ -45,7 +64,6 @@ pub async fn get_event_from_transaction(
     let event = match transaction {
         Transaction::UserTransaction(txn) => {
             txn.events.into_iter().find(|s| {
-                eprintln!("s.typ = {:#?}", s.typ);
                 s.typ == event_type
             })
         }
