@@ -20,7 +20,8 @@ pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::R
             ),
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
-    let txd = config.client.submit_and_wait(&tx).await?.into_inner().transaction_info().unwrap().hash;
-    println!("Init Fri Group {}", txd);
+    let transaction_info = config.client.submit_and_wait(&tx).await?.into_inner().transaction_info().unwrap().clone();
+    let txd = transaction_info.hash;
+    println!("init fri group {}; gas used {}", txd.clone(), transaction_info.gas_used);
     Ok(HashValue::from(txd))
 }

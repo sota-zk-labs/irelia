@@ -2,7 +2,7 @@ use anyhow::Error;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::{MoveValue, serialize_values};
-use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
+use aptos_sdk::types::transaction::{EntryFunction, SignedTransaction, TransactionPayload};
 
 use crate::config::AppConfig;
 use crate::contracts::helper::{build_simulated_transaction, build_transaction, str_to_u256};
@@ -11,6 +11,8 @@ use crate::contracts::vm_status::VmStatus;
 use crate::error::CoreError::TransactionNotSucceed;
 
 pub async fn verify_merkle(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer, root_hash: &str) -> anyhow::Result<bool> {
+    let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles + 1);
+
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
             ModuleId::new(config.module_address, Identifier::new("merkle_verifier").unwrap()),
@@ -24,8 +26,7 @@ pub async fn verify_merkle(loop_cycles: usize, config: &AppConfig, data: &Comput
             ),
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
-    let init_transaction = config.client.submit(&tx).await.unwrap().into_inner();
-    eprintln!("sent init_verify_merkle = {:#?}", init_transaction.hash.to_string());
+    txs.push(("init_verify_merkle".to_string(), tx));
 
     let params = serialize_values(
         &vec![
@@ -42,21 +43,40 @@ pub async fn verify_merkle(loop_cycles: usize, config: &AppConfig, data: &Comput
             params,
         ));
 
-    let mut txs = vec![];
     for i in 0..loop_cycles {
         let tx = build_transaction(payload.clone(), &config.account, config.chain_id);
-        let transaction = config.client.submit(&tx).await.unwrap().into_inner();
-        eprintln!("sent verify merkle {}: {:#?}", i, transaction.hash.to_string());
-        txs.push(transaction);
+        txs.push((format!("sent verify merkle {}", i).to_string(), tx));
     }
 
+    let pending_transactions = txs.into_iter().map(|(name, transaction)| {
+        let client = config.client.clone();
+        tokio::spawn(async move {
+            let init_transaction = client.submit(&transaction).await.unwrap().into_inner();
+            eprintln!("sent {} = {:#?}", name, init_transaction.hash.to_string());
+            (name, init_transaction)
+        })
+    }).collect::<Vec<_>>();
 
-    let init_transaction = config.client.wait_for_transaction(&init_transaction).await.unwrap().into_inner();
-    eprintln!("finished init_verify_merkle: {:#?}", init_transaction.transaction_info().unwrap().hash.to_string());
+    let mut results = Vec::with_capacity(pending_transactions.len());
+    for handle in pending_transactions {
+        results.push(handle.await.unwrap());
+    }
 
-    for i in 0..loop_cycles {
-        let transaction = config.client.wait_for_transaction(txs.get(i).unwrap()).await.unwrap().into_inner();
-        eprintln!("finished verify merkle {}: {:#?}", i, transaction.transaction_info().unwrap().hash.to_string());
+    let results = results.into_iter().map(|(name, pending_transaction)| {
+        let client = config.client.clone();
+        tokio::spawn(async move {
+            let transaction = client.wait_for_transaction(&pending_transaction).await.unwrap().into_inner();
+            let transaction_info = transaction.transaction_info().unwrap();
+            eprintln!("finished {} {:#?}; gas used: {}",
+                      name,
+                      transaction_info.hash.to_string(),
+                      transaction_info.gas_used,
+            );
+        })
+    }).collect::<Vec<_>>();
+
+    for handle in results {
+        handle.await.unwrap();
     }
 
     let tx = build_simulated_transaction(payload.clone(), &config.account, config.chain_id);
