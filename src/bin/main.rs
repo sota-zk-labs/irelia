@@ -44,7 +44,6 @@ async fn main() -> anyhow::Result<()> {
         eprintln!("something went wrong!");
         return Ok(());
     }
-    eprintln!("true = {:#?}", true);
 
     let count_verify_merkle_cycles_request = config.client.view(&ViewRequest {
         function: EntryFunctionId::from_str(format!("{}::merkle_verifier::count_verify_merkle_cycles", config.module_address).as_str()).unwrap(),

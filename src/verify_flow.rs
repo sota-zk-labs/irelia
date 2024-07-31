@@ -4,10 +4,9 @@ mod tests {
     use aptos_sdk::rest_client::aptos_api_types::Event;
     use crate::config::AppConfig;
     use crate::config::EnvConfig;
-    use crate::contracts::compute_next_layer::{compute_next_layer};
     use crate::contracts::helper::str_to_u256;
     use crate::contracts::init_fri_group::init_fri_group;
-    use crate::contracts::types::{ComputeNextLayer, InitFriGroup, VerifyMerkle};
+    use crate::contracts::types::{ComputeNextLayer, InitFriGroup};
     use crate::contracts::verify_fri::verify_fri;
     use crate::data_samples::sample_1::sample1;
 
