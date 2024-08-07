@@ -1,6 +1,8 @@
 use std::str::FromStr;
+
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
+
 use crate::contracts_caller::types::VerifyMerkleTransactionInput;
 
 pub fn verify_merkle_1() -> (VerifyMerkleTransactionInput) {

@@ -5,8 +5,8 @@ use aptos_sdk::move_types::value::{MoveValue, serialize_values};
 use aptos_sdk::types::transaction::{EntryFunction, SignedTransaction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts_caller::helper::{build_simulated_transaction, build_transaction, str_to_u256};
-use crate::contracts_caller::types::{ComputeNextLayer, VerifyMerkle};
+use crate::contracts_caller::helper::{build_simulated_transaction, build_transaction};
+use crate::contracts_caller::types::VerifyMerkle;
 use crate::contracts_caller::vm_status::VmStatus;
 use crate::error::CoreError::TransactionNotSucceed;
 
