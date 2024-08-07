@@ -4,8 +4,8 @@ use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::serialize_values;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use crate::config::AppConfig;
-use crate::contracts::helper::{build_transaction};
-use crate::contracts::types::InitFriGroup;
+use crate::contracts_caller::helper::{build_transaction};
+use crate::contracts_caller::types::InitFriGroup;
 
 pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::Result<HashValue> {
     let payload = TransactionPayload::EntryFunction(

@@ -1,50 +1,52 @@
+use anyhow::Error;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::{MoveValue, serialize_values};
 use aptos_sdk::types::transaction::{EntryFunction, SignedTransaction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts::helper::{build_simulated_transaction, build_transaction};
-use crate::contracts::types::ComputeNextLayer;
-use crate::contracts::vm_status::VmStatus;
+use crate::contracts_caller::helper::{build_simulated_transaction, build_transaction, str_to_u256};
+use crate::contracts_caller::types::{ComputeNextLayer, VerifyMerkle};
+use crate::contracts_caller::vm_status::VmStatus;
+use crate::error::CoreError::TransactionNotSucceed;
 
-pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer) -> Result<(), ()> {
+pub async fn verify_merkle(loop_cycles: usize, config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<bool> {
     let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles + 1);
 
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
-            ModuleId::new(config.module_address, Identifier::new("fri_layer").unwrap()),
-            Identifier::new("init_compute_next_layer").unwrap(),
-            vec![],
-            serialize_values(
-                &vec![
-                    MoveValue::U256(data.fri_queue_ptr.clone()),
-                    MoveValue::U256(data.merkle_queue_ptr.clone()),
-                    MoveValue::U256(data.n_queries.clone()),
-                ]
-            ),
-        ));
-    let tx = build_transaction(payload, &config.account, config.chain_id);
-    txs.push(("init_compute_next_layer".to_string(), tx));
-
-    let payload = TransactionPayload::EntryFunction(
-        EntryFunction::new(
-            ModuleId::new(config.module_address, Identifier::new("fri_layer").unwrap()),
-            Identifier::new("compute_next_layer").unwrap(),
+            ModuleId::new(config.module_address, Identifier::new("merkle_verifier").unwrap()),
+            Identifier::new("init_verify_merkle").unwrap(),
             vec![],
             serialize_values(
                 &vec![
                     MoveValue::U256(data.channel_ptr.clone()),
-                    MoveValue::U256(data.fri_ctx.clone()),
-                    MoveValue::U256(data.evaluation_point.clone()),
-                    MoveValue::U256(data.fri_coset_size.clone()),
+                    MoveValue::U256(data.merkle_queue_ptr.clone()),
                 ]
             ),
+        ));
+    let tx = build_transaction(payload, &config.account, config.chain_id);
+    txs.push(("init_verify_merkle".to_string(), tx));
+
+    let params = serialize_values(
+        &vec![
+            MoveValue::U256(data.channel_ptr.clone()),
+            MoveValue::U256(data.merkle_queue_ptr.clone()),
+            MoveValue::U256(data.expected_root.clone()),
+            MoveValue::U256(data.n_queries.clone()),
+        ]
+    );
+    let payload = TransactionPayload::EntryFunction(
+        EntryFunction::new(
+            ModuleId::new(config.module_address, Identifier::new("merkle_verifier").unwrap()),
+            Identifier::new("verify_merkle").unwrap(),
+            vec![],
+            params,
         ));
 
     for i in 0..loop_cycles {
         let tx = build_transaction(payload.clone(), &config.account, config.chain_id);
-        txs.push((format!("compute next layer {}", i).to_string(), tx));
+        txs.push((format!("sent verify merkle {}", i).to_string(), tx));
     }
 
     let pending_transactions = txs.into_iter().map(|(name, transaction)| {
@@ -77,31 +79,19 @@ pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &C
     for handle in results {
         handle.await.unwrap();
     }
-    Ok(())
-}
 
-pub async fn simulate_compute_next_layer(config: &AppConfig, data: &ComputeNextLayer) -> anyhow::Result<bool> {
-    let payload = TransactionPayload::EntryFunction(
-        EntryFunction::new(
-            ModuleId::new(config.module_address, Identifier::new("fri_layer").unwrap()),
-            Identifier::new("compute_next_layer").unwrap(),
-            vec![],
-            serialize_values(
-                &vec![
-                    MoveValue::U256(data.channel_ptr.clone()),
-                    MoveValue::U256(data.fri_ctx.clone()),
-                    MoveValue::U256(data.evaluation_point.clone()),
-                    MoveValue::U256(data.fri_coset_size.clone()),
-                ]
-            ),
-        ));
-    let tx = build_simulated_transaction(payload, &config.account, config.chain_id);
-    let simulate = config.client.simulate(&tx).await?.into_inner();
+    let tx = build_simulated_transaction(payload.clone(), &config.account, config.chain_id);
+    let simulate = config.client.simulate(&tx).await.unwrap().into_inner();
+    if simulate.get(0).unwrap().info.success {
+        return Ok(false);
+    }
+
     let vm_status = simulate.get(0).unwrap().info.vm_status.as_str();
     let vm_status: VmStatus = vm_status.try_into()?;
-    if vm_status.reason == "ECOMPUTE_NEXT_LAYER_NOT_INITIATED" {
-        println!("compute_next_layer check passes");
+    if vm_status.reason == "EVERIFY_MERKLE_NOT_INITIATED" {
+        println!("verify_merkle check passes");
         return Ok(true);
     }
-    Ok(false)
+
+    return Err(Error::new(TransactionNotSucceed(format!("{}", vm_status).to_string())));
 }

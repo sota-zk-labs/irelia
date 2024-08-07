@@ -1,9 +1,9 @@
 use std::str::FromStr;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
-use crate::contracts::types::VerifyTransactionInput;
+use crate::contracts_caller::types::VerifyFriTransactionInput;
 
-pub fn sample1() -> (VerifyTransactionInput, String) {
+pub fn sample1() -> (VerifyFriTransactionInput, String) {
     let proof_data = MoveValue::Vector(
         vec![
             MoveValue::U256(U256::from_str("732760739612308100049906584047157783110714348888046202826270876912749598168").unwrap()),
@@ -253,7 +253,7 @@ pub fn sample1() -> (VerifyTransactionInput, String) {
         MoveValue::U256(U256::from_str("0").unwrap()),
     ]);
 
-    (VerifyTransactionInput {
+    (VerifyFriTransactionInput {
         proof: proof_data,
         fri_queue,
         evaluation_point: MoveValue::U256(U256::from_str("1127319757609087129328200675198280716580310204088624481346247862057464086751").unwrap()),

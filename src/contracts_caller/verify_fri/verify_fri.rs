@@ -6,10 +6,10 @@ use aptos_sdk::move_types::value::serialize_values;
 use aptos_sdk::rest_client::aptos_api_types::{Event, MoveType};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use crate::config::AppConfig;
-use crate::contracts::helper::{build_transaction, get_event_from_transaction};
-use crate::contracts::types::VerifyTransactionInput;
+use crate::contracts_caller::helper::{build_transaction, get_event_from_transaction};
+use crate::contracts_caller::types::VerifyFriTransactionInput;
 
-pub async fn verify_fri(config: &AppConfig, data: VerifyTransactionInput) -> anyhow::Result<(Event, Event)> {
+pub async fn verify_fri(config: &AppConfig, data: VerifyFriTransactionInput) -> anyhow::Result<(Event, Event)> {
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
             ModuleId::new(config.module_address, Identifier::new("fri_statement").unwrap()),
