@@ -6,6 +6,7 @@ use crate::contracts_caller::helper::str_to_u256;
 use crate::error::CoreError;
 use crate::error::CoreError::PropertyNotFound;
 
+#[derive(Clone)]
 pub struct VerifyFriTransactionInput {
     pub proof: MoveValue,
     pub fri_queue: MoveValue,

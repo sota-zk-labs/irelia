@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "main" }
+aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
 once_cell = { version = "1.19.0" }
 tokio = { version = "1.39.1", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
@@ -14,9 +14,14 @@ dotenv = { version = "0.15.0" }
 color-eyre = { version = "0.6.1" }
 thiserror = { version = "1.0.63" }
 rand_core = { version = "0.5.1" }
-regex = { version = "1.10.5" }
+regex = { version = "1.10.6" }
 serde_json = { version = "1.0.120" }
+serde = { version = "1.0.204", features = ["derive"] }
+lazy_static = "1.5.0"
+[dev-dependencies]
+aptos-testcontainer = {git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master" }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
 x25519-dalek = { git = "https://github.com/Tranduy1dol/x25519-dalek", branch = "zeroize_v1.7" }
+
