@@ -3,15 +3,12 @@ use std::str::FromStr;
 use aptos_sdk::rest_client::aptos_api_types::{EntryFunctionId, ViewRequest};
 
 use verifier_onchain_services::config::{AppConfig, EnvConfig};
-use verifier_onchain_services::contracts_caller::verify_fri::compute_next_layer::{compute_next_layer, simulate_compute_next_layer};
-use verifier_onchain_services::contracts_caller::verify_fri::init_fri_group::init_fri_group;
-use verifier_onchain_services::contracts_caller::types::{ComputeNextLayer, InitFriGroup, RegisterFactVerifyMerkle, VerifyMerkle};
-use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
+use verifier_onchain_services::contracts_caller::types::{RegisterFactVerifyMerkle, VerifyMerkle};
 use verifier_onchain_services::contracts_caller::verify_fri::verify_merkle::verify_merkle;
 use verifier_onchain_services::contracts_caller::verify_merkle::merkle_statement::verify_merkle_statement;
 use verifier_onchain_services::contracts_caller::verify_merkle::register_fact_merkle::register_fact_merkle;
-use verifier_onchain_services::data_samples::sample_1::sample1;
 use verifier_onchain_services::data_samples::merkle_verify::merkle_verify_1::verify_merkle_1;
+
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
