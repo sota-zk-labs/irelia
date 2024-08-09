@@ -7,8 +7,8 @@ use aptos_sdk::rest_client::aptos_api_types::{Event, MoveType};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts_caller::helper::{build_transaction, get_event_from_transaction};
-use crate::contracts_caller::types::VerifyMerkleTransactionInput;
+use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
+use crate::contracts_caller::verify_merkle::types::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle_statement(config: &AppConfig, data: VerifyMerkleTransactionInput) -> anyhow::Result<(Event, Event)> {
     let payload = TransactionPayload::EntryFunction(
