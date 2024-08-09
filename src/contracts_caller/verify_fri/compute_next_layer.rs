@@ -2,14 +2,15 @@ use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::{MoveValue, serialize_values};
 use aptos_sdk::types::transaction::{EntryFunction, SignedTransaction, TransactionPayload};
+use tokio::task::JoinHandle;
 
 use crate::config::AppConfig;
-use crate::contracts_caller::helper::{build_simulated_transaction, build_transaction};
-use crate::contracts_caller::types::ComputeNextLayer;
+use crate::contracts_caller::transaction_helper::{build_simulated_transaction, build_transaction};
+use crate::contracts_caller::verify_fri::types::ComputeNextLayer;
 use crate::contracts_caller::vm_status::VmStatus;
 
-pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer) -> Result<(), ()> {
-    let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles + 1);
+pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer) -> anyhow::Result<()> {
+    let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles);
 
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
@@ -60,8 +61,7 @@ pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &C
     for handle in pending_transactions {
         results.push(handle.await.unwrap());
     }
-
-    let results = results.into_iter().map(|(name, pending_transaction)| {
+    let results: Vec<JoinHandle<_>> = results.into_iter().map(|(name, pending_transaction)| {
         let client = config.client.clone();
         tokio::spawn(async move {
             let transaction = client.wait_for_transaction(&pending_transaction).await.unwrap().into_inner();
@@ -71,11 +71,15 @@ pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &C
                       transaction_info.hash.to_string(),
                       transaction_info.gas_used,
             );
+            transaction
         })
-    }).collect::<Vec<_>>();
+    }).collect();
+
+    let mut transactions = Vec::new();
 
     for handle in results {
-        handle.await.unwrap();
+        let transaction = handle.await.unwrap();
+        transactions.push(transaction);
     }
     Ok(())
 }

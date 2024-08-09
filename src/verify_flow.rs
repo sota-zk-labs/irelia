@@ -4,75 +4,36 @@ mod tests {
     use std::fs::File;
     use std::io::BufReader;
     use std::str::FromStr;
-    use std::sync::Arc;
 
     use aptos_sdk::move_types::u256::U256;
     use aptos_sdk::move_types::value::MoveValue;
     use aptos_sdk::rest_client::aptos_api_types::{EntryFunctionId, ViewRequest};
     use aptos_sdk::types::LocalAccount;
-    use aptos_testcontainer::aptos_container::AptosContainer;
-    use lazy_static::lazy_static;
-    use serde::Deserialize;
-    use tokio::sync::Mutex;
+    use aptos_testcontainer::test_config::aptos_container_test::lazy_aptos_container;
 
     use crate::config::AppConfig;
     use crate::config::EnvConfig;
-    use crate::contracts_caller::types::{ComputeNextLayer, InitFriGroup, RegisterFactVerifyMerkle, VerifyFriTransactionInput, VerifyMerkle, VerifyMerkleTransactionInput};
+    use crate::contracts_caller::types::VerifyMerkle;
     use crate::contracts_caller::verify_fri::compute_next_layer::{compute_next_layer, simulate_compute_next_layer};
     use crate::contracts_caller::verify_fri::init_fri_group::init_fri_group;
+    use crate::contracts_caller::verify_fri::register_fact_fri::register_fact_fri;
+    use crate::contracts_caller::verify_fri::types::{ComputeNextLayer, FriVerifyInput, InitFriGroup, RegisterFactVerifyFri, VerifyFriTransactionInput};
     use crate::contracts_caller::verify_fri::verify_fri::verify_fri;
     use crate::contracts_caller::verify_fri::verify_merkle::verify_merkle;
     use crate::contracts_caller::verify_merkle::merkle_statement::verify_merkle_statement;
     use crate::contracts_caller::verify_merkle::register_fact_merkle::register_fact_merkle;
+    use crate::contracts_caller::verify_merkle::types::{MerkleVerifyInput, RegisterFactVerifyMerkle, VerifyMerkleTransactionInput};
 
-    #[derive(Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    struct MerkleVerifyInput {
-        merkle_view: Vec<String>,
-        initial_merkle_queue: Vec<String>,
-        height: String,
-        expected_root: String,
-    }
-
-    #[derive(Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    struct FriVerifyInput {
-        proof: Vec<String>,
-        fri_queue: Vec<String>,
-        evaluation_point: String,
-        fri_step_size: String,
-        expected_root: String,
-    }
-
-
-    lazy_static! {
-        static ref APTOS_CONTAINER: Arc<Mutex<Option<AptosContainer>>> = Arc::new(Mutex::new(None));
-    }
-
-    async fn init_aptos_container() {
-        let mut container = APTOS_CONTAINER.lock().await;
-        if container.is_none() {
-            let aptos_container = AptosContainer::init().await.unwrap();
-            *container = Some(aptos_container);
-        };
-    }
     #[tokio::test]
     pub async fn test_a() -> anyhow::Result<()> {
-        init_aptos_container().await;
-        let module_account = LocalAccount::from_private_key("0x73791ce34b2414d4afcb87561b0c442e48a3260f1c96de31da80f7cf2eec8113", 0).unwrap();
-        let sender_account = LocalAccount::from_private_key("0xa7599766d8aaace6959eb7e315c1c76af44276641dff8912c9356e3d0799c80d", 0).unwrap();
+        let aptos_container = lazy_aptos_container().await.unwrap();
 
-        let aptos_container = APTOS_CONTAINER.lock().await;
-        let aptos_container = aptos_container.as_ref().unwrap();
+        let node_url = aptos_container.get_node_url().await.unwrap();
+        let sender_account = LocalAccount::from_private_key("0xa7599766d8aaace6959eb7e315c1c76af44276641dff8912c9356e3d0799c80d", 0).unwrap();
+        let module_account = LocalAccount::from_private_key("0x73791ce34b2414d4afcb87561b0c442e48a3260f1c96de31da80f7cf2eec8113", 0).unwrap();
 
         aptos_container.faucet(&module_account).await.unwrap();
         aptos_container.faucet(&sender_account).await.unwrap();
-
-
-        let mut named_addresses = HashMap::new();
-        named_addresses.insert("verifier_addr".to_string(), module_account.address().to_string());
-        aptos_container.upload_contract("./contract-sample/navori", &module_account, &named_addresses).await.unwrap();
-        let node_url = aptos_container.get_node_url().await.unwrap();
 
         let config = AppConfig::from(EnvConfig {
             node_url,
@@ -80,8 +41,14 @@ mod tests {
             module_address: module_account.address().to_string(),
             chain_id: "4".to_string(),
         });
+
         let sequence_number = config.client.get_account(config.account.address()).await?.into_inner().sequence_number;
         config.account.set_sequence_number(sequence_number);
+
+        let mut named_addresses = HashMap::new();
+        named_addresses.insert("verifier_addr".to_string(), module_account.address().to_string());
+        aptos_container.upload_contract("./contract-sample/navori", &module_account, &named_addresses, true).await.unwrap();
+
 
         for i in 1..4 {
             let file_path = format!("./src/data_samples/merkle_verify/merkle_verify_{}.json", i);
@@ -106,7 +73,7 @@ mod tests {
                 (merkle_view, initial_merkle_queue, height, expected_root)
             };
             let (merkle_view, initial_merkle_queue, height, expected_root) = verify_merkle_input();
-            let verify_merkle_input: VerifyMerkleTransactionInput = VerifyMerkleTransactionInput {
+            let verify_merkle_input = VerifyMerkleTransactionInput {
                 merkle_view,
                 initial_merkle_queue,
                 height,
@@ -168,7 +135,7 @@ mod tests {
                 (proof, fri_queue, evaluation_point, fri_step_size, expected_root)
             };
             let (proof, fri_queue, evaluation_point, fri_step_size, expected_root) = verify_fri_input();
-            let verify_merkle_input: VerifyFriTransactionInput = VerifyFriTransactionInput {
+            let verify_merkle_input = VerifyFriTransactionInput {
                 proof,
                 fri_queue,
                 evaluation_point,
@@ -176,11 +143,12 @@ mod tests {
                 expected_root,
             };
 
-            let (event_init, event_compute) = verify_fri(&config, verify_merkle_input.clone()).await?;
+            let (event_init, event_compute, event_register) = verify_fri(&config, verify_merkle_input.clone()).await?;
 
             let input_init: InitFriGroup = event_init.try_into()?;
-
             let input_compute: ComputeNextLayer = event_compute.clone().try_into()?;
+            let input_register: RegisterFactVerifyFri = event_register.try_into()?;
+
             init_fri_group(&config, input_init).await?;
 
             let count_next_layer_cycles_request = config.client.view(&ViewRequest {
@@ -198,7 +166,7 @@ mod tests {
             let next_layer_cycles = count_next_layer_cycles_request.into_inner().remove(0).as_str().unwrap().parse::<usize>().unwrap();
             eprintln!("next_layer_cycles = {:#?}", next_layer_cycles);
 
-            compute_next_layer(next_layer_cycles, &config, &input_compute).await.unwrap();
+            compute_next_layer(next_layer_cycles, &config, &input_compute).await?;
             if !simulate_compute_next_layer(&config, &input_compute).await.unwrap() {
                 eprintln!("something went wrong!");
                 return Ok(());
@@ -229,9 +197,13 @@ mod tests {
                 return Ok(());
             }
 
+            if !register_fact_fri(&config, input_register, input_compute.n_queries).await? {
+                eprintln!("something went wrong!");
+                return Ok(());
+            }
+
             eprintln!("verify success! {}", i);
         }
-
 
         Ok(())
     }

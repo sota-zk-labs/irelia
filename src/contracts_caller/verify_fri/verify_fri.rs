@@ -7,10 +7,10 @@ use aptos_sdk::rest_client::aptos_api_types::{Event, MoveType};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
-use crate::contracts_caller::helper::{build_transaction, get_event_from_transaction};
-use crate::contracts_caller::types::VerifyFriTransactionInput;
+use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
+use crate::contracts_caller::verify_fri::types::VerifyFriTransactionInput;
 
-pub async fn verify_fri(config: &AppConfig, data: VerifyFriTransactionInput) -> anyhow::Result<(Event, Event)> {
+pub async fn verify_fri(config: &AppConfig, data: VerifyFriTransactionInput) -> anyhow::Result<(Event, Event, Event)> {
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
             ModuleId::new(config.module_address, Identifier::new("fri_statement_contract").unwrap()),
@@ -28,12 +28,22 @@ pub async fn verify_fri(config: &AppConfig, data: VerifyFriTransactionInput) -> 
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
+
     let event_type = MoveType::from_str(&format!("{}::fri_statement_contract::FriCtx", config.module_address)).unwrap();
     let fri_ctx_data = get_event_from_transaction(transaction.clone(), event_type).await?;
+
     let compute_next_layer_event_type = MoveType::from_str(&format!("{}::fri_statement_contract::ComputeNextLayer", config.module_address)).unwrap();
     let compute_next_layer_data = get_event_from_transaction(
-        transaction,
+        transaction.clone(),
         compute_next_layer_event_type,
     ).await?;
-    Ok((fri_ctx_data, compute_next_layer_data))
+
+    let register_fact_event_type = MoveType::from_str(&format!("{}::fri_statement_contract::RegisterFactVerifyFri", config.module_address)).unwrap();
+    let register_fact_data = get_event_from_transaction(
+        transaction,
+        register_fact_event_type,
+    ).await?;
+
+
+    Ok((fri_ctx_data, compute_next_layer_data, register_fact_data))
 }

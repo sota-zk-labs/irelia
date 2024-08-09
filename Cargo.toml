@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "devnet" }
+aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
 once_cell = { version = "1.19.0" }
 tokio = { version = "1.39.1", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
@@ -17,7 +17,7 @@ rand_core = { version = "0.5.1" }
 regex = { version = "1.10.6" }
 serde_json = { version = "1.0.120" }
 serde = { version = "1.0.204", features = ["derive"] }
-lazy_static = "1.5.0"
+lazy_static = "1.4.0"
 [dev-dependencies]
 aptos-testcontainer = {git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master" }
 
