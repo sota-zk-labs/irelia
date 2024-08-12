@@ -6,7 +6,7 @@ use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::verify_fri::types::InitFriGroup;
+use crate::contracts_caller::verify_fri::types::init_fri_group::InitFriGroup;
 
 pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::Result<HashValue> {
     let payload = TransactionPayload::EntryFunction(

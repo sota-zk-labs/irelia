@@ -13,6 +13,7 @@ use rand_core::OsRng;
 
 use crate::error::CoreError;
 
+#[inline]
 pub fn str_to_u256(s: &str) -> Result<U256, CoreError> {
     U256::from_str(s).map_err(|e| e.into())
 }
@@ -26,7 +27,7 @@ pub fn build_transaction(payload: TransactionPayload, sender: &LocalAccount, cha
     )
         .sender(sender.address())
         .sequence_number(i)
-        .max_gas_amount(100000)
+        .max_gas_amount(30000)
         .gas_unit_price(100)
         .build();
     sender.sign_transaction(tx)
@@ -51,13 +52,13 @@ pub fn build_simulated_transaction(payload: TransactionPayload, sender: &LocalAc
         .into_inner()
 }
 
-pub async fn get_event_from_transaction(
-    transaction: Transaction,
+pub fn get_event_from_transaction(
+    transaction: &Transaction,
     event_type: MoveType,
-) -> anyhow::Result<Event> {
+) -> anyhow::Result<&Event> {
     let event = match transaction {
         Transaction::UserTransaction(txn) => {
-            txn.events.into_iter().find(|s| {
+            txn.events.iter().find(|s| {
                 s.typ == event_type
             })
         }

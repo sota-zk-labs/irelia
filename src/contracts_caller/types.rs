@@ -25,12 +25,3 @@ impl TryInto<VerifyMerkle> for Event {
         })
     }
 }
-
-
-
-
-
-
-
-
-

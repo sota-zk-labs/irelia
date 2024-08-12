@@ -10,7 +10,7 @@ use crate::contracts_caller::types::VerifyMerkle;
 use crate::contracts_caller::vm_status::VmStatus;
 use crate::error::CoreError::TransactionNotSucceed;
 
-pub async fn verify_merkle(loop_cycles: usize, config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<bool> {
+pub async fn merkle_verifier(loop_cycles: usize, config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<bool> {
     let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles + 1);
 
     let payload = TransactionPayload::EntryFunction(

@@ -60,4 +60,3 @@ impl From<EnvConfig> for AppConfig {
         }
     }
 }
-

@@ -1,61 +1,9 @@
 use aptos_sdk::move_types::u256::U256;
-use aptos_sdk::move_types::value::MoveValue;
 use aptos_sdk::rest_client::aptos_api_types::Event;
-use serde::Deserialize;
+
 use crate::contracts_caller::transaction_helper::str_to_u256;
 use crate::error::CoreError;
 use crate::error::CoreError::PropertyNotFound;
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FriVerifyInput {
-    pub proof: Vec<String>,
-    pub fri_queue: Vec<String>,
-    pub evaluation_point: String,
-    pub fri_step_size: String,
-    pub expected_root: String,
-}
-
-#[derive(Clone)]
-pub struct VerifyFriTransactionInput {
-    pub proof: MoveValue,
-    pub fri_queue: MoveValue,
-    pub evaluation_point: MoveValue,
-    pub fri_step_size: MoveValue,
-    pub expected_root: MoveValue,
-}
-
-#[derive(Debug)]
-pub struct RegisterFactVerifyFri{
-    pub data_to_hash: U256,
-    pub fri_queue_ptr: U256
-}
-
-impl TryInto<RegisterFactVerifyFri> for Event {
-    type Error = CoreError;
-
-    fn try_into(self) -> Result<RegisterFactVerifyFri, Self::Error> {
-        Ok(RegisterFactVerifyFri {
-            data_to_hash: str_to_u256(self.data.get("data_to_hash").ok_or(PropertyNotFound)?.as_str().unwrap())?,
-            fri_queue_ptr: str_to_u256(self.data.get("fri_queue_ptr").ok_or(PropertyNotFound)?.as_str().unwrap())?,
-        })
-    }
-}
-
-#[derive(Debug)]
-pub struct InitFriGroup {
-    pub fri_ctx: MoveValue,
-}
-
-impl TryInto<InitFriGroup> for Event {
-    type Error = CoreError;
-
-    fn try_into(self) -> Result<InitFriGroup, Self::Error> {
-        Ok(InitFriGroup {
-            fri_ctx: MoveValue::U256(str_to_u256(self.data.get("fri_ctx").ok_or(PropertyNotFound)?.as_str().unwrap())?),
-        })
-    }
-}
 
 #[derive(Debug)]
 pub struct ComputeNextLayer {

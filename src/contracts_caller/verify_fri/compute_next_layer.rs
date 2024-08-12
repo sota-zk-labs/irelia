@@ -6,8 +6,10 @@ use tokio::task::JoinHandle;
 
 use crate::config::AppConfig;
 use crate::contracts_caller::transaction_helper::{build_simulated_transaction, build_transaction};
-use crate::contracts_caller::verify_fri::types::ComputeNextLayer;
+use crate::contracts_caller::verify_fri::types::compute_next_layer::ComputeNextLayer;
 use crate::contracts_caller::vm_status::VmStatus;
+
+const ECOMPUTE_NEXT_LAYER_NOT_INITIATED: &str = "ECOMPUTE_NEXT_LAYER_NOT_INITIATED";
 
 pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer) -> anyhow::Result<()> {
     let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles);
@@ -103,8 +105,7 @@ pub async fn simulate_compute_next_layer(config: &AppConfig, data: &ComputeNextL
     let simulate = config.client.simulate(&tx).await?.into_inner();
     let vm_status = simulate.get(0).unwrap().info.vm_status.as_str();
     let vm_status: VmStatus = vm_status.try_into()?;
-    if vm_status.reason == "ECOMPUTE_NEXT_LAYER_NOT_INITIATED" {
-        println!("compute_next_layer check passes");
+    if vm_status.reason == ECOMPUTE_NEXT_LAYER_NOT_INITIATED {
         return Ok(true);
     }
     Ok(false)

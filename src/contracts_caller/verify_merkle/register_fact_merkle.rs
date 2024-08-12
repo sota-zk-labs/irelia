@@ -5,7 +5,7 @@ use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::verify_merkle::types::RegisterFactVerifyMerkle;
+use crate::contracts_caller::verify_merkle::types::register_fact_verify_merkle::RegisterFactVerifyMerkle;
 
 pub async fn register_fact_merkle(config: &AppConfig, data: RegisterFactVerifyMerkle) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(

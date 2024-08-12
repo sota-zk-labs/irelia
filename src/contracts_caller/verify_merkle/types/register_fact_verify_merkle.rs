@@ -1,28 +1,8 @@
 use aptos_sdk::move_types::u256::U256;
-use aptos_sdk::move_types::value::MoveValue;
 use aptos_sdk::rest_client::aptos_api_types::Event;
-use serde::Deserialize;
 use crate::contracts_caller::transaction_helper::str_to_u256;
 use crate::error::CoreError;
 use crate::error::CoreError::PropertyNotFound;
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MerkleVerifyInput {
-    pub merkle_view: Vec<String>,
-    pub initial_merkle_queue: Vec<String>,
-    pub height: String,
-    pub expected_root: String,
-}
-
-
-pub struct VerifyMerkleTransactionInput {
-    pub merkle_view: MoveValue,
-    pub initial_merkle_queue: MoveValue,
-    pub height: MoveValue,
-    pub expected_root: MoveValue,
-}
-
 
 #[derive(Debug)]
 pub struct RegisterFactVerifyMerkle{

@@ -24,5 +24,4 @@ pub enum CoreError {
 
     #[error("property not found")]
     PropertyNotFound,
-
 }

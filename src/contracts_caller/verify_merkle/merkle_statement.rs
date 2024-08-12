@@ -8,7 +8,7 @@ use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
-use crate::contracts_caller::verify_merkle::types::VerifyMerkleTransactionInput;
+use crate::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle_statement(config: &AppConfig, data: VerifyMerkleTransactionInput) -> anyhow::Result<(Event, Event)> {
     let payload = TransactionPayload::EntryFunction(
@@ -29,15 +29,15 @@ pub async fn verify_merkle_statement(config: &AppConfig, data: VerifyMerkleTrans
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let verify_merkle_event_type = MoveType::from_str(&format!("{}::merkle_statement_contract::VerifyMerkle", config.module_address)).unwrap();
     let verify_merkle_data = get_event_from_transaction(
-        transaction.clone(),
+        &transaction,
         verify_merkle_event_type,
-    ).await?;
+    )?.clone();
 
     let register_fact_event_type = MoveType::from_str(&format!("{}::merkle_statement_contract::RegisterFactVerifyMerkle", config.module_address)).unwrap();
     let register_fact_data = get_event_from_transaction(
-        transaction,
+        &transaction,
         register_fact_event_type,
-    ).await?;
+    )?.clone();
 
     Ok((verify_merkle_data, register_fact_data))
 }

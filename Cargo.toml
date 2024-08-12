@@ -18,8 +18,9 @@ regex = { version = "1.10.6" }
 serde_json = { version = "1.0.120" }
 serde = { version = "1.0.204", features = ["derive"] }
 lazy_static = "1.4.0"
+
 [dev-dependencies]
-aptos-testcontainer = {git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master" }
+aptos-testcontainer = {git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master", features = ["testing"] }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

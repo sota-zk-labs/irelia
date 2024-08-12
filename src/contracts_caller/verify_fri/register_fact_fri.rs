@@ -6,7 +6,7 @@ use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::verify_fri::types::RegisterFactVerifyFri;
+use crate::contracts_caller::verify_fri::types::register_fact_verify_fri::RegisterFactVerifyFri;
 
 pub async fn register_fact_fri(config: &AppConfig, data: RegisterFactVerifyFri, n_queries: U256) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(
@@ -24,7 +24,7 @@ pub async fn register_fact_fri(config: &AppConfig, data: RegisterFactVerifyFri, 
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
-    let vm_status = transaction.success();
+    let transaction_status = transaction.success();
     eprintln!("transaction register_fact_verify_fri = {:#?}", transaction.transaction_info().unwrap().hash.to_string());
-    Ok(vm_status)
+    Ok(transaction_status)
 }
