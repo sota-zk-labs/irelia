@@ -27,6 +27,10 @@ pub async fn verify_merkle_statement(config: &AppConfig, data: VerifyMerkleTrans
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
+    let transaction_info = transaction.transaction_info().unwrap();
+    eprintln!("finished verify_merkle_statement {}; gas used: {}",transaction_info.hash.to_string(),
+              transaction_info.gas_used);
+
     let verify_merkle_event_type = MoveType::from_str(&format!("{}::merkle_statement_contract::VerifyMerkle", config.module_address)).unwrap();
     let verify_merkle_data = get_event_from_transaction(
         &transaction,
