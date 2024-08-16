@@ -31,5 +31,5 @@ pub async fn merkle_verifier(config: &AppConfig, data: &VerifyMerkle) -> anyhow:
     let transaction_info = transaction.transaction_info().unwrap();
     eprintln!("finished verify_merkle {}; gas used: {}", transaction_info.hash.to_string(),
               transaction_info.gas_used);
-    Ok(true)
+    Ok(transaction_info.success)
 }

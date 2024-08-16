@@ -6,7 +6,6 @@ mod tests {
     use aptos_sdk::types::chain_id::NamedChain::TESTING;
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
-    use tokio::time::Instant;
 
     use crate::config::AppConfig;
     use crate::config::EnvConfig;
@@ -42,6 +41,7 @@ mod tests {
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("verifier_addr".to_string(), module_account.address().to_string());
                 aptos_container.upload_contract("contract-sample/navori", &module_account.private_key().to_encoded_string().unwrap(), &named_addresses, false).await.unwrap();
+
 
                 for i in 1..4 {
                     let (merkle_view, initial_merkle_queue, height, expected_root) = sample_verify_merkle_input(i).unwrap();

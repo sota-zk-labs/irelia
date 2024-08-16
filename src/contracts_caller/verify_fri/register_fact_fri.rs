@@ -24,9 +24,8 @@ pub async fn register_fact_fri(config: &AppConfig, data: RegisterFactVerifyFri, 
         ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
-    let transaction_status = transaction.success();
     let transaction_info = transaction.transaction_info().unwrap();
     eprintln!("finished register_fact_verify_fri {}; gas used: {}",transaction_info.hash.to_string(),
               transaction_info.gas_used);
-    Ok(transaction_status)
+    Ok(transaction.success())
 }

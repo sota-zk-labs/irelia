@@ -2,11 +2,10 @@ use std::str::FromStr;
 
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
-use aptos_sdk::rest_client::aptos_api_types::{EntryFunctionId, ViewRequest};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::types::VerifyMerkle;
-use crate::contracts_caller::verify_fri::compute_next_layer::{compute_next_layer, simulate_compute_next_layer};
+use crate::contracts_caller::verify_fri::compute_next_layer::compute_next_layer;
 use crate::contracts_caller::verify_fri::fri_statement::fri_statement;
 use crate::contracts_caller::verify_fri::init_fri_group::init_fri_group;
 use crate::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
@@ -38,14 +37,15 @@ pub async fn verify_fri(
     let input_compute: ComputeNextLayer = event_compute.clone().try_into()?;
     let input_register: RegisterFactVerifyFri = event_register.try_into()?;
 
-    init_fri_group(&config, input_init).await?;
-
-    compute_next_layer(1, &config, &input_compute).await?;
-    if !simulate_compute_next_layer(&config, &input_compute).await.unwrap() {
+    if !init_fri_group(&config, input_init).await? {
         eprintln!("something went wrong!");
         return Ok(());
     }
 
+    if !compute_next_layer(&config, &input_compute).await? {
+        eprintln!("something went wrong!");
+        return Ok(());
+    }
 
     let input_verify_merkle: VerifyMerkle = VerifyMerkle {
         channel_ptr: input_compute.channel_ptr,

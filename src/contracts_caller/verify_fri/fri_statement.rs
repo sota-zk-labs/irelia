@@ -29,6 +29,9 @@ pub async fn fri_statement(config: &AppConfig, data: VerifyFriTransactionInput) 
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
 
+    let transaction_info = transaction.transaction_info()?;
+    println!("finished fri statement: {}; gas used: {}", transaction_info.hash.to_string(), transaction_info.gas_used);
+
     let event_type = MoveType::from_str(&format!("{}::fri_statement_contract::FriCtx", config.module_address)).unwrap();
     let fri_ctx_data = get_event_from_transaction(&transaction, event_type)?.clone();
 

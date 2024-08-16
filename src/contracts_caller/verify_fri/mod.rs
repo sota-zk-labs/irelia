@@ -6,3 +6,4 @@ pub mod register_fact_fri;
 pub mod types;
 pub mod sample_verify_fri_input;
 pub mod verify_fri;
+mod fmul;

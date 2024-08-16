@@ -25,6 +25,6 @@ pub async fn register_fact_merkle(config: &AppConfig, data: RegisterFactVerifyMe
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let vm_status = transaction.success();
-    eprintln!("transaction register_fact_verify_merkle = {:#?}", transaction.transaction_info().unwrap().hash.to_string());
+    eprintln!("finished register_fact_verify_merkle = {:#?}", transaction.transaction_info().unwrap().hash.to_string());
     Ok(vm_status)
 }
