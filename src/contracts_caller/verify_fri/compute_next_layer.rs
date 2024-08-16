@@ -12,24 +12,6 @@ use crate::contracts_caller::vm_status::VmStatus;
 const ECOMPUTE_NEXT_LAYER_NOT_INITIATED: &str = "ECOMPUTE_NEXT_LAYER_NOT_INITIATED";
 
 pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &ComputeNextLayer) -> anyhow::Result<()> {
-    let mut txs: Vec<(String, SignedTransaction)> = Vec::with_capacity(loop_cycles);
-
-    let payload = TransactionPayload::EntryFunction(
-        EntryFunction::new(
-            ModuleId::new(config.module_address, Identifier::new("fri_layer").unwrap()),
-            Identifier::new("init_compute_next_layer").unwrap(),
-            vec![],
-            serialize_values(
-                &vec![
-                    MoveValue::U256(data.fri_queue_ptr.clone()),
-                    MoveValue::U256(data.merkle_queue_ptr.clone()),
-                    MoveValue::U256(data.n_queries.clone()),
-                ]
-            ),
-        ));
-    let tx = build_transaction(payload, &config.account, config.chain_id);
-    txs.push(("init_compute_next_layer".to_string(), tx));
-
     let payload = TransactionPayload::EntryFunction(
         EntryFunction::new(
             ModuleId::new(config.module_address, Identifier::new("fri_layer").unwrap()),
@@ -38,51 +20,20 @@ pub async fn compute_next_layer(loop_cycles: usize, config: &AppConfig, data: &C
             serialize_values(
                 &vec![
                     MoveValue::U256(data.channel_ptr.clone()),
+                    MoveValue::U256(data.fri_queue_ptr.clone()),
+                    MoveValue::U256(data.merkle_queue_ptr.clone()),
+                    MoveValue::U256(data.n_queries.clone()),
                     MoveValue::U256(data.fri_ctx.clone()),
                     MoveValue::U256(data.evaluation_point.clone()),
                     MoveValue::U256(data.fri_coset_size.clone()),
                 ]
             ),
         ));
-
-    for i in 0..loop_cycles {
-        let tx = build_transaction(payload.clone(), &config.account, config.chain_id);
-        txs.push((format!("compute next layer {}", i).to_string(), tx));
-    }
-
-    let pending_transactions = txs.into_iter().map(|(name, transaction)| {
-        let client = config.client.clone();
-        tokio::spawn(async move {
-            let init_transaction = client.submit(&transaction).await.unwrap().into_inner();
-            eprintln!("sent {} = {:#?}", name, init_transaction.hash.to_string());
-            (name, init_transaction)
-        })
-    }).collect::<Vec<_>>();
-
-    let mut results = Vec::with_capacity(pending_transactions.len());
-    for handle in pending_transactions {
-        results.push(handle.await.unwrap());
-    }
-    let results: Vec<JoinHandle<_>> = results.into_iter().map(|(name, pending_transaction)| {
-        let client = config.client.clone();
-        tokio::spawn(async move {
-            let transaction = client.wait_for_transaction(&pending_transaction).await.unwrap().into_inner();
-            let transaction_info = transaction.transaction_info().unwrap();
-            eprintln!("finished {} {:#?}; gas used: {}",
-                      name,
-                      transaction_info.hash.to_string(),
-                      transaction_info.gas_used,
-            );
-            transaction
-        })
-    }).collect();
-
-    let mut transactions = Vec::new();
-
-    for handle in results {
-        let transaction = handle.await.unwrap();
-        transactions.push(transaction);
-    }
+    let tx = build_transaction(payload, &config.account, config.chain_id);
+    let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
+    let transaction_info = transaction.transaction_info().unwrap();
+    println!("finished compute next layer {}; gas used: {}", transaction_info.hash.to_string(),
+             transaction_info.gas_used);
     Ok(())
 }
 
@@ -95,6 +46,9 @@ pub async fn simulate_compute_next_layer(config: &AppConfig, data: &ComputeNextL
             serialize_values(
                 &vec![
                     MoveValue::U256(data.channel_ptr.clone()),
+                    MoveValue::U256(data.fri_queue_ptr.clone()),
+                    MoveValue::U256(data.merkle_queue_ptr.clone()),
+                    MoveValue::U256(data.n_queries.clone()),
                     MoveValue::U256(data.fri_ctx.clone()),
                     MoveValue::U256(data.evaluation_point.clone()),
                     MoveValue::U256(data.fri_coset_size.clone()),

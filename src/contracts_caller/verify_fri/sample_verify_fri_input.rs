@@ -12,12 +12,14 @@ pub fn sample_verify_fri_input(index: isize) -> anyhow::Result<(FriVerifyInput, 
     let reader = BufReader::new(input_file);
     let fri_verify_input: FriVerifyInput = serde_json::from_reader(reader).unwrap();
 
+    //proof
     let mut proof_vec = vec![];
     for i in 0..fri_verify_input.proof.len() {
         proof_vec.push(MoveValue::U256(U256::from_str(&*fri_verify_input.proof[i].clone()).unwrap()));
     }
     let proof = MoveValue::Vector(proof_vec);
 
+    //queue
     let mut fri_queue_vec = vec![];
     for i in 0..fri_verify_input.fri_queue.len() {
         fri_queue_vec.push(MoveValue::U256(U256::from_str(&*fri_verify_input.fri_queue[i].clone()).unwrap()));

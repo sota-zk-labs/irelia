@@ -1,7 +1,4 @@
-use std::str::FromStr;
-
 use aptos_sdk::move_types::value::MoveValue;
-use aptos_sdk::rest_client::aptos_api_types::{EntryFunctionId, ViewRequest};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::types::VerifyMerkle;
@@ -30,19 +27,7 @@ pub async fn verify_merkle(
     let input_verify_merkle: VerifyMerkle = event_verify_merkle.try_into()?;
     let input_register_fact_merkle: RegisterFactVerifyMerkle = event_register_fact_merkle.try_into()?;
 
-    let count_verify_merkle_cycles_request = config.client.view(&ViewRequest {
-        function: EntryFunctionId::from_str(format!("{}::merkle_verifier::count_verify_merkle_cycles", config.module_address).as_str()).unwrap(),
-        type_arguments: vec![],
-        arguments: vec![
-            serde_json::Value::String(config.account.address().to_string()),
-            serde_json::Value::String(input_verify_merkle.merkle_queue_ptr.to_string()),
-            serde_json::Value::String(input_verify_merkle.n_queries.to_string()),
-        ],
-    }, None).await?;
-    let verify_merkle_cycles = count_verify_merkle_cycles_request.into_inner().remove(0).as_str().unwrap().parse::<usize>().unwrap();
-    eprintln!("verify_merkle_cycles = {:#?}", verify_merkle_cycles);
-
-    if !merkle_verifier(verify_merkle_cycles, &config, &input_verify_merkle).await? {
+    if !merkle_verifier(&config, &input_verify_merkle).await? {
         eprintln!("something went wrong!");
         return Ok(());
     }

@@ -9,11 +9,11 @@ use crate::error::CoreError::PropertyNotFound;
 pub struct ComputeNextLayer {
     pub channel_ptr: U256,
     pub fri_queue_ptr: U256,
+    pub merkle_queue_ptr: U256,
+    pub n_queries: U256,
     pub fri_ctx: U256,
     pub evaluation_point: U256,
     pub fri_coset_size: U256,
-    pub merkle_queue_ptr: U256,
-    pub n_queries: U256,
 }
 
 impl TryInto<ComputeNextLayer> for Event {
