@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
+use anyhow::Result;
+use dotenv::dotenv;
+
 use aptos_sdk::move_types::account_address::AccountAddress;
 use aptos_sdk::rest_client::Client;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::LocalAccount;
-use color_eyre::Result;
-use dotenv::dotenv;
 
 pub struct EnvConfig {
     pub node_url: String,
@@ -22,9 +23,15 @@ pub fn get_env_var_or_panic(key: &str) -> String {
     get_env_var(key).unwrap_or_else(|e| panic!("Failed to get env var {}: {}", key, e))
 }
 
+impl Default for EnvConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EnvConfig {
     pub fn new() -> Self {
-        dotenv().ok().expect("Failed to load .env file");
+        dotenv().expect("Failed to load .env file");
         let node_url = get_env_var_or_panic("APTOS_NODE_URL");
         let private_key = get_env_var_or_panic("APTOS_PRIVATE_KEY");
         let module_address = get_env_var_or_panic("APTOS_MODULE_ADDRESS");
@@ -49,7 +56,10 @@ impl From<EnvConfig> for AppConfig {
     fn from(config: EnvConfig) -> Self {
         let client = Client::new(config.node_url.parse().unwrap());
         let account = LocalAccount::from_private_key(&config.private_key, 0).unwrap();
-        let module_address = config.module_address.parse().expect("Invalid module address");
+        let module_address = config
+            .module_address
+            .parse()
+            .expect("Invalid module address");
         let chain_id = ChainId::from_str(&config.chain_id).expect("Invalid chain id");
 
         AppConfig {

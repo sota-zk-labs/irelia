@@ -1,11 +1,10 @@
 use aptos_sdk::move_types::value::MoveValue;
+use log::error;
 
 use crate::config::AppConfig;
-use crate::contracts_caller::types::VerifyMerkle;
 use crate::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
 use crate::contracts_caller::verify_merkle::merkle_statement::verify_merkle_statement;
 use crate::contracts_caller::verify_merkle::register_fact_merkle::register_fact_merkle;
-use crate::contracts_caller::verify_merkle::types::register_fact_verify_merkle::RegisterFactVerifyMerkle;
 use crate::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle(
@@ -21,19 +20,16 @@ pub async fn verify_merkle(
         height,
         expected_root,
     };
+    let (input_verify_merkle, input_register_fact_merkle) =
+        verify_merkle_statement(config, verify_merkle_input).await?;
 
-    let (event_verify_merkle, event_register_fact_merkle) = verify_merkle_statement(&config, verify_merkle_input).await?;
-
-    let input_verify_merkle: VerifyMerkle = event_verify_merkle.try_into()?;
-    let input_register_fact_merkle: RegisterFactVerifyMerkle = event_register_fact_merkle.try_into()?;
-
-    if !merkle_verifier(&config, &input_verify_merkle).await? {
-        eprintln!("something went wrong!");
+    if !merkle_verifier(config, &input_verify_merkle).await? {
+        error!("something went wrong!");
         return Ok(());
     }
 
-    if !register_fact_merkle(&config, input_register_fact_merkle).await? {
-        eprintln!("something went wrong!");
+    if !register_fact_merkle(config, &input_register_fact_merkle).await? {
+        error!("something went wrong!");
         return Ok(());
     }
 

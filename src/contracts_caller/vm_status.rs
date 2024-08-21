@@ -25,11 +25,16 @@ impl TryInto<VmStatus> for &str {
         let re = Regex::new(
             r"Move abort in (?P<location>[^:]+::[^:]+): (?:(?P<reason>[^:]*)\()?(?P<code>0x[0-9a-fA-F]+)(?:: (?P<description>.*))?"
         ).expect("never fail");
-        let caps = re.captures(self).ok_or(CoreError::ParseVmStatusError(self.to_string()))?;
+        let caps = re
+            .captures(self)
+            .ok_or(CoreError::ParseVmStatusError(self.to_string()))?;
         let location = caps.name("location").map_or("", |m| m.as_str()).to_string();
         let reason = caps.name("reason").map_or("", |m| m.as_str()).to_string();
         let code = caps.name("code").map_or("", |m| m.as_str());
-        let description = caps.name("description").map_or("", |m| m.as_str()).to_string();
+        let description = caps
+            .name("description")
+            .map_or("", |m| m.as_str())
+            .to_string();
         let code = u64::from_str_radix(code.trim_start_matches("0x"), 16)?;
         Ok(VmStatus {
             location,
@@ -39,4 +44,3 @@ impl TryInto<VmStatus> for &str {
         })
     }
 }
-
