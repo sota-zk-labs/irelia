@@ -1,0 +1,10 @@
+include = ["**/*.toml"]
+
+[formatting]
+align_entries = false
+
+[[rule]]
+keys = ["dependencies", "dev-dependencies", "patch.crates-io"]
+
+[rule.formatting]
+reorder_keys = true
