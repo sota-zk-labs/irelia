@@ -4,16 +4,26 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "main" }
-once_cell = "1.19.0"
-tokio = { version = "1.39.1", features = ["rt", "rt-multi-thread", "macros"] }
-url = { version = "2.4.0", features = ["serde"] }
 anyhow = { version = "1.0.71" }
+aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
 async-trait = { version = "0.1.81" }
 dotenv = { version = "0.15.0" }
-color-eyre = { version = "0.6.1" }
-thiserror = { version = "1.0.63" }
+lazy_static = "1.4.0"
+log = { version = "0.4.22" }
+once_cell = { version = "1.19.0" }
 rand_core = { version = "0.5.1" }
+regex = { version = "1.10.6" }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = { version = "1.0.120" }
+test-log = { version = "0.2.16" }
+thiserror = { version = "1.0.63" }
+tokio = { version = "1.39.1", features = ["macros", "rt-multi-thread"] }
+url = { version = "2.4.0", features = ["serde"] }
+
+[dev-dependencies]
+aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master", features = [
+  "testing",
+] }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

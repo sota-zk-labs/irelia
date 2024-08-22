@@ -1,16 +1,16 @@
 use std::str::FromStr;
-use aptos_sdk::crypto::ed25519::Ed25519PrivateKey;
-use aptos_sdk::crypto::ValidCryptoMaterialStringExt;
+
+use anyhow::Result;
+use dotenv::dotenv;
+
 use aptos_sdk::move_types::account_address::AccountAddress;
 use aptos_sdk::rest_client::Client;
 use aptos_sdk::types::chain_id::ChainId;
-use aptos_sdk::types::{AccountKey, LocalAccount};
-use dotenv::dotenv;
-use color_eyre::Result;
+use aptos_sdk::types::LocalAccount;
+
 pub struct EnvConfig {
     pub node_url: String,
     pub private_key: String,
-    pub account_address: String,
     pub module_address: String,
     pub chain_id: String,
 }
@@ -23,19 +23,23 @@ pub fn get_env_var_or_panic(key: &str) -> String {
     get_env_var(key).unwrap_or_else(|e| panic!("Failed to get env var {}: {}", key, e))
 }
 
+impl Default for EnvConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EnvConfig {
     pub fn new() -> Self {
-        dotenv().ok().expect("Failed to load .env file");
+        dotenv().expect("Failed to load .env file");
         let node_url = get_env_var_or_panic("APTOS_NODE_URL");
         let private_key = get_env_var_or_panic("APTOS_PRIVATE_KEY");
-        let account_address = get_env_var_or_panic("APTOS_ACCOUNT_ADDRESS");
         let module_address = get_env_var_or_panic("APTOS_MODULE_ADDRESS");
         let chain_id = get_env_var_or_panic("CHAIN_ID");
         EnvConfig {
             chain_id,
             node_url,
             private_key,
-            account_address,
             module_address,
         }
     }
@@ -51,11 +55,11 @@ pub struct AppConfig {
 impl From<EnvConfig> for AppConfig {
     fn from(config: EnvConfig) -> Self {
         let client = Client::new(config.node_url.parse().unwrap());
-        let private_key = Ed25519PrivateKey::from_encoded_string(&config.private_key).expect("Failed to parse private key");
-        let account_key = AccountKey::from(private_key);
-        let account_address = config.account_address.parse().expect("Invalid account address");
-        let account = LocalAccount::new(account_address, account_key, 500);
-        let module_address = config.module_address.parse().expect("Invalid module address");
+        let account = LocalAccount::from_private_key(&config.private_key, 0).unwrap();
+        let module_address = config
+            .module_address
+            .parse()
+            .expect("Invalid module address");
         let chain_id = ChainId::from_str(&config.chain_id).expect("Invalid chain id");
 
         AppConfig {
@@ -66,4 +70,3 @@ impl From<EnvConfig> for AppConfig {
         }
     }
 }
-
