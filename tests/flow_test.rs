@@ -53,7 +53,7 @@ mod tests {
                     .insert("lib_addr".to_string(), module_account.address().to_string());
                 aptos_container
                     .upload_contract(
-                        "./contract-sample/navori",
+                        "./contracts",
                         &module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "verifier"]),

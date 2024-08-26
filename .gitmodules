@@ -1,3 +1,6 @@
 [submodule "contract-sample/navori"]
 	path = contract-sample/navori
 	url = git@github.com:sota-zk-labs/navori.git
+[submodule "contracts"]
+	path = contracts
+	url = git@github.com:sota-zk-labs/navori.git
