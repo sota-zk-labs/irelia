@@ -2,7 +2,6 @@
 mod tests {
     use std::collections::HashMap;
 
-    use aptos_sdk::crypto::ValidCryptoMaterialStringExt;
     use aptos_sdk::types::chain_id::NamedChain::TESTING;
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
@@ -53,8 +52,8 @@ mod tests {
                     .insert("lib_addr".to_string(), module_account.address().to_string());
                 aptos_container
                     .upload_contract(
-                        "./contracts",
-                        &module_account_private_key,
+                        "./contracts/navori",
+                        module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "verifier"]),
                         false,
