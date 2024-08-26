@@ -1,0 +1,65 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  cargo-check:
+    name: Cargo check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: false
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev
+      - name: Set PKG_CONFIG_PATH
+        run: echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig" >> $GITHUB_ENV
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+
+  fmt-check:
+    name: Rust fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: false
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  test-and-coverage:
+    name: Test and Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: arduino/setup-protoc@v3
+
+      - name: Install dependencies
+        run: |
+          rustup self update
+          rustup update
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev
+          cargo install cargo-tarpaulin --force
+      - name: Set PKG_CONFIG_PATH
+        run: echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig" >> $GITHUB_ENV
+      - name: Run tests
+        run: cargo tarpaulin --all-features --verbose
