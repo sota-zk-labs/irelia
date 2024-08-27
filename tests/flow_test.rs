@@ -2,22 +2,19 @@
 mod tests {
     use std::collections::HashMap;
 
-    use aptos_sdk::crypto::ValidCryptoMaterialStringExt;
     use aptos_sdk::types::chain_id::NamedChain::TESTING;
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
     use log::info;
 
-    use crate::config::AppConfig;
-    use crate::config::EnvConfig;
-    use crate::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-    use crate::contracts_caller::verify_fri::verify_fri::verify_fri;
-    use crate::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-    use crate::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
+    use verifier_onchain_services::config::{AppConfig, EnvConfig};
+    use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
+    use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
+    use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
+    use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 
     #[tokio::test]
-    pub async fn verifier_test() -> anyhow::Result<()> {
-        let aptos_container = lazy_aptos_container().await?;
+    pub async fn verifier_test() {
         run(2, |accounts| {
             Box::pin(async move {
                 let aptos_container = lazy_aptos_container().await.unwrap();
@@ -51,11 +48,14 @@ mod tests {
                     "verifier_addr".to_string(),
                     module_account.address().to_string(),
                 );
+                named_addresses
+                    .insert("lib_addr".to_string(), module_account.address().to_string());
                 aptos_container
                     .upload_contract(
-                        "contract-sample/navori",
-                        &module_account.private_key().to_encoded_string().unwrap(),
+                        "./contracts/navori",
+                        module_account_private_key,
                         &named_addresses,
+                        Some(vec!["libs", "verifier"]),
                         false,
                     )
                     .await
@@ -100,5 +100,6 @@ mod tests {
             })
         })
         .await
+        .unwrap()
     }
 }
