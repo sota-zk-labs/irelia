@@ -90,3 +90,25 @@ pub fn get_event_from_transaction(
     };
     event.ok_or(Error::new(CoreError::NotFound))
 }
+
+pub fn get_events_from_transaction(
+    transaction: &Transaction,
+    event_type: MoveType,
+) -> anyhow::Result<Vec<&Event>> {
+    let events: Vec<&Event> = match transaction {
+        Transaction::UserTransaction(txn) => {
+            txn.events.iter().filter(|s| s.typ == event_type).collect()
+        }
+        Transaction::BlockMetadataTransaction(_) => vec![],
+        Transaction::PendingTransaction(_) => vec![],
+        Transaction::GenesisTransaction(_) => vec![],
+        Transaction::StateCheckpointTransaction(_) => vec![],
+        Transaction::BlockEpilogueTransaction(_) => vec![],
+        Transaction::ValidatorTransaction(_) => vec![],
+    };
+    if events.is_empty() {
+        Err(Error::new(CoreError::NotFound))
+    } else {
+        Ok(events)
+    }
+}
