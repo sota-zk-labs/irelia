@@ -17,11 +17,11 @@ serde = { version = "1.0.204", features = ["derive"] }
 serde_json = { version = "1.0.120" }
 test-log = { version = "0.2.16" }
 thiserror = { version = "1.0.63" }
-tokio = { version = "1.39.1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
 
 [dev-dependencies]
-aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", branch = "master", features = [
+aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", tag = "v0.0.1", features = [
   "testing",
 ] }
 
