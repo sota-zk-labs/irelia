@@ -7,9 +7,7 @@ mod tests {
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
 
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_memory::{
-        large_register_memory_batch, register_memory, register_memory_batch,
-    };
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_memory::register_memory;
 
     #[tokio::test]
     pub async fn memory_page_test() {
@@ -59,9 +57,8 @@ mod tests {
                     .await
                     .unwrap();
 
-                //register_memory_batch(&config).await.unwrap();
-                //register_memory(&config).await.unwrap();
-                large_register_memory_batch(&config).await.unwrap();
+                register_memory(&config).await.unwrap();
+
                 Ok(())
             })
         })

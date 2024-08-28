@@ -8004,7 +8004,6 @@ dependencies = [
  "aptos-testcontainer",
  "async-trait",
  "dotenv",
- "itertools 0.10.5",
  "lazy_static",
  "log",
  "once_cell",
