@@ -1,10 +1,9 @@
-use log::info;
+use log::{error, info};
 
 use verifier_onchain_services::config::{AppConfig, EnvConfig};
+use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page_batch;
 use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
 use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -18,33 +17,17 @@ async fn main() -> anyhow::Result<()> {
     config.account.set_sequence_number(sequence_number);
 
     for i in 1..4 {
-        let (merkle_view, initial_merkle_queue, height, expected_root) =
-            sample_verify_merkle_input(i)?;
-        verify_merkle(
-            &config,
-            merkle_view,
-            initial_merkle_queue,
-            height,
-            expected_root,
-        )
-        .await?;
+        sample_verify_merkle_input(&config, i).await?;
         info!("Verify Merkle {} success", i);
     }
 
     for i in 1..8 {
-        let (fri_verify_input, proof, fri_queue, evaluation_point, fri_step_size, expected_root) =
-            sample_verify_fri_input(i)?;
-        verify_fri(
-            &config,
-            fri_verify_input,
-            proof,
-            fri_queue,
-            evaluation_point,
-            fri_step_size,
-            expected_root,
-        )
-        .await?;
+        sample_verify_fri_input(&config, i).await?;
         info!("Verify FRI {} success", i);
+    }
+
+    if !sample_register_continuous_page_batch(&config).await? {
+        error!("something went wrong!")
     }
 
     Ok(())

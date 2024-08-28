@@ -5,11 +5,13 @@ mod tests {
     use aptos_sdk::types::chain_id::NamedChain::TESTING;
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
+    use log::error;
+    use test_log::test;
 
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_memory::register_memory;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_large_data_register_continuous_page_batch, sample_register_continuous_page, sample_register_continuous_page_batch};
 
-    #[tokio::test]
+    #[test(tokio::test)]
     pub async fn memory_page_test() {
         run(2, |accounts| {
             Box::pin(async move {
@@ -57,12 +59,19 @@ mod tests {
                     .await
                     .unwrap();
 
-                register_memory(&config).await.unwrap();
-
+                if !sample_register_continuous_page_batch(&config).await? {
+                    error!("something went wrong!")
+                }
+                if !sample_register_continuous_page(&config).await? {
+                    error!("something went wrong!")
+                }
+                if !sample_large_data_register_continuous_page_batch(&config).await? {
+                    error!("something went wrong!")
+                }
                 Ok(())
             })
         })
-            .await
-            .unwrap()
+        .await
+        .unwrap()
     }
 }

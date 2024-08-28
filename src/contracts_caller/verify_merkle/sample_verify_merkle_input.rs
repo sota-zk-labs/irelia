@@ -2,14 +2,13 @@ use std::fs::File;
 use std::io::BufReader;
 use std::str::FromStr;
 
+use crate::config::AppConfig;
+use crate::contracts_caller::verify_merkle::types::verify_merkle_input::MerkleVerifyInput;
+use crate::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
 
-use crate::contracts_caller::verify_merkle::types::verify_merkle_input::MerkleVerifyInput;
-
-pub fn sample_verify_merkle_input(
-    index: isize,
-) -> anyhow::Result<(MoveValue, MoveValue, MoveValue, MoveValue)> {
+pub async fn sample_verify_merkle_input(config: &AppConfig, index: isize) -> anyhow::Result<()> {
     let file_path = format!(
         "./src/data_samples/merkle_verify/merkle_verify_{}.json",
         index
@@ -37,5 +36,13 @@ pub fn sample_verify_merkle_input(
     let height = MoveValue::U64(u64::from_str(&merkle_verify_input.height.clone())?);
     let expected_root =
         MoveValue::U256(U256::from_str(&merkle_verify_input.expected_root.clone())?);
-    Ok((merkle_view, initial_merkle_queue, height, expected_root))
+    verify_merkle(
+        config,
+        merkle_view,
+        initial_merkle_queue,
+        height,
+        expected_root,
+    )
+    .await?;
+    Ok(())
 }

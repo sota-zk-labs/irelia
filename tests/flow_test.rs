@@ -6,14 +6,13 @@ mod tests {
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
     use log::info;
+    use test_log::test;
 
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
     use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-    use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
     use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-    use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 
-    #[tokio::test]
+    #[test(tokio::test)]
     pub async fn verifier_test() {
         run(2, |accounts| {
             Box::pin(async move {
@@ -62,38 +61,12 @@ mod tests {
                     .unwrap();
 
                 for i in 1..4 {
-                    let (merkle_view, initial_merkle_queue, height, expected_root) =
-                        sample_verify_merkle_input(i).unwrap();
-                    verify_merkle(
-                        &config,
-                        merkle_view,
-                        initial_merkle_queue,
-                        height,
-                        expected_root,
-                    )
-                    .await?;
+                    sample_verify_merkle_input(&config, i).await.unwrap();
                     info!("Verify Merkle {} success", i);
                 }
 
                 for i in 1..8 {
-                    let (
-                        fri_verify_input,
-                        proof,
-                        fri_queue,
-                        evaluation_point,
-                        fri_step_size,
-                        expected_root,
-                    ) = sample_verify_fri_input(i).unwrap();
-                    verify_fri(
-                        &config,
-                        fri_verify_input,
-                        proof,
-                        fri_queue,
-                        evaluation_point,
-                        fri_step_size,
-                        expected_root,
-                    )
-                    .await?;
+                    sample_verify_fri_input(&config, i).await.unwrap();
                     info!("Verify FRI {} success", i);
                 }
                 Ok(())
