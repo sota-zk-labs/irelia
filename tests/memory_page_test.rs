@@ -4,10 +4,11 @@ mod tests {
 
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
-    use log::error;
     use test_log::test;
 
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memorypage::register_continuous_memorypage;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
     use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_large_data_register_continuous_page_batch, sample_register_continuous_page, sample_register_continuous_page_batch};
 
     #[test(tokio::test)]
@@ -52,15 +53,20 @@ mod tests {
                     .await
                     .unwrap();
 
-                if !sample_register_continuous_page_batch(&config).await? {
-                    error!("something went wrong!")
-                }
-                if !sample_register_continuous_page(&config).await? {
-                    error!("something went wrong!")
-                }
-                if !sample_large_data_register_continuous_page_batch(&config).await? {
-                    error!("something went wrong!")
-                }
+                let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
+                register_continuous_page_batch(&config, register_continuous_page_batch_input)
+                    .await?;
+
+                let register_continuous_page_input = sample_register_continuous_page()?;
+                register_continuous_memorypage(&config, register_continuous_page_input).await?;
+
+                let large_data_register_continuous_page_batch_input =
+                    sample_large_data_register_continuous_page_batch()?;
+                register_continuous_page_batch(
+                    &config,
+                    large_data_register_continuous_page_batch_input,
+                )
+                .await?;
                 Ok(())
             })
         })

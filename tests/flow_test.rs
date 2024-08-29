@@ -56,12 +56,40 @@ mod tests {
                     .unwrap();
 
                 for i in 1..4 {
-                    sample_verify_merkle_input(&config, i).await?;
+                    let (merkle_view, initial_merkle_queue, height, expected_root) =
+                        sample_verify_merkle_input(i).unwrap();
+                    verify_merkle(
+                        &config,
+                        merkle_view,
+                        initial_merkle_queue,
+                        height,
+                        expected_root,
+                    )
+                    .await
+                    .unwrap();
                     info!("Verify Merkle {} success", i);
                 }
 
                 for i in 1..8 {
-                    sample_verify_fri_input(&config, i).await?;
+                    let (
+                        fri_verify_input,
+                        proof,
+                        fri_queue,
+                        evaluation_point,
+                        fri_step_size,
+                        expected_root,
+                    ) = sample_verify_fri_input(i).unwrap();
+                    verify_fri(
+                        &config,
+                        fri_verify_input,
+                        proof,
+                        fri_queue,
+                        evaluation_point,
+                        fri_step_size,
+                        expected_root,
+                    )
+                    .await
+                    .unwrap();
                     info!("Verify FRI {} success", i);
                 }
                 Ok(())
