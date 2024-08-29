@@ -4,16 +4,15 @@ mod tests {
 
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
-    use log::info;
     use test_log::test;
+
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
-    use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-    use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
-    use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-    use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_large_data_register_continuous_page_batch, sample_register_continuous_page, sample_register_continuous_page_batch};
 
     #[test(tokio::test)]
-    pub async fn verifier_test() {
+    pub async fn memory_page_test() {
         run(2, |accounts| {
             Box::pin(async move {
                 let aptos_container = lazy_aptos_container().await.unwrap();
@@ -54,43 +53,22 @@ mod tests {
                     .await
                     .unwrap();
 
-                for i in 1..4 {
-                    let (merkle_view, initial_merkle_queue, height, expected_root) =
-                        sample_verify_merkle_input(i).unwrap();
-                    verify_merkle(
-                        &config,
-                        merkle_view,
-                        initial_merkle_queue,
-                        height,
-                        expected_root,
-                    )
+                let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
+                register_continuous_page_batch(&config, register_continuous_page_batch_input)
                     .await
                     .unwrap();
-                    info!("Verify Merkle {} success", i);
-                }
 
-                for i in 1..8 {
-                    let (
-                        fri_verify_input,
-                        proof,
-                        fri_queue,
-                        evaluation_point,
-                        fri_step_size,
-                        expected_root,
-                    ) = sample_verify_fri_input(i).unwrap();
-                    verify_fri(
-                        &config,
-                        fri_verify_input,
-                        proof,
-                        fri_queue,
-                        evaluation_point,
-                        fri_step_size,
-                        expected_root,
-                    )
-                    .await
-                    .unwrap();
-                    info!("Verify FRI {} success", i);
-                }
+                let register_continuous_page_input = sample_register_continuous_page()?;
+                register_continuous_memory_page(&config, register_continuous_page_input).await?;
+
+                let large_data_register_continuous_page_batch_input =
+                    sample_large_data_register_continuous_page_batch()?;
+                register_continuous_page_batch(
+                    &config,
+                    large_data_register_continuous_page_batch_input,
+                )
+                .await
+                .unwrap();
                 Ok(())
             })
         })

@@ -58,4 +58,4 @@ jobs:
       - name: Set PKG_CONFIG_PATH
         run: echo "PKG_CONFIG_PATH=/usr/lib/pkgconfig" >> $GITHUB_ENV
       - name: Run tests
-        run: cargo tarpaulin --all-features --verbose --tests
+        run: cargo tarpaulin --all-features --verbose --tests --skip-clean

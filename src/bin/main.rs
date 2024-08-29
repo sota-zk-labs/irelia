@@ -1,6 +1,8 @@
 use log::info;
 
 use verifier_onchain_services::config::{AppConfig, EnvConfig};
+use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
+use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page_batch;
 use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
 use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
 use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
@@ -47,5 +49,8 @@ async fn main() -> anyhow::Result<()> {
         info!("Verify FRI {} success", i);
     }
 
+    let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
+    register_continuous_page_batch(&config, register_continuous_page_batch_input).await?;
+    info!("Register continuous page batch success");
     Ok(())
 }

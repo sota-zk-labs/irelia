@@ -8,6 +8,7 @@ anyhow = { version = "1.0.71" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
 async-trait = { version = "0.1.81" }
 dotenv = { version = "0.15.0" }
+itertools = "0.10.5"
 lazy_static = "1.4.0"
 log = { version = "0.4.22" }
 once_cell = { version = "1.19.0" }
@@ -21,7 +22,7 @@ tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
 
 [dev-dependencies]
-aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", tag = "v0.0.1", features = [
+aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", tag = "v0.0.3", features = [
   "testing",
 ] }
 
