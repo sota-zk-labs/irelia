@@ -6,7 +6,6 @@ mod tests {
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
     use log::info;
     use test_log::test;
-
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
     use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
     use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;

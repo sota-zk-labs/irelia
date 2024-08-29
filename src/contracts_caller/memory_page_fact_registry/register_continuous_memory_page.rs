@@ -1,17 +1,19 @@
-use crate::config::AppConfig;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memorypage::ContinuousMemorypage;
-use crate::contracts_caller::transaction_helper::build_transaction;
+use std::str::FromStr;
+
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
-use std::str::FromStr;
 
-pub async fn register_continuous_memorypage(
+use crate::config::AppConfig;
+use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
+use crate::contracts_caller::transaction_helper::build_transaction;
+
+pub async fn register_continuous_memory_page(
     config: &AppConfig,
-    data: ContinuousMemorypage,
+    data: ContinuousMemoryPage,
 ) -> anyhow::Result<bool> {
     let mut values = vec![];
     for e in &data.values {
@@ -37,7 +39,7 @@ pub async fn register_continuous_memorypage(
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "register_continuous_memorypage: {}; gas used: {}",
+        "register_continuous_memory_page: {}; gas used: {}",
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

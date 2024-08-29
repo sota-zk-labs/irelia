@@ -1,12 +1,11 @@
 use std::str::FromStr;
 
 use anyhow::Result;
-use dotenv::dotenv;
-
 use aptos_sdk::move_types::account_address::AccountAddress;
 use aptos_sdk::rest_client::Client;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::LocalAccount;
+use dotenv::dotenv;
 
 pub struct EnvConfig {
     pub node_url: String,

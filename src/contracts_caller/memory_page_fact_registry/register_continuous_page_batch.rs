@@ -1,6 +1,5 @@
-use crate::config::AppConfig;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
-use crate::contracts_caller::transaction_helper::build_transaction;
+use std::str::FromStr;
+
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::u256::U256;
@@ -8,7 +7,10 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use itertools::Itertools;
 use log::info;
-use std::str::FromStr;
+
+use crate::config::AppConfig;
+use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
+use crate::contracts_caller::transaction_helper::build_transaction;
 
 pub async fn register_continuous_page_batch(
     config: &AppConfig,
@@ -77,24 +79,14 @@ pub async fn register_continuous_page_batch(
             };
             let transaction_info = transaction.transaction_info()?;
             info!(
-                "register_continuous_memorypage_batch: {}; gas used: {}",
+                "register_continuous_memory_page_batch: {}; gas used: {}",
                 transaction_info.hash.to_string(),
                 transaction_info.gas_used
             );
-
-            if !transaction.success() {
-                success = false;
-                new_remaining_data.extend(chunk);
-                break;
-            }
         }
 
-        if success {
-            break;
-        } else {
-            remaining_data = new_remaining_data;
-            chunk_size /= 2;
-        }
+        remaining_data = new_remaining_data;
+        chunk_size /= 2;
     }
     Ok(success)
 }
