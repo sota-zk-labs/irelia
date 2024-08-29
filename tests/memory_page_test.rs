@@ -55,7 +55,8 @@ mod tests {
 
                 let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
                 register_continuous_page_batch(&config, register_continuous_page_batch_input)
-                    .await?;
+                    .await
+                    .unwrap();
 
                 let register_continuous_page_input = sample_register_continuous_page()?;
                 register_continuous_memory_page(&config, register_continuous_page_input).await?;
@@ -66,7 +67,8 @@ mod tests {
                     &config,
                     large_data_register_continuous_page_batch_input,
                 )
-                .await?;
+                .await
+                .unwrap();
                 Ok(())
             })
         })

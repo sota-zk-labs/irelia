@@ -1,92 +1,159 @@
 use std::str::FromStr;
 
+use anyhow::ensure;
 use aptos_sdk::move_types::identifier::Identifier;
 use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::{serialize_values, MoveValue};
+use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
-use itertools::Itertools;
-use log::info;
+use log::{debug, info};
 
 use crate::config::AppConfig;
+use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
 use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
 use crate::contracts_caller::transaction_helper::build_transaction;
+use crate::error::CoreError::TransactionNotSucceed;
+
+const MAX_MEMORY_VALUE_LEN: usize = 500;
 
 pub async fn register_continuous_page_batch(
     config: &AppConfig,
     data: MemoryPageEntries,
-) -> anyhow::Result<bool> {
-    let data_input = data.memory_page_entries;
-    let initial_chunk_size = 15;
+) -> anyhow::Result<()> {
+    let ContinuousMemoryPage {
+        z,
+        alpha,
+        prime,
+        values: _,
+        start_addr: _,
+    } = data.memory_page_entries.first().unwrap();
 
-    let mut start_addr_values = vec![];
+    let z = MoveValue::U256(U256::from_str(z)?);
+    let alpha = MoveValue::U256(U256::from_str(alpha)?);
+    let prime = MoveValue::U256(U256::from_str(prime)?);
 
-    for e in &data_input {
-        let start_addr = MoveValue::U256(U256::from_str(&e.start_addr)?);
-        let mut value = vec![];
-        for v in &e.values {
-            value.push(MoveValue::U256(U256::from_str(v)?));
-        }
-        start_addr_values.push((start_addr, MoveValue::Vector(value)));
-    }
-
-    start_addr_values.sort_by_key(|(_, values)| match values {
+    let mut converted_data = data
+        .memory_page_entries
+        .into_iter()
+        .map(|entry| {
+            let start_addr = MoveValue::U256(U256::from_str(&entry.start_addr).unwrap());
+            let values = entry
+                .values
+                .into_iter()
+                .map(|value| MoveValue::U256(U256::from_str(&value).unwrap()))
+                .collect::<Vec<_>>();
+            (start_addr, values.len(), MoveValue::Vector(values))
+        })
+        .collect::<Vec<_>>();
+    converted_data.sort_by_key(|(_, _, values)| match values {
         MoveValue::Vector(v) => v.len(),
         _ => 0,
     });
 
-    let mut chunk_size = initial_chunk_size;
-    let mut success = true;
-    let mut remaining_data = start_addr_values;
-
-    while chunk_size > 0 {
-        success = true;
-        let mut new_remaining_data = vec![];
-
-        for chunk in &remaining_data.iter().chunks(chunk_size) {
-            let chunk: Vec<_> = chunk.cloned().collect();
-            let mut chunk_start_addr = vec![];
-            let mut chunk_values = vec![];
-
-            for (addr, val) in &chunk {
-                chunk_start_addr.push(addr.clone());
-                chunk_values.push(val.clone());
+    let (mut chunks, cur_el, _) = converted_data.into_iter().fold(
+        (vec![], vec![], 0),
+        |(mut chunks, mut cur_el, mut cur_value_len), (start_addr, values_len, values)| {
+            let new_value_len = cur_value_len + values_len;
+            if cur_el.len() == 0 {
+                cur_el.push((start_addr, values));
+                cur_value_len += values_len;
+                return (chunks, cur_el, cur_value_len);
             }
 
-            let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-                ModuleId::new(
-                    config.module_address,
-                    Identifier::new("memory_page_fact_registry")?,
-                ),
-                Identifier::new("register_continuous_page_batch")?,
-                vec![],
-                serialize_values(&vec![
-                    MoveValue::Vector(chunk_start_addr),
-                    MoveValue::Vector(chunk_values),
-                    MoveValue::U256(U256::from_str(&data_input.first().unwrap().z)?),
-                    MoveValue::U256(U256::from_str(&data_input.first().unwrap().alpha)?),
-                    MoveValue::U256(U256::from_str(&data_input.first().unwrap().prime)?),
-                ]),
-            ));
-            let tx = build_transaction(payload, &config.account, config.chain_id);
-            let transaction = match config.client.submit_and_wait(&tx).await {
-                Ok(tx) => tx.into_inner(),
-                Err(_) => {
-                    success = false;
-                    new_remaining_data.extend(chunk);
-                    break;
-                }
-            };
-            let transaction_info = transaction.transaction_info()?;
-            info!(
-                "register_continuous_memory_page_batch: {}; gas used: {}",
-                transaction_info.hash.to_string(),
-                transaction_info.gas_used
-            );
-        }
+            if new_value_len > MAX_MEMORY_VALUE_LEN {
+                chunks.push(cur_el);
+                cur_value_len = values_len;
+                cur_el = vec![(start_addr, values)];
+                return (chunks, cur_el, cur_value_len);
+            }
 
-        remaining_data = new_remaining_data;
-        chunk_size /= 2;
+            cur_value_len = new_value_len;
+            cur_el.push((start_addr, values));
+            (chunks, cur_el, cur_value_len)
+        },
+    );
+
+    if cur_el.len() != 0 {
+        chunks.push(cur_el);
     }
-    Ok(success)
+
+    let txs = chunks.into_iter().enumerate().map(|(i, chunk)| {
+        let (chunk_start_addr, chunk_values): (Vec<_>, Vec<_>) = chunk.into_iter().unzip();
+
+        let payload = TransactionPayload::EntryFunction(EntryFunction::new(
+            ModuleId::new(
+                config.module_address,
+                Identifier::new("memory_page_fact_registry").unwrap(),
+            ),
+            Identifier::new("register_continuous_page_batch").unwrap(),
+            vec![],
+            serialize_values(&vec![
+                MoveValue::Vector(chunk_start_addr),
+                MoveValue::Vector(chunk_values),
+                z.clone(),
+                alpha.clone(),
+                prime.clone(),
+            ]),
+        ));
+        let tx = build_transaction(payload, &config.account, config.chain_id);
+        (
+            format!("register_continuous_memory_page_batch_{}", i).to_string(),
+            tx,
+        )
+    });
+
+    let pending_transactions = txs
+        .into_iter()
+        .map(|(name, transaction)| {
+            let client = config.client.clone();
+            tokio::spawn(async move {
+                let init_transaction = client.submit(&transaction).await?.into_inner();
+                debug!(
+                    "sent {}: hash = {}",
+                    name,
+                    init_transaction.hash.to_string()
+                );
+                Ok::<_, RestError>((name, init_transaction))
+            })
+        })
+        .collect::<Vec<_>>();
+
+    let mut results = Vec::with_capacity(pending_transactions.len());
+    for handle in pending_transactions {
+        results.push(handle.await??);
+    }
+
+    let results = results
+        .into_iter()
+        .map(|(name, pending_transaction)| {
+            let client = config.client.clone();
+            tokio::spawn(async move {
+                let transaction = client
+                    .wait_for_transaction(&pending_transaction)
+                    .await?
+                    .into_inner();
+                let transaction_info = transaction.transaction_info()?;
+                ensure!(
+                    transaction_info.success,
+                    TransactionNotSucceed(
+                        format!("{}; hash: {}", name, transaction_info.hash).to_string()
+                    )
+                );
+                info!(
+                    "{}: {}; gas used: {}",
+                    name,
+                    transaction_info.hash.to_string(),
+                    transaction_info.gas_used,
+                );
+                Ok(())
+            })
+        })
+        .collect::<Vec<_>>();
+
+    for handle in results {
+        handle.await??;
+    }
+
+    Ok(())
 }
