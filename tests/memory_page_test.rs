@@ -2,7 +2,6 @@
 mod tests {
     use std::collections::HashMap;
 
-    use aptos_sdk::types::chain_id::NamedChain::TESTING;
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
     use log::error;
@@ -16,21 +15,19 @@ mod tests {
         run(2, |accounts| {
             Box::pin(async move {
                 let aptos_container = lazy_aptos_container().await.unwrap();
-                let node_url = aptos_container.get_node_url().await.unwrap();
-
+                let node_url = aptos_container.get_node_url();
                 let module_account_private_key = accounts.first().unwrap();
                 let module_account =
                     LocalAccount::from_private_key(module_account_private_key, 0).unwrap();
 
                 let sender_account_private_key = accounts.get(1).unwrap();
-                let sender_account =
-                    LocalAccount::from_private_key(sender_account_private_key, 0).unwrap();
 
+                let module_address = module_account.address().to_string();
                 let config = AppConfig::from(EnvConfig {
                     node_url,
                     private_key: sender_account_private_key.to_string(),
-                    module_address: module_account.address().to_string(),
-                    chain_id: TESTING.id().to_string(),
+                    module_address: module_address.clone(),
+                    chain_id: aptos_container.get_chain_id().to_string(),
                 });
 
                 let sequence_number = config
@@ -42,12 +39,8 @@ mod tests {
                 config.account.set_sequence_number(sequence_number);
 
                 let mut named_addresses = HashMap::new();
-                named_addresses.insert(
-                    "verifier_addr".to_string(),
-                    module_account.address().to_string(),
-                );
-                named_addresses
-                    .insert("lib_addr".to_string(), module_account.address().to_string());
+                named_addresses.insert("verifier_addr".to_string(), module_address.clone());
+                named_addresses.insert("lib_addr".to_string(), module_address);
                 aptos_container
                     .upload_contract(
                         "./contracts/navori",
