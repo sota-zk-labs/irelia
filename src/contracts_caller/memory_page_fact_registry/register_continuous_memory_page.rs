@@ -8,7 +8,7 @@ use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
 use crate::config::AppConfig;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
+use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memorypage::ContinuousMemorypage;
 use crate::contracts_caller::transaction_helper::build_transaction;
 
 pub async fn register_continuous_memory_page(
