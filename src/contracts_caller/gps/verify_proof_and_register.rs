@@ -1,4 +1,3 @@
-use std::fs;
 use std::str::FromStr;
 
 use aptos_sdk::move_types::value::MoveValue;
@@ -6,9 +5,7 @@ use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use log::debug;
 
 use crate::config::AppConfig;
-use crate::contracts_caller::gps::types::verify_proof_and_register::{
-    VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
-};
+use crate::contracts_caller::gps::types::verify_proof_and_register::VerifyProofAndRegisterData;
 use crate::contracts_caller::transaction_helper::{get_event_from_transaction, send_tx};
 
 pub async fn verify_proof_and_register(

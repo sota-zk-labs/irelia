@@ -97,10 +97,7 @@ pub async fn register_continuous_page_batch(
             ]),
         ));
         let tx = build_transaction(payload, &config.account, config.chain_id);
-        (
-            format!("register_continuous_memory_page_batch_{}", i).to_string(),
-            tx,
-        )
+        (format!("register_continuous_memory_page_batch_{}", i), tx)
     });
 
     let pending_transactions = txs
@@ -136,9 +133,7 @@ pub async fn register_continuous_page_batch(
                 let transaction_info = transaction.transaction_info()?;
                 ensure!(
                     transaction_info.success,
-                    TransactionNotSucceed(
-                        format!("{}; hash: {}", name, transaction_info.hash).to_string()
-                    )
+                    TransactionNotSucceed(format!("{}; hash: {}", name, transaction_info.hash))
                 );
                 info!(
                     "{}: {}; gas used: {}",

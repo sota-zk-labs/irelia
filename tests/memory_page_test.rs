@@ -41,13 +41,14 @@ mod tests {
 
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
-                named_addresses.insert("lib_addr".to_string(), module_address);
+                named_addresses.insert("lib_addr".to_string(), module_address.clone());
+                named_addresses.insert("cpu_addr".to_string(), module_address);
                 aptos_container
                     .upload_contract(
                         "./contracts/navori",
                         module_account_private_key,
                         &named_addresses,
-                        Some(vec!["libs", "verifier"]),
+                        Some(vec!["libs", "cpu", "verifier"]),
                         false,
                     )
                     .await

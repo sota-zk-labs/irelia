@@ -112,7 +112,7 @@ pub async fn send_tx(
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "Finished running the function {} {}; gas used: {}",
+        "Finished: {} {}; gas used: {}",
         fn_name,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
