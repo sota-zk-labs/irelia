@@ -111,9 +111,11 @@ pub async fn send_tx(
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
+
     info!(
-        "Finished: {} {}; gas used: {}",
+        "{} finished: id={}; hash={}; gas={}",
         fn_name,
+        transaction_info.version,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

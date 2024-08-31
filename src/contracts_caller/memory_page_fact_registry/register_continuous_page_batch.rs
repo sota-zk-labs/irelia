@@ -136,8 +136,9 @@ pub async fn register_continuous_page_batch(
                     TransactionNotSucceed(format!("{}; hash: {}", name, transaction_info.hash))
                 );
                 info!(
-                    "{}: {}; gas used: {}",
+                    "{} finished: id={}; hash={}; gas={}",
                     name,
+                    transaction_info.version,
                     transaction_info.hash.to_string(),
                     transaction_info.gas_used,
                 );

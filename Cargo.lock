@@ -986,7 +986,7 @@ dependencies = [
 [[package]]
 name = "aptos-testcontainer"
 version = "0.1.0"
-source = "git+https://github.com/sota-zk-labs/aptos-testcontainer.git?tag=v0.0.4#8bff7b476576da98e81fb2acb84432faf04c9cbb"
+source = "git+https://github.com/sota-zk-labs/aptos-testcontainer.git?tag=v0.1.0#3dfb2795a78be837a2c46aba5d84794f4356ee27"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
