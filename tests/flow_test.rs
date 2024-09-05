@@ -187,7 +187,6 @@ mod tests {
                 verify_proof_and_register(&config, &sample_vpar_data(1).unwrap())
                     .await
                     .unwrap();
-
                 Ok(())
             })
         })

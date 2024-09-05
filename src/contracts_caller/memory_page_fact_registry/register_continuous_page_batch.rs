@@ -55,7 +55,7 @@ pub async fn register_continuous_page_batch(
         (vec![], vec![], 0),
         |(mut chunks, mut cur_el, mut cur_value_len), (start_addr, values_len, values)| {
             let new_value_len = cur_value_len + values_len;
-            if cur_el.len() == 0 {
+            if cur_el.is_empty() {
                 cur_el.push((start_addr, values));
                 cur_value_len += values_len;
                 return (chunks, cur_el, cur_value_len);
@@ -74,7 +74,7 @@ pub async fn register_continuous_page_batch(
         },
     );
 
-    if cur_el.len() != 0 {
+    if !cur_el.is_empty() {
         chunks.push(cur_el);
     }
 

@@ -1,21 +1,16 @@
 use std::str::FromStr;
 use std::time::SystemTime;
 
-use anyhow::{ensure, Error};
-use aptos_sdk::move_types::identifier::Identifier;
-use aptos_sdk::move_types::language_storage::ModuleId;
+use anyhow::Error;
 use aptos_sdk::move_types::u256::U256;
-use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::rest_client::aptos_api_types::{Event, MoveType};
 use aptos_sdk::rest_client::Transaction;
 use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::chain_id::ChainId;
-use aptos_sdk::types::transaction::{EntryFunction, SignedTransaction, TransactionPayload};
+use aptos_sdk::types::transaction::{SignedTransaction, TransactionPayload};
 use aptos_sdk::types::LocalAccount;
-use log::info;
 use rand_core::OsRng;
 
-use crate::config::AppConfig;
 use crate::error::CoreError;
 
 #[inline]
@@ -94,34 +89,4 @@ pub fn get_event_from_transaction(
         Transaction::ValidatorTransaction(_) => None,
     };
     event.ok_or(Error::new(CoreError::NotFound))
-}
-
-pub async fn send_tx(
-    config: &AppConfig,
-    module_name: &str,
-    fn_name: &str,
-    args: &Vec<MoveValue>,
-) -> anyhow::Result<Transaction> {
-    let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new(module_name)?),
-        Identifier::new(fn_name)?,
-        vec![],
-        serialize_values(args),
-    ));
-    let tx = build_transaction(payload, &config.account, config.chain_id);
-    let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
-    let transaction_info = transaction.transaction_info()?;
-
-    info!(
-        "{} finished: id={}; hash={}; gas={}",
-        fn_name,
-        transaction_info.version,
-        transaction_info.hash.to_string(),
-        transaction_info.gas_used
-    );
-    ensure!(
-        transaction_info.success,
-        CoreError::TransactionNotSucceed(transaction_info.hash.to_string())
-    );
-    Ok(transaction)
 }
