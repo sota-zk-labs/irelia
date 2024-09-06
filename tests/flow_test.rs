@@ -42,6 +42,10 @@ mod tests {
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
                 named_addresses.insert("cpu_addr".to_string(), module_address.clone());
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
+                named_addresses.insert(
+                    "cpu_constraint_poly_addr".to_string(),
+                    module_address.clone(),
+                );
 
                 let now = Instant::now();
                 aptos_container
@@ -49,7 +53,7 @@ mod tests {
                         "./contracts/navori",
                         module_account_private_key,
                         &named_addresses,
-                        Some(vec!["libs", "cpu", "verifier"]),
+                        Some(vec!["libs", "cpu", "cpu-constraint-poly", "verifier"]),
                         false,
                     )
                     .await
@@ -150,6 +154,10 @@ mod tests {
                     "verifier_addr".to_string(),
                     module_account.address().to_string(),
                 );
+                named_addresses.insert(
+                    "cpu_constraint_poly_addr".to_string(),
+                    module_account.address().to_string(),
+                );
 
                 let now = Instant::now();
                 aptos_container
@@ -157,7 +165,7 @@ mod tests {
                         "./contracts/navori",
                         module_account_private_key,
                         &named_addresses,
-                        Some(vec!["libs", "cpu", "verifier"]),
+                        Some(vec!["libs", "cpu", "cpu-constraint-poly", "verifier"]),
                         false,
                     )
                     .await

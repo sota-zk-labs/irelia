@@ -22,9 +22,7 @@ tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
 
 [dev-dependencies]
-aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", tag = "v0.1.0", features = [
-  "testing",
-] }
+aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
