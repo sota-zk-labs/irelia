@@ -32,7 +32,6 @@ pub async fn register_continuous_memory_page(
             MoveValue::Vector(values),
             MoveValue::U256(U256::from_str(&data.z)?),
             MoveValue::U256(U256::from_str(&data.alpha)?),
-            MoveValue::U256(U256::from_str(&data.prime)?),
         ]),
     ));
     let tx = build_transaction(payload, &config.account, config.chain_id);

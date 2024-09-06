@@ -25,13 +25,12 @@ pub async fn register_continuous_page_batch(
         z,
         alpha,
         prime,
-        values: _,
-        start_addr: _,
+        values,
+        start_addr,
     } = data.memory_page_entries.first().unwrap();
 
     let z = MoveValue::U256(U256::from_str(z)?);
     let alpha = MoveValue::U256(U256::from_str(alpha)?);
-    let prime = MoveValue::U256(U256::from_str(prime)?);
 
     let mut converted_data = data
         .memory_page_entries
@@ -80,7 +79,6 @@ pub async fn register_continuous_page_batch(
 
     let txs = chunks.into_iter().enumerate().map(|(i, chunk)| {
         let (chunk_start_addr, chunk_values): (Vec<_>, Vec<_>) = chunk.into_iter().unzip();
-
         let payload = TransactionPayload::EntryFunction(EntryFunction::new(
             ModuleId::new(
                 config.module_address,
@@ -93,7 +91,6 @@ pub async fn register_continuous_page_batch(
                 MoveValue::Vector(chunk_values),
                 z.clone(),
                 alpha.clone(),
-                prime.clone(),
             ]),
         ));
         let tx = build_transaction(payload, &config.account, config.chain_id);

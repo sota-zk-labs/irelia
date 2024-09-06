@@ -4,6 +4,7 @@ mod tests {
 
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
+    use log::info;
     use test_log::test;
 
     use verifier_onchain_services::config::{AppConfig, EnvConfig};
@@ -31,18 +32,11 @@ mod tests {
                     chain_id: aptos_container.get_chain_id().to_string(),
                 });
 
-                let sequence_number = config
-                    .client
-                    .get_account(config.account.address())
-                    .await?
-                    .into_inner()
-                    .sequence_number;
-                config.account.set_sequence_number(sequence_number);
-
                 let mut named_addresses = HashMap::new();
-                named_addresses.insert("verifier_addr".to_string(), module_address.clone());
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
-                named_addresses.insert("cpu_addr".to_string(), module_address);
+                named_addresses.insert("cpu_addr".to_string(), module_address.clone());
+                named_addresses.insert("verifier_addr".to_string(), module_address.clone());
+
                 aptos_container
                     .upload_contract(
                         "./contracts/navori",
@@ -54,14 +48,36 @@ mod tests {
                     .await
                     .unwrap();
 
+                aptos_container
+                    .run_script(
+                        "./contracts/navori",
+                        sender_account_private_key,
+                        &named_addresses,
+                        &vec!["verifier"],
+                    )
+                    .await
+                    .unwrap();
+                let sequence_number = config
+                    .client
+                    .get_account(config.account.address())
+                    .await?
+                    .into_inner()
+                    .sequence_number;
+                config.account.set_sequence_number(sequence_number);
+
+                info!("Registering continuous page batch");
                 let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
                 register_continuous_page_batch(&config, register_continuous_page_batch_input)
                     .await
                     .unwrap();
 
+                info!("Registering continuous memory page");
                 let register_continuous_page_input = sample_register_continuous_page()?;
-                register_continuous_memory_page(&config, register_continuous_page_input).await?;
+                register_continuous_memory_page(&config, register_continuous_page_input)
+                    .await
+                    .unwrap();
 
+                info!("Registering large data continuous page batch");
                 let large_data_register_continuous_page_batch_input =
                     sample_large_data_register_continuous_page_batch()?;
                 register_continuous_page_batch(
@@ -70,6 +86,7 @@ mod tests {
                 )
                 .await
                 .unwrap();
+
                 Ok(())
             })
         })

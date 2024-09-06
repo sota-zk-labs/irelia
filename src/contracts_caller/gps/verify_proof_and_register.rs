@@ -7,12 +7,12 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
-use log::{debug, error, info};
+use log::{debug, info};
 
 use crate::config::AppConfig;
 use crate::contracts_caller::gps::types::verify_proof_and_register::VerifyProofAndRegisterData;
 use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
-use crate::error::CoreError::TransactionNotSucceed;
+use crate::error::CoreError::{FlowNotFinished, TransactionNotSucceed};
 
 pub async fn verify_proof_and_register(
     config: &AppConfig,
@@ -115,42 +115,43 @@ pub async fn verify_proof_and_register(
                     .wait_for_transaction(&pending_transaction)
                     .await?
                     .into_inner();
-                let transaction_info = transaction.transaction_info()?;
-                ensure!(
-                    transaction_info.success,
-                    TransactionNotSucceed(format!("{}; hash: {}", name, transaction_info.hash))
-                );
-                info!(
-                    "{} finished: id={}; hash={}; gas={}",
-                    name,
-                    transaction_info.version,
-                    transaction_info.hash.to_string(),
-                    transaction_info.gas_used,
-                );
-                Ok::<_, anyhow::Error>(transaction)
+                Ok::<_, anyhow::Error>((name, transaction))
             })
         })
         .collect::<Vec<_>>();
 
     let mut transactions = Vec::with_capacity(results.len());
     for handle in results {
-        transactions.push(handle.await??);
+        let (name, transaction) = handle.await??;
+        let transaction_info = transaction.transaction_info()?;
+        ensure!(
+            transaction_info.success,
+            TransactionNotSucceed(format!("{}; hash: {}", name, transaction_info.hash))
+        );
+        info!(
+            "{} finished: id={}; hash={}; gas={}",
+            name,
+            transaction_info.version,
+            transaction_info.hash.to_string(),
+            transaction_info.gas_used,
+        );
+        transactions.push(transaction);
     }
+
+    let last_transaction = transactions.last().unwrap();
 
     // Get the event from the last transaction
-    if let Some(last_transaction) = transactions.last() {
-        let event = get_event_from_transaction(
-            last_transaction,
-            MoveType::from_str(&format!(
-                "{}::{}::VparFinished",
-                config.module_address, module_name
-            ))?,
-        );
+    let event = get_event_from_transaction(
+        last_transaction,
+        MoveType::from_str(&format!(
+            "{}::{}::VparFinished",
+            config.module_address, module_name
+        ))?,
+    );
+    ensure!(
+        event.is_ok(),
+        FlowNotFinished("verify_proof_and_register".to_string())
+    );
 
-        info!("Verify_proof_and_register {}", event.is_ok());
-        if event.is_err() {
-            error!("Some things went wrong!");
-        }
-    }
     Ok(())
 }
