@@ -26,7 +26,8 @@ pub async fn merkle_verifier(config: &AppConfig, data: &VerifyMerkle) -> anyhow:
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "finished verify_merkle {}; gas used: {}",
+        "verify_merkle finished: id={}; hash={}; gas={}",
+        transaction_info.version,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

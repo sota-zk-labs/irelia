@@ -21,17 +21,10 @@ pub async fn register_continuous_page_batch(
     config: &AppConfig,
     data: MemoryPageEntries,
 ) -> anyhow::Result<()> {
-    let ContinuousMemoryPage {
-        z,
-        alpha,
-        prime,
-        values: _,
-        start_addr: _,
-    } = data.memory_page_entries.first().unwrap();
+    let ContinuousMemoryPage { z, alpha, .. } = data.memory_page_entries.first().unwrap();
 
     let z = MoveValue::U256(U256::from_str(z)?);
     let alpha = MoveValue::U256(U256::from_str(alpha)?);
-    let prime = MoveValue::U256(U256::from_str(prime)?);
 
     let mut converted_data = data
         .memory_page_entries
@@ -55,7 +48,7 @@ pub async fn register_continuous_page_batch(
         (vec![], vec![], 0),
         |(mut chunks, mut cur_el, mut cur_value_len), (start_addr, values_len, values)| {
             let new_value_len = cur_value_len + values_len;
-            if cur_el.len() == 0 {
+            if cur_el.is_empty() {
                 cur_el.push((start_addr, values));
                 cur_value_len += values_len;
                 return (chunks, cur_el, cur_value_len);
@@ -74,13 +67,12 @@ pub async fn register_continuous_page_batch(
         },
     );
 
-    if cur_el.len() != 0 {
+    if !cur_el.is_empty() {
         chunks.push(cur_el);
     }
 
     let txs = chunks.into_iter().enumerate().map(|(i, chunk)| {
         let (chunk_start_addr, chunk_values): (Vec<_>, Vec<_>) = chunk.into_iter().unzip();
-
         let payload = TransactionPayload::EntryFunction(EntryFunction::new(
             ModuleId::new(
                 config.module_address,
@@ -93,14 +85,10 @@ pub async fn register_continuous_page_batch(
                 MoveValue::Vector(chunk_values),
                 z.clone(),
                 alpha.clone(),
-                prime.clone(),
             ]),
         ));
         let tx = build_transaction(payload, &config.account, config.chain_id);
-        (
-            format!("register_continuous_memory_page_batch_{}", i).to_string(),
-            tx,
-        )
+        (format!("register_continuous_memory_page_batch_{}", i), tx)
     });
 
     let pending_transactions = txs
@@ -136,13 +124,12 @@ pub async fn register_continuous_page_batch(
                 let transaction_info = transaction.transaction_info()?;
                 ensure!(
                     transaction_info.success,
-                    TransactionNotSucceed(
-                        format!("{}; hash: {}", name, transaction_info.hash).to_string()
-                    )
+                    TransactionNotSucceed(format!("{}; hash: {}", name, transaction_info.hash))
                 );
                 info!(
-                    "{}: {}; gas used: {}",
+                    "{} finished: id={}; hash={}; gas={}",
                     name,
+                    transaction_info.version,
                     transaction_info.hash.to_string(),
                     transaction_info.gas_used,
                 );

@@ -30,7 +30,8 @@ pub async fn compute_next_layer(
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "finished compute next layer {}; gas used: {}",
+        "compute_next_layer finished: id={}; hash={}; gas={}",
+        transaction_info.version,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

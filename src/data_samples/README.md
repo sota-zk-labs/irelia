@@ -1,6 +1,7 @@
 # Aptos Transaction Verification
 
-This project verifies transaction data from the Ethereum mainnet. It follows a specific flow to verify both Merkle and FRI transactions, and then registers a continuous page batch and verifies proof and register.
+This project verifies transaction data from the Ethereum mainnet. It follows a specific flow to verify both Merkle and
+FRI transactions, and then registers a continuous page batch and verifies proof and register.
 
 ## Transaction Verification Flow
 

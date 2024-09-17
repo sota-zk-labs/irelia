@@ -40,7 +40,7 @@ pub fn build_transaction(
     )
     .sender(sender.address())
     .sequence_number(i)
-    .max_gas_amount(30000)
+    .max_gas_amount(200000)
     .gas_unit_price(100)
     .build();
     sender.sign_transaction(tx)

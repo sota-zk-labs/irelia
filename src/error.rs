@@ -19,6 +19,9 @@ pub enum CoreError {
     #[error("transaction not succeed {0}")]
     TransactionNotSucceed(String),
 
+    #[error("flow not finished {0}")]
+    FlowNotFinished(String),
+
     #[error("not found")]
     NotFound,
 

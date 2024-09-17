@@ -32,14 +32,14 @@ pub async fn register_continuous_memory_page(
             MoveValue::Vector(values),
             MoveValue::U256(U256::from_str(&data.z)?),
             MoveValue::U256(U256::from_str(&data.alpha)?),
-            MoveValue::U256(U256::from_str(&data.prime)?),
         ]),
     ));
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "register_continuous_memory_page: {}; gas used: {}",
+        "register_continuous_memory_page finished: id={}; hash={}; gas={}",
+        transaction_info.version,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

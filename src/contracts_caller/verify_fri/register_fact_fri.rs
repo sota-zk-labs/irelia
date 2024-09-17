@@ -31,7 +31,8 @@ pub async fn register_fact_fri(
     let transaction_status = transaction.success();
     let transaction_info = transaction.transaction_info()?;
     info!(
-        "finished register_fact_verify_fri {}; gas used: {}",
+        "register_fact_verify_fri finished: id={}; hash={}; gas={}",
+        transaction_info.version,
         transaction_info.hash.to_string(),
         transaction_info.gas_used
     );

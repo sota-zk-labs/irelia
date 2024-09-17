@@ -23,10 +23,10 @@ pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::R
         .into_inner()
         .transaction_info()?
         .clone();
-    let txd = transaction_info.hash;
     info!(
-        "init fri group {}; gas used {}",
-        txd.clone(),
+        "init_fri_group finished: id={}; hash={}; gas={}",
+        transaction_info.version,
+        transaction_info.hash.to_string(),
         transaction_info.gas_used
     );
     Ok(transaction_info.success)
