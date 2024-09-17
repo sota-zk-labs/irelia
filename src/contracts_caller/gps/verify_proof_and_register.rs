@@ -22,19 +22,19 @@ pub async fn verify_proof_and_register(
     let mut txs = vec![];
 
     // Register facts transaction
-    let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new("fact_registry")?),
-        Identifier::new("register_facts")?,
-        vec![],
-        serialize_values(&vec![MoveValue::Vector(
-            data.pre_registered_facts
-                .iter()
-                .map(|v| MoveValue::U256(*v))
-                .collect(),
-        )]),
-    ));
-    let tx = build_transaction(payload, &config.account, config.chain_id);
-    txs.push(("register_facts".to_string(), tx));
+    // let payload = TransactionPayload::EntryFunction(EntryFunction::new(
+    //     ModuleId::new(config.module_address, Identifier::new("fact_registry")?),
+    //     Identifier::new("register_facts")?,
+    //     vec![],
+    //     serialize_values(&vec![MoveValue::Vector(
+    //         data.pre_registered_facts
+    //             .iter()
+    //             .map(|v| MoveValue::U256(*v))
+    //             .collect(),
+    //     )]),
+    // ));
+    // let tx = build_transaction(payload, &config.account, config.chain_id);
+    // txs.push(("register_facts".to_string(), tx));
 
     // Prepush task metadata transaction
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(

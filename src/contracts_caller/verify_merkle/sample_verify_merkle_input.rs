@@ -11,7 +11,7 @@ pub fn sample_verify_merkle_input(
     index: isize,
 ) -> anyhow::Result<(MoveValue, MoveValue, MoveValue, MoveValue)> {
     let file_path = format!(
-        "./src/data_samples/merkle_verify/merkle_verify_{}.json",
+        "./src/data_samples/data_samples/merkle_verify/merkle_verify_{}.json",
         index
     );
     let input_file = File::open(file_path)?;

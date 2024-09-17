@@ -13,6 +13,8 @@ mod tests {
         VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
     };
     use verifier_onchain_services::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page;
     use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
     use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
     use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
@@ -41,6 +43,7 @@ mod tests {
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
                 named_addresses.insert("cpu_addr".to_string(), module_address.clone());
+                named_addresses.insert("cpu_constraint_poly_addr".to_string(), module_address.clone());
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
 
                 let now = Instant::now();
@@ -49,7 +52,7 @@ mod tests {
                         "./contracts/navori",
                         module_account_private_key,
                         &named_addresses,
-                        Some(vec!["libs", "cpu", "verifier"]),
+                        Some(vec!["libs", "cpu", "cpu-constraint-poly", "verifier"]),
                         false,
                     )
                     .await
@@ -113,6 +116,19 @@ mod tests {
                     .unwrap();
                     info!("Verify FRI {} success", i);
                 }
+
+                 for i in 1..4 {
+                     let register_continuous_page_input = sample_register_continuous_page(i)?;
+                     register_continuous_memory_page(&config, register_continuous_page_input)
+                         .await
+                         .unwrap();
+                     info!("Regiser continuous page {} success", i);
+                 }
+
+                verify_proof_and_register(&config, &sample_vpar_data(1).unwrap())
+                    .await
+                    .unwrap();
+
                 Ok(())
             })
         })
@@ -197,7 +213,7 @@ mod tests {
     fn sample_vpar_data(test_num: isize) -> anyhow::Result<VerifyProofAndRegisterData> {
         let data = serde_json::from_str::<VerifyProofAndRegisterDataJson>(
             fs::read_to_string(format!(
-                "src/data_samples/gps/verify_proof_and_register_{}.json",
+                "src/data_samples/data_samples/gps/verify_proof_and_register_{}.json",
                 test_num
             ))?
             .as_str(),
