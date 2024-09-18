@@ -49,7 +49,7 @@ async fn main() -> anyhow::Result<()> {
         info!("Verify FRI {} success", i);
     }
 
-    let register_continuous_page_batch_input = sample_register_continuous_page_batch()?;
+    let register_continuous_page_batch_input = sample_register_continuous_page_batch(1)?;
     register_continuous_page_batch(&config, register_continuous_page_batch_input).await?;
     info!("Register continuous page batch success");
     Ok(())

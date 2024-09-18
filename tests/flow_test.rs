@@ -14,7 +14,8 @@ mod tests {
     };
     use verifier_onchain_services::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
     use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_register_continuous_page, sample_register_continuous_page_batch};
     use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
     use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
     use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
@@ -43,7 +44,10 @@ mod tests {
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
                 named_addresses.insert("cpu_addr".to_string(), module_address.clone());
-                named_addresses.insert("cpu_constraint_poly_addr".to_string(), module_address.clone());
+                named_addresses.insert(
+                    "cpu_constraint_poly_addr".to_string(),
+                    module_address.clone(),
+                );
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
 
                 let now = Instant::now();
@@ -117,13 +121,13 @@ mod tests {
                     info!("Verify FRI {} success", i);
                 }
 
-                 for i in 1..4 {
-                     let register_continuous_page_input = sample_register_continuous_page(i)?;
-                     register_continuous_memory_page(&config, register_continuous_page_input)
-                         .await
-                         .unwrap();
-                     info!("Regiser continuous page {} success", i);
-                 }
+                for i in 1..5 {
+                    let register_continuous_page_input = sample_register_continuous_page_batch(i)?;
+                    register_continuous_page_batch(&config, register_continuous_page_input)
+                        .await
+                        .unwrap();
+                    info!("Regiser continuous page {} success", i);
+                }
 
                 verify_proof_and_register(&config, &sample_vpar_data(1).unwrap())
                     .await
