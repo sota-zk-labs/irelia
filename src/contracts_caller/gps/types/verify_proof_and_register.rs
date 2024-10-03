@@ -10,7 +10,7 @@ pub struct VerifyProofAndRegisterData {
     pub task_metadata: Vec<U256>,
     pub cairo_aux_input: Vec<U256>,
     pub cairo_verifier_id: U256,
-    pub pre_registered_facts: Vec<U256>,
+    pub pre_registered_facts: Option<Vec<U256>>,
 }
 
 #[derive(Deserialize)]
@@ -21,7 +21,7 @@ pub struct VerifyProofAndRegisterDataJson {
     pub task_metadata: Vec<String>,
     pub cairo_aux_input: Vec<String>,
     pub cairo_verifier_id: String,
-    pub pre_registered_facts: Vec<String>,
+    pub pre_registered_facts: Option<Vec<String>>,
 }
 
 impl From<VerifyProofAndRegisterDataJson> for VerifyProofAndRegisterData {
@@ -50,9 +50,9 @@ impl From<VerifyProofAndRegisterDataJson> for VerifyProofAndRegisterData {
             cairo_verifier_id: U256::from_str(value.cairo_verifier_id.as_str()).unwrap(),
             pre_registered_facts: value
                 .pre_registered_facts
-                .iter()
-                .map(|x| U256::from_str(x).unwrap())
-                .collect(),
+                .and_then(|data| Some(data.iter()
+                    .map(|x| U256::from_str(x).unwrap())
+                    .collect()))
         }
     }
 }

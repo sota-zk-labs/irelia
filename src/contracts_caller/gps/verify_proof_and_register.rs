@@ -77,7 +77,7 @@ pub async fn verify_proof_and_register(
     txs.push(("prepush_data_to_verify_proof_and_register".to_string(), tx));
 
     // Verify_proof_and_register
-    for cnt_loop in 1..10 {
+    for cnt_loop in 1..=12 {
         debug!("verify_proof_and_register {}", cnt_loop);
         let payload = TransactionPayload::EntryFunction(EntryFunction::new(
             ModuleId::new(config.module_address, Identifier::new(module_name)?),

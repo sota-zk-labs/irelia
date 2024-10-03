@@ -14,8 +14,7 @@ mod tests {
     };
     use verifier_onchain_services::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
     use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_register_continuous_page, sample_register_continuous_page_batch};
+    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_register_continuous_page};
     use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
     use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
     use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
@@ -43,11 +42,11 @@ mod tests {
 
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
-                named_addresses.insert("cpu_addr".to_string(), module_address.clone());
                 named_addresses.insert(
-                    "cpu_constraint_poly_addr".to_string(),
+                    "cpu_2_addr".to_string(),
                     module_address.clone(),
                 );
+                named_addresses.insert("cpu_addr".to_string(), module_address.clone());
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
 
                 let now = Instant::now();
@@ -56,7 +55,7 @@ mod tests {
                         "./contracts/navori",
                         module_account_private_key,
                         &named_addresses,
-                        Some(vec!["libs", "cpu", "cpu-constraint-poly", "verifier"]),
+                        Some(vec!["libs", "cpu-2", "cpu", "verifier"]),
                         false,
                     )
                     .await
@@ -83,7 +82,7 @@ mod tests {
                     .sequence_number;
                 config.account.set_sequence_number(sequence_number);
 
-                for i in 1..4 {
+                for i in 1..=3 {
                     let (merkle_view, initial_merkle_queue, height, expected_root) =
                         sample_verify_merkle_input(i).unwrap();
                     verify_merkle(
@@ -98,7 +97,7 @@ mod tests {
                     info!("Verify Merkle {} success", i);
                 }
 
-                for i in 1..8 {
+                for i in 1..=8 {
                     let (
                         fri_verify_input,
                         proof,
@@ -121,9 +120,9 @@ mod tests {
                     info!("Verify FRI {} success", i);
                 }
 
-                for i in 1..5 {
-                    let register_continuous_page_input = sample_register_continuous_page_batch(i)?;
-                    register_continuous_page_batch(&config, register_continuous_page_input)
+                for i in 1..=1 {
+                    let register_continuous_page_input = sample_register_continuous_page(i)?;
+                    register_continuous_memory_page(&config, register_continuous_page_input)
                         .await
                         .unwrap();
                     info!("Regiser continuous page {} success", i);
