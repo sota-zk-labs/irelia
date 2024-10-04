@@ -3,8 +3,13 @@ name = "verifier-onchain-services"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-anyhow = { version = "1.0.71" }
+[workspace]
+members = [
+    "adapter",
+    "prover",
+]
+
+[workspace.dependencies]
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
 async-trait = { version = "0.1.81" }
 dotenv = { version = "0.15.0" }
@@ -13,14 +18,23 @@ lazy_static = "1.4.0"
 log = { version = "0.4.22" }
 once_cell = { version = "1.19.0" }
 rand_core = { version = "0.5.1" }
-regex = { version = "1.10.6" }
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = { version = "1.0.120" }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = { version = "1.0.128" }
 test-log = { version = "0.2.16" }
-thiserror = { version = "1.0.63" }
+thiserror = { version = "1.0.64" }
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
 #stark_evm_adapter = {git = "https://github.com/sota-zk-labs/stark-evm-adapter", rev = "d7b073b1fbb3f0f520fc21d9d663f42669902c1b"}
+stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
+tempfile = "3.13.0"
+anyhow = "1.0.89"
+adapter = { path = "adapter" }
+scopeguard = "1.2.0"
+regex = "1.11.0"
+ethers = "2.0.14"
+num-bigint = "0.4.6"
+num-traits = "0.2.19"
+
 
 [dev-dependencies]
 aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
