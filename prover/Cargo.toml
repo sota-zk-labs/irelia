@@ -1,0 +1,7 @@
+[package]
+name = "prover"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+stone-cli = {git = "https://github.com/sota-zk-labs/stone-cli"}
