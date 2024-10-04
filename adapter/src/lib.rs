@@ -1,6 +1,6 @@
 use ethers::prelude::U256;
 
-mod annotated_proof;
+pub mod annotated_proof;
 mod annotation_parser;
 mod builtin_info;
 mod errors;

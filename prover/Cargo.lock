@@ -13,6 +13,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "adapter"
+version = "0.1.0"
+dependencies = [
+ "ethers",
+ "num-bigint",
+ "num-traits",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2968,7 +2981,12 @@ dependencies = [
 name = "prover"
 version = "0.1.0"
 dependencies = [
+ "adapter",
+ "anyhow",
+ "scopeguard",
+ "serde_json",
  "stone-cli",
+ "tempfile",
 ]
 
 [[package]]
