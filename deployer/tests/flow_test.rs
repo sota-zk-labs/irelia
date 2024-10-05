@@ -5,20 +5,20 @@ mod tests {
 
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
+    use deployer::config::{AppConfig, EnvConfig};
+    use deployer::contracts_caller::gps::types::verify_proof_and_register::{
+        VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
+    };
+    use deployer::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
+    use deployer::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
+    use deployer::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page;
+    use deployer::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
+    use deployer::contracts_caller::verify_fri::verify_fri::verify_fri;
+    use deployer::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
+    use deployer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
     use log::info;
     use test_log::test;
     use tokio::time::Instant;
-    use verifier_onchain_services::config::{AppConfig, EnvConfig};
-    use verifier_onchain_services::contracts_caller::gps::types::verify_proof_and_register::{
-        VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
-    };
-    use verifier_onchain_services::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
-    use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::{sample_register_continuous_page};
-    use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-    use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
-    use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-    use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 
     #[test(tokio::test)]
     pub async fn verifier_test() {
@@ -42,17 +42,14 @@ mod tests {
 
                 let mut named_addresses = HashMap::new();
                 named_addresses.insert("lib_addr".to_string(), module_address.clone());
-                named_addresses.insert(
-                    "cpu_2_addr".to_string(),
-                    module_address.clone(),
-                );
+                named_addresses.insert("cpu_2_addr".to_string(), module_address.clone());
                 named_addresses.insert("cpu_addr".to_string(), module_address.clone());
                 named_addresses.insert("verifier_addr".to_string(), module_address.clone());
 
                 let now = Instant::now();
                 aptos_container
                     .upload_contract(
-                        "./contracts/navori",
+                        "../contracts/navori",
                         module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "cpu-2", "cpu", "verifier"]),
@@ -65,7 +62,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .run_script(
-                        "./contracts/navori",
+                        "../contracts/navori",
                         sender_account_private_key,
                         &named_addresses,
                         &vec!["verifier"],
@@ -125,7 +122,7 @@ mod tests {
                     register_continuous_memory_page(&config, register_continuous_page_input)
                         .await
                         .unwrap();
-                    info!("Regiser continuous page {} success", i);
+                    info!("Register continuous page {} success", i);
                 }
 
                 verify_proof_and_register(&config, &sample_vpar_data(1).unwrap())
@@ -173,7 +170,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .upload_contract(
-                        "./contracts/navori",
+                        "../contracts/navori",
                         module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "cpu", "verifier"]),
@@ -186,7 +183,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .run_script(
-                        "./contracts/navori",
+                        "../contracts/navori",
                         sender_account_private_key,
                         &named_addresses,
                         &vec!["verifier"],

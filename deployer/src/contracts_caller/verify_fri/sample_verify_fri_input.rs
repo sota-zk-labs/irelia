@@ -17,7 +17,10 @@ pub fn sample_verify_fri_input(
     MoveValue,
     MoveValue,
 )> {
-    let file_path = format!("./src/data_samples/data_samples/fri_verify/fri_verify_{}.json", index);
+    let file_path = format!(
+        "./src/data_samples/data_samples/fri_verify/fri_verify_{}.json",
+        index
+    );
     let input_file = File::open(file_path)?;
     let reader = BufReader::new(input_file);
     let fri_verify_input: FriVerifyInput = serde_json::from_reader(reader)?;

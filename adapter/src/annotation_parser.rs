@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 use ethers::abi::Token;
 use ethers::utils::keccak256;
 use ethers::{types::U256, utils::hex};
@@ -5,7 +7,6 @@ use num_bigint::BigUint;
 use num_traits::{Num, One};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
 
 use crate::annotated_proof::AnnotatedProof;
 use crate::errors::ParseError;

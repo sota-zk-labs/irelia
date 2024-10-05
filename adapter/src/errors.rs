@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 use ethers::{
     abi::{
         ethereum_types::{FromDecStrErr, FromStrRadixErr},
@@ -6,7 +8,6 @@ use ethers::{
     utils::hex::FromHexError,
 };
 use num_bigint::ParseBigIntError;
-use std::num::ParseIntError;
 use thiserror::Error;
 
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/errors.rs

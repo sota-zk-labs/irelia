@@ -1,9 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 
-use ethers::{
-    types::U256,
-};
+use ethers::types::U256;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -27,7 +25,6 @@ pub struct FRIMerkleStatement {
 }
 
 impl FRIMerkleStatement {
-
     pub fn to_json(&self) -> String {
         let mut fri_queue = self.input_interleaved.clone();
         fri_queue.push(U256::from(0));
@@ -46,6 +43,7 @@ impl FRIMerkleStatement {
         let file_path = format!("{}.json", file_name);
         let mut file = File::create(file_path).expect("Unable to create file");
         let json_string = self.to_json();
-        file.write_all(json_string.as_bytes()).expect("Unable to write data");
+        file.write_all(json_string.as_bytes())
+            .expect("Unable to write data");
     }
 }

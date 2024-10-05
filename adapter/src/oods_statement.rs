@@ -1,7 +1,8 @@
-use std::{collections::HashMap, sync::Arc};
 use std::fs::File;
 use std::io::Write;
 use std::str::FromStr;
+use std::{collections::HashMap};
+
 use ethers::{
     abi::Token,
     types::U256,
@@ -11,11 +12,12 @@ use num_bigint::BigInt;
 use num_traits::{Num, One};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+
+use crate::builtin_info::{get_layout7_selected_builtins, BOOTLOADER_LEN, N_BUILTINS};
 use crate::{
     annotated_proof::{MemorySegment, ProofParameters, PublicInput, PublicMemory},
     default_prime,
 };
-use crate::builtin_info::{get_layout7_selected_builtins, BOOTLOADER_LEN, N_BUILTINS};
 
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/oods_statement.rs
 
@@ -153,7 +155,7 @@ impl MainProof {
     pub fn fit_layout_7(&mut self) {
         let mut selected_builtins = get_layout7_selected_builtins();
         let start_position = BOOTLOADER_LEN + 2;
-        for i in 0..N_BUILTINS-1 {
+        for i in 0..N_BUILTINS - 1 {
             if (selected_builtins & 1) == 0 {
                 let start = i + start_position;
                 let end = start + N_BUILTINS;
@@ -195,7 +197,6 @@ impl MainProof {
                 "poseidon",
             ];
         }
-
 
         let segments = &self.public_input.memory_segments;
         let mut sorted_segments: Vec<MemorySegment> = Vec::new();
@@ -598,7 +599,7 @@ impl MainProof {
         Ok(task_metadata)
     }
 
-    pub fn to_json(&self, fact_topologies: Vec<FactTopology>, layout: usize) -> String{
+    pub fn to_json(&self, fact_topologies: Vec<FactTopology>, layout: usize) -> String {
         let proof_param = self.proof_params();
         let task_meta_data = self.generate_tasks_metadata(true, fact_topologies).unwrap();
         let cairo_aux_input = self.cairo_aux_input(layout);
@@ -615,10 +616,16 @@ impl MainProof {
         serde_json::to_string_pretty(&json_data).expect("Unable to serialize data")
     }
 
-    pub fn write_to_json(&self, fact_topologies: Vec<FactTopology>, file_name: &str, layout: usize) {
+    pub fn write_to_json(
+        &self,
+        fact_topologies: Vec<FactTopology>,
+        file_name: &str,
+        layout: usize,
+    ) {
         let json_string = self.to_json(fact_topologies, layout);
         let file_path = format!("{}.json", file_name);
         let mut file = File::create(file_path).expect("Unable to create file");
-        file.write_all(json_string.as_bytes()).expect("Unable to write data");
+        file.write_all(json_string.as_bytes())
+            .expect("Unable to write data");
     }
 }

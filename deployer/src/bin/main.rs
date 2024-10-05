@@ -1,12 +1,11 @@
+use deployer::config::{AppConfig, EnvConfig};
+use deployer::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
+use deployer::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page_batch;
+use deployer::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
+use deployer::contracts_caller::verify_fri::verify_fri::verify_fri;
+use deployer::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
+use deployer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 use log::info;
-
-use verifier_onchain_services::config::{AppConfig, EnvConfig};
-use verifier_onchain_services::contracts_caller::memory_page_fact_registry::register_continuous_page_batch::register_continuous_page_batch;
-use verifier_onchain_services::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page_batch;
-use verifier_onchain_services::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-use verifier_onchain_services::contracts_caller::verify_fri::verify_fri::verify_fri;
-use verifier_onchain_services::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-use verifier_onchain_services::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

@@ -1,15 +1,16 @@
 use std::path::PathBuf;
+
+use adapter::annotated_proof::AnnotatedProof;
 use anyhow::Error;
 use scopeguard::defer;
-use tempfile::Builder;
-use stone_cli::args::{LayoutName, SerializeArgs, VerifyArgs};
 use stone_cli::args::Network::ethereum;
+use stone_cli::args::{LayoutName, SerializeArgs, VerifyArgs};
 use stone_cli::bootloader::run_bootloader;
 use stone_cli::prover::run_stone_prover_bootloader;
 use stone_cli::serialize::serialize_proof;
 use stone_cli::utils::{cleanup_tmp_files, parse, set_env_vars};
 use stone_cli::verifier::run_stone_verifier;
-use adapter::annotated_proof::AnnotatedProof;
+use tempfile::Builder;
 const CONFIG: &str = include_str!("../configs/env.json");
 const PARAMETER_PATH: &str = "./configs/bootloader_cpu_air_params.json";
 const BOOTLOADER_PROOF_NAME: &str = "bootloader_proof.json";
@@ -23,7 +24,7 @@ const SERIALIZED_PROOF_PATH: &str = "bootloader_serialized_proof.json";
 pub fn generate_proof(
     cairo_programs: Option<Vec<PathBuf>>,
     cairo_pies: Option<Vec<PathBuf>>,
-    layout: LayoutName
+    layout: LayoutName,
 ) -> Result<((serde_json::Value, AnnotatedProof)), Error> {
     if layout != LayoutName::starknet {
         anyhow::anyhow!("This layout is not supported");
@@ -35,19 +36,21 @@ pub fn generate_proof(
     // make a temp folder for storing proof
     let proof_tmp_dir = Builder::new()
         .prefix("stone-cli-proof")
-        .tempdir().map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e)).unwrap();
+        .tempdir()
+        .map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e))
+        .unwrap();
 
-    defer!{
+    defer! {
         cleanup_tmp_files(&proof_tmp_dir);
     }
-
 
     let tmp_dir = Builder::new()
         .prefix("stone-cli-")
         .tempdir()
-        .map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e)).unwrap();
+        .map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e))
+        .unwrap();
 
-    defer!{
+    defer! {
         cleanup_tmp_files(&tmp_dir);
     }
 
@@ -74,9 +77,8 @@ pub fn generate_proof(
                 &run_bootloader_result.air_private_input,
                 &tmp_dir,
             )
-                .map_err(|e| anyhow::anyhow!("Failed to run stone prover: {}", e))
+            .map_err(|e| anyhow::anyhow!("Failed to run stone prover: {}", e))
         })?;
-
 
     // verify proof
     let verify_args = VerifyArgs {
@@ -96,7 +98,8 @@ pub fn generate_proof(
     };
     serialize_proof(serialize_args).map_err(|e| anyhow::anyhow!("Serialization failed: {}", e))?;
 
-    let origin_proof_file = std::fs::read_to_string(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH))?;
+    let origin_proof_file =
+        std::fs::read_to_string(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH))?;
     let annotated_proof: AnnotatedProof = serde_json::from_str(&origin_proof_file)?;
 
     let topologies_file = std::fs::read_to_string(proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH))?;

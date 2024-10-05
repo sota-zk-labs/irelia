@@ -50,9 +50,7 @@ impl From<VerifyProofAndRegisterDataJson> for VerifyProofAndRegisterData {
             cairo_verifier_id: U256::from_str(value.cairo_verifier_id.as_str()).unwrap(),
             pre_registered_facts: value
                 .pre_registered_facts
-                .and_then(|data| Some(data.iter()
-                    .map(|x| U256::from_str(x).unwrap())
-                    .collect()))
+                .and_then(|data| Some(data.iter().map(|x| U256::from_str(x).unwrap()).collect())),
         }
     }
 }

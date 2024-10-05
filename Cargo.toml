@@ -5,8 +5,7 @@ edition = "2021"
 
 [workspace]
 members = [
-    "adapter",
-    "prover",
+    "adapter", "deployer", "prover"
 ]
 
 [workspace.dependencies]
@@ -34,6 +33,7 @@ regex = "1.11.0"
 ethers = "2.0.14"
 num-bigint = "0.4.6"
 num-traits = "0.2.19"
+aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
 
 
 [dev-dependencies]

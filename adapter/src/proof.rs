@@ -11,8 +11,12 @@ pub struct Proof {
     pub layout: usize,
 }
 
-impl Proof{
-    pub fn new(topology_json: serde_json::Value, annotated_proof: AnnotatedProof, layout: usize) -> Result<Self, String>{
+impl Proof {
+    pub fn new(
+        topology_json: serde_json::Value,
+        annotated_proof: AnnotatedProof,
+        layout: usize,
+    ) -> Result<Self, String> {
         if layout == 6 {
             Ok(Self::generate_layout6_proof(topology_json, annotated_proof))
         } else {
@@ -20,11 +24,15 @@ impl Proof{
         }
     }
 
-    pub fn generate_layout6_proof(topology_json: serde_json::Value, annotated_proof: AnnotatedProof) -> Self{
+    pub fn generate_layout6_proof(
+        topology_json: serde_json::Value,
+        annotated_proof: AnnotatedProof,
+    ) -> Self {
         let mut merkle_proofs: Vec<String> = vec![];
         let mut fri_proofs: Vec<String> = vec![];
         let mut memory_pages: Vec<String> = vec![];
-        let mut split_proofs: SplitProofs = split_fri_merkle_statements(annotated_proof.clone()).unwrap();
+        let mut split_proofs: SplitProofs =
+            split_fri_merkle_statements(annotated_proof.clone()).unwrap();
         let fact_topologies: Vec<FactTopology> =
             serde_json::from_value(topology_json.get("fact_topologies").unwrap().clone()).unwrap();
 
@@ -54,7 +62,7 @@ impl Proof{
             fri_proofs,
             memory_pages,
             main_proof,
-            layout: 6
+            layout: 6,
         }
     }
 }
@@ -64,16 +72,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_generate_proof() -> Result<(), Box<dyn std::error::Error>>{
+    fn test_generate_proof() -> Result<(), Box<dyn std::error::Error>> {
         let origin_proof_file = include_str!(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/test/bootloader_serialized_proof.json"
+            env!("CARGO_MANIFEST_DIR"),
+            "/test/bootloader_serialized_proof.json"
         ));
         let annotated_proof: AnnotatedProof = serde_json::from_str(&origin_proof_file)?;
 
         let topologies_file = include_str!(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/test/fact_topologies.json"
+            env!("CARGO_MANIFEST_DIR"),
+            "/test/fact_topologies.json"
         ));
         let topology_json: serde_json::Value = serde_json::from_str(&topologies_file).unwrap();
 

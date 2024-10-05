@@ -11,11 +11,10 @@ pub const N_BUILTINS: usize = 9;
 
 pub const BOOTLOADER_LEN: usize = 728;
 pub fn get_layout7_selected_builtins() -> usize {
-    let selected_builtins =
-        (1 << OUTPUT_BUILTIN_BIT) |
-            (1 << PEDERSEN_BUILTIN_BIT) |
-            (1 << RANGE_CHECK_BUILTIN_BIT) |
-            (1 << BITWISE_BUILTIN_BIT) |
-            (1 << POSEIDON_BUILTIN_BIT);
+    let selected_builtins = (1 << OUTPUT_BUILTIN_BIT)
+        | (1 << PEDERSEN_BUILTIN_BIT)
+        | (1 << RANGE_CHECK_BUILTIN_BIT)
+        | (1 << BITWISE_BUILTIN_BIT)
+        | (1 << POSEIDON_BUILTIN_BIT);
     selected_builtins as usize
 }
