@@ -7,7 +7,7 @@ mod errors;
 mod fri_merkle_statement;
 mod merkle_statement;
 mod oods_statement;
-mod proof;
+pub mod proof;
 
 /// Default prime field for cairo. This prime will be used when modular operations are needed.
 pub fn default_prime() -> U256 {

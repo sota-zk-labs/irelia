@@ -1,7 +1,8 @@
+mod errors;
+
 use std::path::PathBuf;
 
 use adapter::annotated_proof::AnnotatedProof;
-use anyhow::Error;
 use scopeguard::defer;
 use stone_cli::args::Network::ethereum;
 use stone_cli::args::{LayoutName, SerializeArgs, VerifyArgs};
@@ -11,6 +12,13 @@ use stone_cli::serialize::serialize_proof;
 use stone_cli::utils::{cleanup_tmp_files, parse, set_env_vars};
 use stone_cli::verifier::run_stone_verifier;
 use tempfile::Builder;
+
+use crate::errors::GenerateProofError;
+use crate::errors::GenerateProofError::{
+    BootloaderError, JsonValueError, SerializationError, StoneProverError, TempDirError,
+    UnsupportedLayoutError, VerifierError,
+};
+
 const CONFIG: &str = include_str!("../configs/env.json");
 const PARAMETER_PATH: &str = "./configs/bootloader_cpu_air_params.json";
 const BOOTLOADER_PROOF_NAME: &str = "bootloader_proof.json";
@@ -25,10 +33,11 @@ pub fn generate_proof(
     cairo_programs: Option<Vec<PathBuf>>,
     cairo_pies: Option<Vec<PathBuf>>,
     layout: LayoutName,
-) -> Result<((serde_json::Value, AnnotatedProof)), Error> {
+) -> Result<(serde_json::Value, AnnotatedProof), GenerateProofError> {
     if layout != LayoutName::starknet {
-        anyhow::anyhow!("This layout is not supported");
+        return Err(UnsupportedLayoutError);
     }
+
     // load config file
     let config = parse(CONFIG);
     set_env_vars(&config);
@@ -37,8 +46,7 @@ pub fn generate_proof(
     let proof_tmp_dir = Builder::new()
         .prefix("stone-cli-proof")
         .tempdir()
-        .map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e))
-        .unwrap();
+        .map_err(|_| TempDirError)?;
 
     defer! {
         cleanup_tmp_files(&proof_tmp_dir);
@@ -47,8 +55,7 @@ pub fn generate_proof(
     let tmp_dir = Builder::new()
         .prefix("stone-cli-")
         .tempdir()
-        .map_err(|e| anyhow::anyhow!("Failed to create temp dir: {}", e))
-        .unwrap();
+        .map_err(|_| TempDirError)?;
 
     defer! {
         cleanup_tmp_files(&tmp_dir);
@@ -69,7 +76,7 @@ pub fn generate_proof(
 
     // generate bootloader proof
     run_bootloader(&proof_args, &tmp_dir)
-        .map_err(|e| anyhow::anyhow!("Bootloader failed: {}", e))
+        .map_err(|e| BootloaderError(e.to_string()))
         .and_then(|run_bootloader_result| {
             run_stone_prover_bootloader(
                 &proof_args,
@@ -77,7 +84,7 @@ pub fn generate_proof(
                 &run_bootloader_result.air_private_input,
                 &tmp_dir,
             )
-            .map_err(|e| anyhow::anyhow!("Failed to run stone prover: {}", e))
+            .map_err(|e| StoneProverError(e.to_string()))
         })?;
 
     // verify proof
@@ -86,7 +93,7 @@ pub fn generate_proof(
         annotation_file: Some(PathBuf::from(proof_tmp_dir.path().join(ANNOTATION_PATH))),
         extra_output_file: Some(PathBuf::from(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH))),
     };
-    run_stone_verifier(verify_args).map_err(|e| anyhow::anyhow!("Verification failed: {}", e))?;
+    run_stone_verifier(verify_args).map_err(|e| VerifierError(e.to_string()))?;
 
     // serialize proof
     let serialize_args = SerializeArgs {
@@ -96,14 +103,17 @@ pub fn generate_proof(
         annotation_file: Some(PathBuf::from(proof_tmp_dir.path().join(ANNOTATION_PATH))),
         extra_output_file: Some(PathBuf::from(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH))),
     };
-    serialize_proof(serialize_args).map_err(|e| anyhow::anyhow!("Serialization failed: {}", e))?;
+    serialize_proof(serialize_args).map_err(|e| SerializationError(e.to_string()))?;
 
     let origin_proof_file =
-        std::fs::read_to_string(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH))?;
-    let annotated_proof: AnnotatedProof = serde_json::from_str(&origin_proof_file)?;
+        std::fs::read_to_string(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH)).unwrap();
+    let annotated_proof: AnnotatedProof =
+        serde_json::from_str(&origin_proof_file).map_err(|_| JsonValueError)?;
 
-    let topologies_file = std::fs::read_to_string(proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH))?;
-    let topology_json: serde_json::Value = serde_json::from_str(&topologies_file)?;
+    let topologies_file =
+        std::fs::read_to_string(proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH)).unwrap();
+    let topology_json: serde_json::Value =
+        serde_json::from_str(&topologies_file).map_err(|_| JsonValueError)?;
     Ok((topology_json, annotated_proof))
 }
 

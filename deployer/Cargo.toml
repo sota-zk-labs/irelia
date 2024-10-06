@@ -4,24 +4,24 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-aptos-sdk = { workspace = true}
+anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
 async-trait = { workspace = true }
 dotenv = { workspace = true }
-itertools = {workspace = true}
-lazy_static = {workspace = true}
+itertools = { workspace = true }
+lazy_static = { workspace = true }
 log = { workspace = true }
 once_cell = { workspace = true }
 rand_core = { workspace = true }
+regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 test-log = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 url = { workspace = true }
-anyhow = {workspace = true}
-regex = {workspace = true}
 
 [dev-dependencies]
-aptos-testcontainer = { workspace = true}
+aptos-testcontainer = { workspace = true }
 merlin = { git = "https://github.com/aptos-labs/merlin" }
 x25519-dalek = { git = "https://github.com/Tranduy1dol/x25519-dalek", branch = "zeroize_v1.7" }

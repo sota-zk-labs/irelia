@@ -1,6 +1,8 @@
 use crate::annotated_proof::AnnotatedProof;
 use crate::annotation_parser::{split_fri_merkle_statements, SplitProofs};
 use crate::default_prime;
+use crate::errors::GeneralError;
+use crate::errors::GeneralError::{JsonValueError, SplitError, UnsupportedLayoutError};
 use crate::oods_statement::FactTopology;
 
 pub struct Proof {
@@ -16,25 +18,26 @@ impl Proof {
         topology_json: serde_json::Value,
         annotated_proof: AnnotatedProof,
         layout: usize,
-    ) -> Result<Self, String> {
+    ) -> Result<Self, GeneralError> {
         if layout == 6 {
-            Ok(Self::generate_layout6_proof(topology_json, annotated_proof))
+            Self::generate_layout6_proof(topology_json, annotated_proof)
         } else {
-            Err(String::from("Unsupported layout"))
+            Err(UnsupportedLayoutError)
         }
     }
 
     pub fn generate_layout6_proof(
         topology_json: serde_json::Value,
         annotated_proof: AnnotatedProof,
-    ) -> Self {
+    ) -> Result<Self, GeneralError> {
         let mut merkle_proofs: Vec<String> = vec![];
         let mut fri_proofs: Vec<String> = vec![];
         let mut memory_pages: Vec<String> = vec![];
-        let mut split_proofs: SplitProofs =
-            split_fri_merkle_statements(annotated_proof.clone()).unwrap();
+        let split_proofs: SplitProofs =
+            split_fri_merkle_statements(annotated_proof.clone()).map_err(|_| SplitError)?;
         let fact_topologies: Vec<FactTopology> =
-            serde_json::from_value(topology_json.get("fact_topologies").unwrap().clone()).unwrap();
+            serde_json::from_value(topology_json.get("fact_topologies").unwrap().clone())
+                .map_err(|_| JsonValueError)?;
 
         for fri_statement in split_proofs.fri_merkle_statements {
             fri_proofs.push(fri_statement.to_json());
@@ -57,13 +60,13 @@ impl Proof {
         }
 
         let main_proof = split_proofs.main_proof.to_json(fact_topologies, 6);
-        Self {
+        Ok(Self {
             merkle_proofs,
             fri_proofs,
             memory_pages,
             main_proof,
             layout: 6,
-        }
+        })
     }
 }
 

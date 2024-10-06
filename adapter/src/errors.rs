@@ -31,6 +31,15 @@ pub enum ParseError {
     EtherEncodingError,
 }
 
+#[derive(Error, Debug)]
+pub enum GeneralError {
+    #[error("split error")]
+    SplitError,
+    #[error("unsupported layout error")]
+    UnsupportedLayoutError,
+    #[error("json value error")]
+    JsonValueError,
+}
 impl From<FromDecStrErr> for ParseError {
     fn from(_: FromDecStrErr) -> Self {
         ParseError::ParseU256Error

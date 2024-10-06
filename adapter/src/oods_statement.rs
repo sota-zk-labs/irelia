@@ -1,7 +1,4 @@
-use std::fs::File;
-use std::io::Write;
-use std::str::FromStr;
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use ethers::{
     abi::Token,
@@ -614,18 +611,5 @@ impl MainProof {
         });
 
         serde_json::to_string_pretty(&json_data).expect("Unable to serialize data")
-    }
-
-    pub fn write_to_json(
-        &self,
-        fact_topologies: Vec<FactTopology>,
-        file_name: &str,
-        layout: usize,
-    ) {
-        let json_string = self.to_json(fact_topologies, layout);
-        let file_path = format!("{}.json", file_name);
-        let mut file = File::create(file_path).expect("Unable to create file");
-        file.write_all(json_string.as_bytes())
-            .expect("Unable to write data");
     }
 }

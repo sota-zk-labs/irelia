@@ -4,9 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [
-    "adapter", "deployer", "prover"
-]
+members = ["adapter", "deployer", "prover"]
 
 [workspace.dependencies]
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
@@ -28,6 +26,7 @@ stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
 tempfile = "3.13.0"
 anyhow = "1.0.89"
 adapter = { path = "adapter" }
+prover = { path = "prover" }
 scopeguard = "1.2.0"
 regex = "1.11.0"
 ethers = "2.0.14"
@@ -42,3 +41,10 @@ aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
 x25519-dalek = { git = "https://github.com/Tranduy1dol/x25519-dalek", branch = "zeroize_v1.7" }
+
+[dependencies]
+adapter = { workspace = true }
+anyhow = { workspace = true }
+prover = { workspace = true }
+stone-cli = { workspace = true }
+thiserror = { workspace = true }
