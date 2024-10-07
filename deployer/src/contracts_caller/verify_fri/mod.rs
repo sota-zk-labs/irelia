@@ -1,4 +1,5 @@
 pub mod compute_next_layer;
+pub mod extract_verify_fri_input;
 pub mod fri_statement;
 pub mod init_fri_group;
 pub mod merkle_verifier;

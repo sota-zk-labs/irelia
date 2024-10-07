@@ -8,4 +8,6 @@ pub enum FlowError {
     ProverError(String),
     #[error("adapter error")]
     AdapterError(String),
+    #[error("verify error")]
+    VerifyError(String),
 }

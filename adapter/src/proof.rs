@@ -78,13 +78,13 @@ mod tests {
     fn test_generate_proof() -> Result<(), Box<dyn std::error::Error>> {
         let origin_proof_file = include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/test/bootloader_serialized_proof.json"
+            "/tests/bootloader_serialized_proof.json"
         ));
         let annotated_proof: AnnotatedProof = serde_json::from_str(&origin_proof_file)?;
 
         let topologies_file = include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/test/fact_topologies.json"
+            "/tests/fact_topologies.json"
         ));
         let topology_json: serde_json::Value = serde_json::from_str(&topologies_file).unwrap();
 

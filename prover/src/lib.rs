@@ -61,13 +61,19 @@ pub fn generate_proof(
         cleanup_tmp_files(&tmp_dir);
     }
 
+    let parameter_file = Some(PathBuf::from(format!(
+        "{}/{}",
+        env!("CARGO_MANIFEST_DIR"),
+        PARAMETER_PATH
+    )));
+
     // proof generator arguments
     let proof_args = stone_cli::args::ProveBootloaderArgs {
         cairo_programs,
         cairo_pies,
         layout,
         prover_config_file: Default::default(),
-        parameter_file: Some(PathBuf::from(PARAMETER_PATH)),
+        parameter_file,
         output: PathBuf::from(proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME)),
         fact_topologies_output: PathBuf::from(proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH)),
         parameter_config: Default::default(),
@@ -124,7 +130,7 @@ mod tests {
     #[test]
     fn test_generate_proof() {
         let cairo_programs = None;
-        let cairo_pie = Some(vec![PathBuf::from("./test/fibonacci_with_output.zip")]);
+        let cairo_pie = Some(vec![PathBuf::from("./tests/fibonacci_with_output.zip")]);
         let layout = LayoutName::starknet;
         let res = generate_proof(cairo_programs, cairo_pie, layout);
         assert!(res.is_ok());

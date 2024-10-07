@@ -2979,6 +2979,7 @@ checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
 name = "deployer"
 version = "0.1.0"
 dependencies = [
+ "adapter",
  "anyhow",
  "aptos-sdk",
  "aptos-testcontainer",
@@ -10045,15 +10046,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1bddf1187be692e79c5ffeab891132dfb0f236ed36a43c7ed39f1165ee20191"
 
 [[package]]
-name = "verifier-onchain-services"
+name = "verifier"
 version = "0.1.0"
 dependencies = [
  "adapter",
  "anyhow",
+ "aptos-sdk",
  "aptos-testcontainer",
+ "deployer",
+ "log",
  "prover",
  "stone-cli",
+ "test-log",
  "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "verifier-onchain-services"
+version = "0.1.0"
+dependencies = [
+ "aptos-testcontainer",
 ]
 
 [[package]]
