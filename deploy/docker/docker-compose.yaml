@@ -1,0 +1,56 @@
+version: '3.8'
+networks:
+  rust-api-server:
+name: 'rust-services-docker'
+services:
+  quickwit:
+    image: quickwit/quickwit:latest
+    command: run
+    restart: always
+    environment:
+      QW_ENABLE_OTLP_ENDPOINT: 'true'
+      QW_ENABLE_JAEGER_ENDPOINT: 'true'
+    ports:
+      - '7280:7280'
+      - '7281:7281'
+  jaeger:
+    image: jaegertracing/jaeger-query:latest
+    restart: always
+    depends_on:
+      - quickwit
+    environment:
+      SPAN_STORAGE_TYPE: 'grpc-plugin'
+      GRPC_STORAGE_SERVER: 'quickwit:7281'
+    ports:
+      - '16686:16686'
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - '5432:5432'
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis:/data
+    ports:
+      - '6379:6379'
+  public_server:
+    image: rust-api-server
+    build:
+      context: ../..
+      target: public-dev
+    ports:
+      - '8888:8888'
+    volumes:
+      - ./01_public_custom.toml:/user/01_custom.toml:ro
+    depends_on:
+      - postgres
+volumes:
+  postgres:
+  redis:

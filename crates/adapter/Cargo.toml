@@ -1,0 +1,25 @@
+[package]
+autobenches = true
+autobins = true
+autoexamples = true
+autotests = true
+edition = "2021"
+name = "adapter"
+version = "0.0.1"
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+common = { workspace = true }
+deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
+diesel = { workspace = true, features = [
+  "postgres",
+  "postgres_backend",
+  "uuid",
+] }
+diesel_migrations = { workspace = true }
+redis-async = { workspace = true }
+rust_core = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+testcontainers-modules = { workspace = true, features = ["postgres", "redis"] }
+tokio = { workspace = true, features = ["full"] }

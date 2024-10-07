@@ -1,44 +1,45 @@
-[package]
-name = "verifier-onchain-services"
-version = "0.1.0"
-edition = "2021"
-
 [workspace]
-members = ["adapter", "deployer", "prover", "verifier"]
+resolver = "2"
+
+members = [
+  "crates/adapter",
+  "crates/common",
+  "crates/core",
+  "crates/public",
+]
 
 [workspace.dependencies]
-aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
-async-trait = { version = "0.1.81" }
-dotenv = { version = "0.15.0" }
-itertools = "0.10.5"
-lazy_static = "1.4.0"
-log = { version = "0.4.22" }
-once_cell = { version = "1.19.0" }
-rand_core = { version = "0.5.1" }
-serde = { version = "1.0.210", features = ["derive"] }
+adapter = { path = "crates/adapter" }
+common = { path = "crates/common" }
+rust_core = { path = "crates/core" }
+
+anyhow = { version = "1.0.87" }
+async = { version = "0.0.2" }
+async-trait = { version = "0.1.82" }
+clap = { version = "4.5.17" }
+config = { version = "0.14.0" }
+deadpool-diesel = { version = "0.6.1" }
+diesel = { version = "2.2.4" }
+diesel_migrations = { version = "2.2.0" }
+glob = { version = "0.3.1" }
+openssl = { version = "0.10.66" }
+opentelemetry = { version = "0.24.0" }
+opentelemetry-otlp = { version = "0.17.0" }
+opentelemetry-semantic-conventions = { version = "0.16.0" }
+opentelemetry_sdk = { version = "0.24.1" }
+prost = { version = "0.13.2" }
+rand = { version = "0.9.0-alpha.2" }
+readonly = { version = "0.2.12" }
+redis-async = { version = "0.17.2" }
+serde = { version = "1.0" }
 serde_json = { version = "1.0.128" }
-test-log = { version = "0.2.16" }
-thiserror = { version = "1.0.64" }
-tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
-url = { version = "2.4.0", features = ["serde"] }
-#stark_evm_adapter = {git = "https://github.com/sota-zk-labs/stark-evm-adapter", rev = "d7b073b1fbb3f0f520fc21d9d663f42669902c1b"}
-stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
-tempfile = "3.13.0"
-anyhow = "1.0.89"
-adapter = { path = "adapter" }
-prover = { path = "prover" }
-deployer = { path = "deployer" }
-scopeguard = "1.2.0"
-regex = "1.11.0"
-ethers = "2.0.14"
-num-bigint = "0.4.6"
-num-traits = "0.2.19"
-aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
-
-
-[dev-dependencies]
-aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
-
-[patch.crates-io]
-merlin = { git = "https://github.com/aptos-labs/merlin" }
-x25519-dalek = { git = "https://github.com/Tranduy1dol/x25519-dalek", branch = "zeroize_v1.7" }
+testcontainers-modules = { version = "0.11.2" }
+thiserror = { version = "1.0.63" }
+tokio = { version = "1.40.0" }
+tonic = { version = "0.12.2" }
+tracing = { version = "0.1.40" }
+tracing-bunyan-formatter = { version = "0.3.9" }
+tracing-opentelemetry = { version = "0.25.0" }
+tracing-subscriber = { version = "0.3.18" }
+tower-http = { version =  "0.6.1" }
+axum = {version = "0.8.0-alpha.1"}
