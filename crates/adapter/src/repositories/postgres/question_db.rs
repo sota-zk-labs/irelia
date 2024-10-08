@@ -4,7 +4,7 @@ use diesel::{
     delete, insert_into, update, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
-use rust_core::common::errors::CoreError;
+use rust_core::common::core_error::CoreError;
 use rust_core::entities::question::{QuestionEntity, QuestionId};
 use rust_core::entities::question_filter::QuestionFilter;
 use rust_core::ports::question::QuestionPort;

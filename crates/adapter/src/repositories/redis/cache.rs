@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 use redis_async::{client, resp::RespValue, resp_array};
-use rust_core::{common::errors::CoreError, ports::cache::CachePort};
+use rust_core::{common::core_error::CoreError, ports::cache::CachePort};
 
 /// Represents a Redis cache implementation.
 pub struct RedisCache {

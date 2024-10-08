@@ -1,0 +1,13 @@
+[package]
+edition = "2021"
+name = "prover"
+version = "0.1.0"
+
+[dependencies]
+adapter = { workspace = true }
+anyhow = { workspace = true }
+scopeguard = { workspace = true }
+serde_json = { workspace = true }
+stone-cli = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use rust_core::common::errors::CoreError;
+use rust_core::common::core_error::CoreError;
 use rust_core::entities::question::{QuestionEntity, QuestionId};
 use rust_core::entities::question_filter::QuestionFilter;
 use rust_core::ports::question::QuestionPort;

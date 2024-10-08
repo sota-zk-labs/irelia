@@ -5,7 +5,7 @@ use std::{
 };
 
 use async_trait::async_trait;
-use rust_core::common::errors::CoreError;
+use rust_core::common::core_error::CoreError;
 use rust_core::ports::cache::CachePort;
 use tokio::sync::RwLock;
 

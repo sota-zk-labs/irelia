@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::common::errors::CoreError;
+use crate::common::core_error::CoreError;
 use crate::entities::question::{QuestionEntity, QuestionId};
 use crate::entities::question_filter::QuestionFilter;
 

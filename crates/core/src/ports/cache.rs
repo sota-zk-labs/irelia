@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 
-use crate::common::errors::CoreError;
+use crate::common::core_error::CoreError;
 
 /// Represents a cache port for storing key-value pairs.
 #[async_trait]

@@ -2,7 +2,7 @@ use std::io;
 
 use axum::extract::rejection::JsonRejection;
 use axum::response::{IntoResponse, Response};
-use rust_core::common::errors::CoreError;
+use rust_core::common::core_error::CoreError;
 use thiserror::Error;
 
 use crate::json_response::JsonResponse;

@@ -10,5 +10,10 @@ version = "0.0.1"
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { workspace = true }
+ethers = { workspace = true }
+num-bigint = { workspace = true }
+regex = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+stone-cli = { workspace = true }
 thiserror = { workspace = true }

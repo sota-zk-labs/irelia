@@ -130,7 +130,7 @@ mod question_repository_tests {
 mod cache_repository_tests {
     use std::time::Duration;
 
-    use rust_core::common::errors::CoreError;
+    use rust_core::common::core_error::CoreError;
     use rust_core::ports::cache::CachePort;
     use testcontainers_modules::redis::Redis;
     use testcontainers_modules::testcontainers::runners::AsyncRunner;

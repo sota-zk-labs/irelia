@@ -1,0 +1,17 @@
+[package]
+edition = "2021"
+name = "verifier"
+version = "0.1.0"
+
+[dependencies]
+adapter = { workspace = true }
+anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
+aptos-testcontainer = { workspace = true }
+deployer = { workspace = true }
+log = { workspace = true, features = [] }
+prover = { workspace = true }
+stone-cli = { workspace = true }
+test-log = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
