@@ -4,9 +4,9 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::verify_fri::types::register_fact_verify_fri::RegisterFactVerifyFri;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::transaction_helper::build_transaction;
+use crate::aptos_writer::contracts_caller::verify_fri::types::register_fact_verify_fri::RegisterFactVerifyFri;
 
 pub async fn register_fact_fri(
     config: &AppConfig,

@@ -1,4 +1,4 @@
-use crate::contracts_caller::gps::types::verify_proof_and_register::{
+use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::{
     VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
 };
 

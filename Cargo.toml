@@ -2,24 +2,19 @@
 resolver = "2"
 
 members = [
-#  "crates/adapter",
+  "crates/adapter",
   "crates/common",
   "crates/core",
-#  "crates/public",
-#  "crates/temp/deployer",
-#  "crates/temp/prover",
-#  "crates/temp/adapter",
-#  "crates/temp/verifier",
+  "crates/public",
   "crates/worker",
 ]
 
 [workspace.dependencies]
-#adapter = { path = "crates/adapter" }
+adapter = { path = "crates/adapter" }
 common = { path = "crates/common" }
 rust_core = { path = "crates/core" }
-#temp_adapter = { path = "crates/temp/adapter" }
-#verifier = { path = "crates/temp/verifier" }
-worker = { path = "crates/worker" }
+verifier = { path = "crates/temp/verifier" }
+worker = {path = "crates/worker"}
 
 anyhow = { version = "1.0.87" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
@@ -34,7 +29,6 @@ diesel_migrations = { version = "2.2.0" }
 dotenv = { version = "0.15.0" }
 ethers = { version = "2.0.14" }
 glob = { version = "0.3.1" }
-graphile_worker = { version = "0.8.0" }
 itertools = { version = "0.13.0" }
 lazy_static = { version = "1.4.0" }
 log = { version = "0.4.22" }
@@ -48,14 +42,15 @@ opentelemetry-semantic-conventions = { version = "0.16.0" }
 opentelemetry_sdk = { version = "0.24.1" }
 prost = { version = "0.13.2" }
 rand = { version = "0.9.0-alpha.2" }
-rand_core = { version = "0.6.4" }
+rand_core = { version = "0.5.1" }
+graphile_worker = { version = "0.8.0" }
 readonly = { version = "0.2.12" }
 redis-async = { version = "0.17.2" }
 regex = { version = "1.11.0" }
 scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
-serde_json = { version = "1.0.128" }
 sqlx = { version = "*" }
+serde_json = { version = "1.0.128" }
 stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
@@ -69,6 +64,7 @@ tracing-bunyan-formatter = { version = "0.3.9" }
 tracing-opentelemetry = { version = "0.25.0" }
 tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.4.0", features = ["serde"] }
+uuid = { version = "1.10.0"}
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

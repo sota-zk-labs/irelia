@@ -5,17 +5,17 @@ mod tests {
 
     use aptos_sdk::types::LocalAccount;
     use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
-    use deployer::config::{AppConfig, EnvConfig};
-    use deployer::contracts_caller::gps::types::verify_proof_and_register::{
+    use crate::aptos_writer::config::{AppConfig, EnvConfig};
+    use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::{
         VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
     };
-    use deployer::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
-    use deployer::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
-    use deployer::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page;
-    use deployer::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
-    use deployer::contracts_caller::verify_fri::verify_fri::verify_fri;
-    use deployer::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
-    use deployer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
+    use crate::aptos_writer::contracts_caller::gps::verify_proof_and_register::verify_proof_and_register;
+    use crate::aptos_writer::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
+    use crate::aptos_writer::contracts_caller::memory_page_fact_registry::sample_register_memory::sample_register_continuous_page;
+    use crate::aptos_writer::contracts_caller::verify_fri::sample_verify_fri_input::sample_verify_fri_input;
+    use crate::aptos_writer::contracts_caller::verify_fri::verify_fri::verify_fri;
+    use crate::aptos_writer::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
+    use crate::aptos_writer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
     use log::info;
     use test_log::test;
     use tokio::time::Instant;
@@ -170,7 +170,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .upload_contract(
-                        "../contracts/navori",
+                        "../../../contracts/navori",
                         module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "cpu", "verifier"]),
@@ -183,7 +183,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .run_script(
-                        "../contracts/navori",
+                        "../../../contracts/navori",
                         sender_account_private_key,
                         &named_addresses,
                         &vec!["verifier"],

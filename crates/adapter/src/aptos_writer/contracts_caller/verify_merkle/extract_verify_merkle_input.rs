@@ -3,7 +3,7 @@ use std::str::FromStr;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
 
-use crate::contracts_caller::verify_merkle::types::verify_merkle_input::MerkleVerifyInput;
+use crate::aptos_writer::contracts_caller::verify_merkle::types::verify_merkle_input::MerkleVerifyInput;
 
 pub fn extract_verify_merkle_input(
     merkle_inputs: &[String],

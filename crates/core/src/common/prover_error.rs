@@ -39,6 +39,18 @@ pub enum ProverError {
     UnsupportedLayoutError,
     #[error("json value error")]
     JsonValueError,
+    #[error("parse error")]
+    ParseError,
+    #[error("temporary directory error")]
+    TempDirError,
+    #[error("bootloader error")]
+    BootloaderError(String),
+    #[error("stone temp error")]
+    StoneProverError(String),
+    #[error("verifier error")]
+    VerifierError(String),
+    #[error("serialization error")]
+    SerializationError(String),
 }
 impl From<FromDecStrErr> for ParseError {
     fn from(_: FromDecStrErr) -> Self {

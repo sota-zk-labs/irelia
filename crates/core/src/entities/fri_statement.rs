@@ -1,10 +1,7 @@
-use ethers::types::U256;
+use ethers::prelude::U256;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-/// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/fri_merkle_statement.rs
-
-/// Decommitment for a FRI layer merkle statement
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FRIMerkleStatement {
     pub expected_root: U256,

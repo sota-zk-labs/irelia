@@ -10,16 +10,15 @@ use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{SignedTransaction, TransactionPayload};
 use aptos_sdk::types::LocalAccount;
 use rand_core::OsRng;
-
-use crate::error::CoreError;
+use rust_core::common::aptos_writer_error::AptosWriterError;
 
 #[inline]
-pub fn str_to_u256(s: &str) -> Result<U256, CoreError> {
+pub fn str_to_u256(s: &str) -> Result<U256, AptosWriterError> {
     U256::from_str(s).map_err(|e| e.into())
 }
 
 #[inline]
-pub fn str_to_u64(s: &str) -> Result<u64, CoreError> {
+pub fn str_to_u64(s: &str) -> Result<u64, AptosWriterError> {
     u64::from_str(s).map_err(|e| e.into())
 }
 
@@ -88,5 +87,5 @@ pub fn get_event_from_transaction(
         Transaction::BlockEpilogueTransaction(_) => None,
         Transaction::ValidatorTransaction(_) => None,
     };
-    event.ok_or(Error::new(CoreError::NotFound))
+    event.ok_or(Error::new(AptosWriterError::NotFound))
 }

@@ -17,3 +17,6 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 stone-cli = { workspace = true }
 thiserror = { workspace = true }
+aptos-sdk = {workspace = true}
+#diesel = {workspace = true, features = ["uuid"]}
+uuid = { workspace = true, features = ["v4"] }

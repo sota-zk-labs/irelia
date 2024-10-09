@@ -3,7 +3,7 @@ use std::str::FromStr;
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
 
-use crate::contracts_caller::verify_fri::types::fri_verify_input::FriVerifyInput;
+use crate::aptos_writer::contracts_caller::verify_fri::types::fri_verify_input::FriVerifyInput;
 
 pub fn extract_verify_fri_input(
     fri_inputs: &[String],

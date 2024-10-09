@@ -6,13 +6,12 @@ use ethers::{types::U256, utils::hex};
 use num_bigint::BigUint;
 use num_traits::{Num, One};
 use regex::Regex;
+use rust_core::common::prover_error::ParseError;
+use rust_core::entities::annotated_proof::{AnnotatedProof, SplitProofs};
+use rust_core::entities::fri_statement::FRIMerkleStatement;
+use rust_core::entities::gps_statement::MainProof;
+use rust_core::entities::merkle_statement::MerkleStatement;
 use serde::{Deserialize, Serialize};
-
-use crate::annotated_proof::AnnotatedProof;
-use crate::errors::ParseError;
-use crate::fri_merkle_statement::FRIMerkleStatement;
-use crate::merkle_statement::MerkleStatement;
-use crate::oods_statement::MainProof;
 
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/annotation_parser.rs
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -70,14 +69,6 @@ struct FriMerklesOriginal {
     pub fri_names: Vec<String>,
     pub original_proof: Vec<u8>,
     pub merkle_patches: HashSet<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-/// [SplitProofs] maps the split proof json file which contains the main proof and the merkle statements
-pub struct SplitProofs {
-    pub main_proof: MainProof,
-    pub merkle_statements: HashMap<String, MerkleStatement>,
-    pub fri_merkle_statements: Vec<FRIMerkleStatement>,
 }
 
 // Parses hex strings and pads with zeros to make it 64 characters long

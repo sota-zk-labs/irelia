@@ -1,10 +1,7 @@
-use ethers::types::U256;
+use ethers::prelude::U256;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-/// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/merkle_statement.rs
-
-/// Decommitment for a merkle statement
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MerkleStatement {
     expected_root: U256,

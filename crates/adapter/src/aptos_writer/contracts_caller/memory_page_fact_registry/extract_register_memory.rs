@@ -1,5 +1,5 @@
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
+use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
+use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
 
 pub fn extract_register_continuous_page_batch(
     memory_pages: &[String],

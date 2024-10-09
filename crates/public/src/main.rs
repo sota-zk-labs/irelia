@@ -4,13 +4,10 @@ use openssl;
 #[cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 use diesel;
 
-use std::net::{Ipv4Addr, SocketAddrV4};
-use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use adapter::repositories::in_memory::question::QuestionInMemoryRepository;
-use adapter::repositories::postgres::question_db::QuestionDBRepository;
+use adapter::repositories::postgres::job_db::JobDBRepository;
 use clap::{Parser, Subcommand};
 use common::kill_signals;
 use common::loggers::telemetry::init_telemetry;
@@ -21,33 +18,14 @@ use irelia::controllers::app_state::AppState;
 use irelia::options::Options;
 use irelia::router::routes;
 use opentelemetry::global;
-use rust_core::ports::question::QuestionPort;
-use tokio::sync::oneshot;
-use tokio::sync::oneshot::Receiver;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-
+use common::cli_args::CliArgs;
+use worker
 #[tokio::main]
 async fn main() {
-    let args = Args::parse();
-    if args.version {
-        println!(env!("APP_VERSION"));
-        return;
-    }
-
-    let options: Options = match parse_options(args.config_path) {
-        Ok(options) => options,
-        Err(err) => {
-            println!("Failed to load config: {}", err);
-            return;
-        }
-    };
-
-    if let Some(Commands::Config) = args.command {
-        println!("{:#?}", options);
-        return;
-    }
+    let options: Options = CliArgs::default_run_or_get_options(env!("APP_VERSION"));
 
     init_telemetry(
         options.service_name.as_str(),
@@ -55,13 +33,8 @@ async fn main() {
         options.log.level.as_str(),
     );
 
-    let (tx, rx) = oneshot::channel();
-    let server = tokio::spawn(serve(options, rx));
-
-    kill_signals::wait_for_kill_signals().await;
-
-    // Send the shutdown signal
-    let _ = tx.send(());
+    let server = tokio::spawn(serve(options));
+    run_workers(options.pg.clone()).await;
 
     // Wait for the server to finish shutting down
     tokio::try_join!(server).expect("Failed to run server");
@@ -90,25 +63,16 @@ enum Commands {
     Config,
 }
 
-pub async fn serve(options: Options, rx: Receiver<()>) {
-    let question_port: Arc<dyn QuestionPort + Send + Sync> = if options.db.in_memory.is_some() {
-        info!("Using in-memory database");
-        Arc::new(QuestionInMemoryRepository::new())
-    } else if options.db.pg.is_some() {
-        let database_config = options.db.pg.clone().unwrap();
-        info!("Using postgres database: {}", database_config.url);
-        let manager = Manager::new(database_config.url, Runtime::Tokio1);
-        let pool = Pool::builder(manager)
-            .max_size(database_config.max_size)
-            .build()
-            .unwrap();
-        Arc::new(QuestionDBRepository::new(pool))
-    } else {
-        info!("No database specified, falling back to in-memory");
-        Arc::new(QuestionInMemoryRepository::new())
-    };
+pub async fn serve(options: Options) {
+    info!("Using postgres database: {}", &options.pg.url);
+    let manager = Manager::new(&options.pg.url, Runtime::Tokio1);
+    let pool = Pool::builder(manager)
+        .max_size(options.pg.max_size)
+        .build()
+        .unwrap();
+    let job_port = Arc::new(JobDBRepository::new(pool));
 
-    let routes = routes(AppState { question_port }).layer((
+    let routes = routes(AppState { job_port }).layer((
         TraceLayer::new_for_http(),
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.

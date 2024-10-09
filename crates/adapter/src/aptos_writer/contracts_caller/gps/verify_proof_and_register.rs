@@ -8,11 +8,15 @@ use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::{debug, info};
+use rust_core::common::aptos_writer_error::AptosWriterError::{
+    FlowNotFinished, TransactionNotSucceed,
+};
 
-use crate::config::AppConfig;
-use crate::contracts_caller::gps::types::verify_proof_and_register::VerifyProofAndRegisterData;
-use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
-use crate::error::CoreError::{FlowNotFinished, TransactionNotSucceed};
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::VerifyProofAndRegisterData;
+use crate::aptos_writer::contracts_caller::transaction_helper::{
+    build_transaction, get_event_from_transaction,
+};
 
 pub async fn verify_proof_and_register(
     config: &AppConfig,

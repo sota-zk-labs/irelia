@@ -1,8 +1,7 @@
 use std::fmt::{Display, Formatter};
 
 use regex::Regex;
-
-use crate::error::CoreError;
+use rust_core::common::aptos_writer_error::AptosWriterError;
 
 #[derive(Debug)]
 pub struct VmStatus {
@@ -19,7 +18,7 @@ impl Display for VmStatus {
 }
 
 impl TryInto<VmStatus> for &str {
-    type Error = CoreError;
+    type Error = AptosWriterError;
 
     fn try_into(self) -> Result<VmStatus, Self::Error> {
         let re = Regex::new(
@@ -27,7 +26,7 @@ impl TryInto<VmStatus> for &str {
         ).expect("never fail");
         let caps = re
             .captures(self)
-            .ok_or(CoreError::ParseVmStatusError(self.to_string()))?;
+            .ok_or(AptosWriterError::ParseVmStatusError(self.to_string()))?;
         let location = caps.name("location").map_or("", |m| m.as_str()).to_string();
         let reason = caps.name("reason").map_or("", |m| m.as_str()).to_string();
         let code = caps.name("code").map_or("", |m| m.as_str());

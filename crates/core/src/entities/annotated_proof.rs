@@ -4,6 +4,10 @@ use ethers::types::U256;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
+use crate::entities::fri_statement::FRIMerkleStatement;
+use crate::entities::gps_statement::MainProof;
+use crate::entities::merkle_statement::MerkleStatement;
+
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/annotated_proof.rs
 #[derive(Serialize, Deserialize, Debug, Clone)]
 /// [AnnotatedProof] maps annotated proof json file which contains the original proof
@@ -62,6 +66,14 @@ pub struct PublicMemory {
     pub page: u32,
     // todo refactor to u256
     pub value: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+/// [SplitProofs] maps the split proof json file which contains the main proof and the merkle statements
+pub struct SplitProofs {
+    pub main_proof: MainProof,
+    pub merkle_statements: HashMap<String, MerkleStatement>,
+    pub fri_merkle_statements: Vec<FRIMerkleStatement>,
 }
 
 impl AnnotatedProof {

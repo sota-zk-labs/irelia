@@ -1,11 +1,8 @@
-use std::path::PathBuf;
 use async_trait::async_trait;
-use stone_cli::args::LayoutName;
 
+use crate::common::prover_error::ProverError;
+use crate::entities::sharp_proof::SharpProof;
 #[async_trait]
 pub trait ProverPort {
-    async fn generate_proof(&self,
-                            layout: LayoutName,
-                            cairo_pies: Option<Vec<PathBuf>>
-    ) -> Result<(serde_json::Value, AnnotatedProof), GenerateProofError>;
+    async fn generate_proof(&self) -> Result<SharpProof, ProverError>;
 }

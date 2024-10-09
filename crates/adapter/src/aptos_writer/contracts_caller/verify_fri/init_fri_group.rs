@@ -4,9 +4,9 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::verify_fri::types::init_fri_group::InitFriGroup;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::transaction_helper::build_transaction;
+use crate::aptos_writer::contracts_caller::verify_fri::types::init_fri_group::InitFriGroup;
 
 pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(

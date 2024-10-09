@@ -7,11 +7,13 @@ use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
-use crate::contracts_caller::types::VerifyMerkle;
-use crate::contracts_caller::verify_merkle::types::register_fact_verify_merkle::RegisterFactVerifyMerkle;
-use crate::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::transaction_helper::{
+    build_transaction, get_event_from_transaction,
+};
+use crate::aptos_writer::contracts_caller::types::VerifyMerkle;
+use crate::aptos_writer::contracts_caller::verify_merkle::types::register_fact_verify_merkle::RegisterFactVerifyMerkle;
+use crate::aptos_writer::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle_statement(
     config: &AppConfig,

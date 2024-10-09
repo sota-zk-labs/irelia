@@ -1,9 +1,9 @@
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::rest_client::aptos_api_types::Event;
+use rust_core::common::aptos_writer_error::AptosWriterError;
+use rust_core::common::aptos_writer_error::AptosWriterError::PropertyNotFound;
 
-use crate::contracts_caller::transaction_helper::{str_to_u256, str_to_u64};
-use crate::error::CoreError;
-use crate::error::CoreError::PropertyNotFound;
+use crate::aptos_writer::contracts_caller::transaction_helper::{str_to_u256, str_to_u64};
 
 #[derive(Debug)]
 pub struct ComputeNextLayer {
@@ -17,7 +17,7 @@ pub struct ComputeNextLayer {
 }
 
 impl TryInto<ComputeNextLayer> for Event {
-    type Error = CoreError;
+    type Error = AptosWriterError;
 
     fn try_into(self) -> Result<ComputeNextLayer, Self::Error> {
         Ok(ComputeNextLayer {

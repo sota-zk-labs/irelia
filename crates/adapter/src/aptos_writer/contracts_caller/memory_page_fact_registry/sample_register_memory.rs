@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::BufReader;
 
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
+use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
+use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
 
 pub fn sample_register_continuous_page_batch(index: u64) -> anyhow::Result<MemoryPageEntries> {
     let file_path = format!("./src/test_samples/test_samples/memory_page_fact_registry/register_continuous_page_batch_{}.json", index);

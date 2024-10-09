@@ -3,7 +3,7 @@ service_name = "irelia-worker"
 
 [pg]
 max_size = 10
-url = "postgres://postgres:changeme@10.20.10.121:5432/postgres"
+url = "postgres://postgres:changeme@127.0.0.1:5432/postgres"
 
 [server]
 port = 8000

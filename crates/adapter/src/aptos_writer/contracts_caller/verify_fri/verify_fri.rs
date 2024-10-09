@@ -4,14 +4,14 @@ use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
 use log::error;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::types::VerifyMerkle;
-use crate::contracts_caller::verify_fri::compute_next_layer::compute_next_layer;
-use crate::contracts_caller::verify_fri::fri_statement::fri_statement;
-use crate::contracts_caller::verify_fri::init_fri_group::init_fri_group;
-use crate::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
-use crate::contracts_caller::verify_fri::register_fact_fri::register_fact_fri;
-use crate::contracts_caller::verify_fri::types::fri_verify_input::{
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::types::VerifyMerkle;
+use crate::aptos_writer::contracts_caller::verify_fri::compute_next_layer::compute_next_layer;
+use crate::aptos_writer::contracts_caller::verify_fri::fri_statement::fri_statement;
+use crate::aptos_writer::contracts_caller::verify_fri::init_fri_group::init_fri_group;
+use crate::aptos_writer::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
+use crate::aptos_writer::contracts_caller::verify_fri::register_fact_fri::register_fact_fri;
+use crate::aptos_writer::contracts_caller::verify_fri::types::fri_verify_input::{
     FriVerifyInput, VerifyFriTransactionInput,
 };
 

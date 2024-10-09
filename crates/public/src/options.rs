@@ -12,7 +12,8 @@ pub struct Options {
     /// Configuration for the server.
     pub server: Server,
     /// Specifies the configuration of database will be connected.
-    pub db: Database,
+    // pub db: Database,
+    pub pg: DBConfig,
     /// The endpoint for the exporter.
     pub exporter_endpoint: String,
     /// The name of the service.
@@ -21,19 +22,6 @@ pub struct Options {
     #[serde(default = "default_log")]
     pub log: Log,
 }
-
-/// Represents database configuration options.
-#[derive(Deserialize, Debug)]
-pub struct Database {
-    /// Configuration for using in-memory database.
-    pub in_memory: Option<InMemoryDatabase>,
-    /// Configuration for PostgresSQL.
-    pub pg: Option<DBConfig>,
-}
-
-/// Represents in-memory database configuration.
-#[derive(Deserialize, Debug)]
-pub struct InMemoryDatabase {}
 
 /// Represents server configuration.
 #[derive(Debug, Deserialize, Clone)]

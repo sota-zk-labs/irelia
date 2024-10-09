@@ -1,11 +1,11 @@
 use aptos_sdk::move_types::value::MoveValue;
 use log::error;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
-use crate::contracts_caller::verify_merkle::merkle_statement::verify_merkle_statement;
-use crate::contracts_caller::verify_merkle::register_fact_merkle::register_fact_merkle;
-use crate::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::verify_fri::merkle_verifier::merkle_verifier;
+use crate::aptos_writer::contracts_caller::verify_merkle::merkle_statement::verify_merkle_statement;
+use crate::aptos_writer::contracts_caller::verify_merkle::register_fact_merkle::register_fact_merkle;
+use crate::aptos_writer::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle(
     config: &AppConfig,

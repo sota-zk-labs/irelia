@@ -6,12 +6,14 @@ use aptos_sdk::move_types::value::serialize_values;
 use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 
-use crate::config::AppConfig;
-use crate::contracts_caller::transaction_helper::{build_transaction, get_event_from_transaction};
-use crate::contracts_caller::verify_fri::types::compute_next_layer::ComputeNextLayer;
-use crate::contracts_caller::verify_fri::types::fri_verify_input::VerifyFriTransactionInput;
-use crate::contracts_caller::verify_fri::types::init_fri_group::InitFriGroup;
-use crate::contracts_caller::verify_fri::types::register_fact_verify_fri::RegisterFactVerifyFri;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::transaction_helper::{
+    build_transaction, get_event_from_transaction,
+};
+use crate::aptos_writer::contracts_caller::verify_fri::types::compute_next_layer::ComputeNextLayer;
+use crate::aptos_writer::contracts_caller::verify_fri::types::fri_verify_input::VerifyFriTransactionInput;
+use crate::aptos_writer::contracts_caller::verify_fri::types::init_fri_group::InitFriGroup;
+use crate::aptos_writer::contracts_caller::verify_fri::types::register_fact_verify_fri::RegisterFactVerifyFri;
 
 pub async fn fri_statement(
     config: &AppConfig,

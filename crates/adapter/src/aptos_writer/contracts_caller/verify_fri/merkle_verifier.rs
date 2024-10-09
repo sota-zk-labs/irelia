@@ -4,9 +4,9 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::transaction_helper::build_transaction;
-use crate::contracts_caller::types::VerifyMerkle;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::transaction_helper::build_transaction;
+use crate::aptos_writer::contracts_caller::types::VerifyMerkle;
 
 pub async fn merkle_verifier(config: &AppConfig, data: &VerifyMerkle) -> anyhow::Result<bool> {
     let params = serialize_values(&vec![

@@ -8,7 +8,6 @@ adapter = { workspace = true }
 anyhow = { workspace = true }
 aptos-sdk = { workspace = true }
 aptos-testcontainer = { workspace = true }
-deployer = { workspace = true }
 log = { workspace = true, features = [] }
 prover = { workspace = true }
 stone-cli = { workspace = true }

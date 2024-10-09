@@ -7,9 +7,9 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
 use log::info;
 
-use crate::config::AppConfig;
-use crate::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
-use crate::contracts_caller::transaction_helper::build_transaction;
+use crate::aptos_writer::config::AppConfig;
+use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
+use crate::aptos_writer::contracts_caller::transaction_helper::build_transaction;
 
 pub async fn register_continuous_memory_page(
     config: &AppConfig,
