@@ -55,7 +55,6 @@ pub fn init_telemetry(service_name: &str, exporter_endpoint: &str, log_level: &s
 
     subscriber
         .with(level_filter_layer)
-        .with(tracing_subscriber::fmt::layer().without_time())
         .with(tracing_layer)
         .with(JsonStorageLayer)
         .with(formatting_layer)

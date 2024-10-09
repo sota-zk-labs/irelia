@@ -2,24 +2,24 @@
 resolver = "2"
 
 members = [
-  "crates/adapter",
+#  "crates/adapter",
   "crates/common",
   "crates/core",
-  "crates/public",
-  "crates/temp/deployer",
-  "crates/temp/prover",
-  "crates/temp/adapter",
-  "crates/temp/verifier",
+#  "crates/public",
+#  "crates/temp/deployer",
+#  "crates/temp/prover",
+#  "crates/temp/adapter",
+#  "crates/temp/verifier",
+  "crates/worker",
 ]
 
 [workspace.dependencies]
-adapter = { path = "crates/adapter" }
+#adapter = { path = "crates/adapter" }
 common = { path = "crates/common" }
-deployer = { path = "crates/temp/deployer" }
-prover = { path = "crates/temp/prover" }
 rust_core = { path = "crates/core" }
-temp_adapter = { path = "crates/temp/adapter" }
-verifier = { path = "crates/temp/verifier" }
+#temp_adapter = { path = "crates/temp/adapter" }
+#verifier = { path = "crates/temp/verifier" }
+worker = { path = "crates/worker" }
 
 anyhow = { version = "1.0.87" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
@@ -34,6 +34,7 @@ diesel_migrations = { version = "2.2.0" }
 dotenv = { version = "0.15.0" }
 ethers = { version = "2.0.14" }
 glob = { version = "0.3.1" }
+graphile_worker = { version = "0.8.0" }
 itertools = { version = "0.13.0" }
 lazy_static = { version = "1.4.0" }
 log = { version = "0.4.22" }
@@ -54,6 +55,7 @@ regex = { version = "1.11.0" }
 scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = { version = "1.0.128" }
+sqlx = { version = "*" }
 stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }

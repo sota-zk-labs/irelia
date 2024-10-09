@@ -1,7 +1,7 @@
 version: "3.8"
 networks:
-  rust-api-server:
-name: "rust-api-server-local"
+  irelia-server:
+name: "irelia-local"
 services:
   quickwit:
     image: quickwit/quickwit:latest
@@ -33,13 +33,5 @@ services:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
-  redis:
-    image: redis:latest
-    restart: always
-    volumes:
-      - redis:/data
-    ports:
-      - "6379:6379"
 volumes:
   postgres:
-  redis:

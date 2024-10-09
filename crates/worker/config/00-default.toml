@@ -1,0 +1,10 @@
+exporter_endpoint = "http://localhost:7281"
+service_name = "irelia-worker"
+
+[pg]
+max_size = 10
+url = "postgres://postgres:changeme@10.20.10.121:5432/postgres"
+
+[server]
+port = 8000
+url = "0.0.0.0"

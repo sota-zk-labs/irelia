@@ -8,6 +8,7 @@ name = "common"
 version = "0.0.1"
 
 [dependencies]
+clap = { workspace = true }
 config = { workspace = true }
 glob = { workspace = true }
 opentelemetry = { workspace = true }
