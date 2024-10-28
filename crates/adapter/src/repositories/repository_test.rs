@@ -8,7 +8,7 @@
 //         Manager,
 //     };
 //     use diesel_migrations::MigrationHarness;
-//     use rust_core::{
+//     use irelia_core::{
 //         entities::{
 //             pagination_entity::PaginationEntity,
 //             question::{QuestionEntity, QuestionId},
@@ -130,8 +130,8 @@
 // mod cache_repository_tests {
 //     use std::time::Duration;
 //
-//     use rust_core::common::core_error::CoreError;
-//     use rust_core::ports::cache::CachePort;
+//     use irelia_core::common::core_error::CoreError;
+//     use irelia_core::ports::cache::CachePort;
 //     use testcontainers_modules::redis::Redis;
 //     use testcontainers_modules::testcontainers::runners::AsyncRunner;
 //     use tokio::time::sleep;

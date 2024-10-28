@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 
+use irelia_core::common::aptos_writer_error::AptosWriterError;
 use regex::Regex;
-use rust_core::common::aptos_writer_error::AptosWriterError;
 
 #[derive(Debug)]
 pub struct VmStatus {

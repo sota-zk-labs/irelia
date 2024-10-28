@@ -1,17 +1,16 @@
 [package]
-autobenches = true
-autobins = true
-autoexamples = true
-autotests = true
 edition = "2021"
-name = "adapter"
+name = "irelia_adapter"
 version = "0.0.1"
 
 [dependencies]
+irelia_common = { workspace = true }
+irelia_core = { workspace = true }
+
 anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
+aptos-testcontainer = { workspace = true }
 async-trait = { workspace = true }
-num-bigint = {workspace = true}
-common = { workspace = true }
 deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
 diesel = { workspace = true, features = [
   "postgres",
@@ -19,22 +18,20 @@ diesel = { workspace = true, features = [
   "uuid",
 ] }
 diesel_migrations = { workspace = true }
-ethers = {workspace = true}
+dotenv = { workspace = true }
+ethers = { workspace = true }
+log = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
+rand_core = { workspace = true }
 redis-async = { workspace = true }
-rust_core = { workspace = true }
+regex = { workspace = true }
+scopeguard = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+stone-cli = { workspace = true }
+tempfile = { workspace = true }
+test-log = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres", "redis"] }
 tokio = { workspace = true, features = ["full"] }
-aptos-sdk = {workspace = true}
-rand_core = {workspace = true}
-regex = {workspace = true}
-serde_json = {workspace = true}
-num-traits = {workspace = true}
-log = {workspace = true}
-scopeguard = {workspace = true}
-tempfile = {workspace = true}
-stone-cli = {workspace = true}
 uuid = { version = "1.10.0", features = ["v4"] }
-dotenv = {workspace = true}
-aptos-testcontainer = {workspace = true}
-test-log = {workspace = true}

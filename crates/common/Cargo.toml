@@ -1,10 +1,6 @@
 [package]
-autobenches = true
-autobins = true
-autoexamples = true
-autotests = true
 edition = "2021"
-name = "common"
+name = "irelia_common"
 version = "0.0.1"
 
 [dependencies]

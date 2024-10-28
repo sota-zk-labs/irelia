@@ -1,6 +1,6 @@
 use std::io;
 
-use rust_core::common::core_error::CoreError;
+use irelia_core::common::core_error::CoreError;
 use thiserror::Error;
 
 // The kinds of errors we can hit in our application.

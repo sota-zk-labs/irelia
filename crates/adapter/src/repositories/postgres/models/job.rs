@@ -2,7 +2,7 @@ use std::io::{Error, ErrorKind};
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use rust_core::entities::job::{JobEntity, JobId};
+use irelia_core::entities::job::{JobEntity, JobId};
 use uuid::Uuid;
 
 #[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable)]

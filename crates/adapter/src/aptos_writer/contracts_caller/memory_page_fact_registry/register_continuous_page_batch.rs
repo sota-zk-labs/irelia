@@ -13,7 +13,7 @@ use crate::aptos_writer::config::AppConfig;
 use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_memory_page::ContinuousMemoryPage;
 use crate::aptos_writer::contracts_caller::memory_page_fact_registry::types::register_continuous_page_batch::MemoryPageEntries;
 use crate::aptos_writer::contracts_caller::transaction_helper::build_transaction;
-use rust_core::common::aptos_writer_error::AptosWriterError::TransactionNotSucceed;
+use irelia_core::common::aptos_writer_error::AptosWriterError::TransactionNotSucceed;
 
 const MAX_MEMORY_VALUE_LEN: usize = 500;
 

@@ -1,5 +1,5 @@
-use adapter::repositories::postgres::config::DBConfig;
-use common::options::{default_log, Log};
+use irelia_adapter::repositories::postgres::config::DBConfig;
+use irelia_common::options::{default_log, Log};
 use serde::Deserialize;
 
 /// Configuration options for the application.

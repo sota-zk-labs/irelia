@@ -23,38 +23,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "adapter"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "aptos-sdk",
- "aptos-testcontainer",
- "async-trait",
- "common",
- "deadpool-diesel",
- "diesel",
- "diesel_migrations",
- "dotenv",
- "ethers",
- "log",
- "num-bigint 0.4.6",
- "num-traits",
- "rand_core 0.5.1",
- "redis-async",
- "regex",
- "rust_core",
- "scopeguard",
- "serde",
- "serde_json",
- "stone-cli",
- "tempfile",
- "test-log",
- "testcontainers-modules",
- "tokio",
- "uuid 1.10.0",
-]
-
-[[package]]
 name = "addchain"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2676,27 +2644,6 @@ checksum = "cbf2150cce219b664a8a70df7a1f933836724b503f8a413af9365b4dcc4d90b8"
 dependencies = [
  "lazy_static",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "common"
-version = "0.0.1"
-dependencies = [
- "clap 4.5.17",
- "config",
- "glob",
- "opentelemetry",
- "opentelemetry-otlp",
- "opentelemetry-semantic-conventions",
- "opentelemetry_sdk",
- "prost 0.13.2",
- "serde",
- "tokio",
- "tonic 0.12.3",
- "tracing",
- "tracing-bunyan-formatter",
- "tracing-opentelemetry",
- "tracing-subscriber 0.3.18",
 ]
 
 [[package]]
@@ -5509,19 +5456,20 @@ checksum = "ddc24109865250148c2e0f3d25d4f0f479571723792d3802153c60922a4fb708"
 name = "irelia"
 version = "0.0.1"
 dependencies = [
- "adapter",
  "anyhow",
  "axum 0.8.0-alpha.1",
  "clap 4.5.17",
- "common",
  "deadpool-diesel",
  "diesel",
  "diesel_migrations",
+ "graphile_worker",
+ "irelia_adapter",
+ "irelia_common",
+ "irelia_core",
  "openssl",
  "opentelemetry",
  "rand 0.9.0-alpha.2",
  "readonly",
- "rust_core",
  "serde",
  "serde_json",
  "testcontainers-modules",
@@ -5529,21 +5477,94 @@ dependencies = [
  "tokio",
  "tower-http",
  "tracing",
+ "tracing-opentelemetry",
 ]
 
 [[package]]
-name = "irelia-worker"
+name = "irelia_adapter"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "aptos-sdk",
+ "aptos-testcontainer",
+ "async-trait",
+ "deadpool-diesel",
+ "diesel",
+ "diesel_migrations",
+ "dotenv",
+ "ethers",
+ "graphile_worker",
+ "irelia_common",
+ "irelia_core",
+ "log",
+ "num-bigint 0.4.6",
+ "num-traits",
+ "rand_core 0.5.1",
+ "redis-async",
+ "regex",
+ "scopeguard",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "stone-cli",
+ "tempfile",
+ "test-log",
+ "testcontainers-modules",
+ "tokio",
+ "uuid 1.10.0",
+]
+
+[[package]]
+name = "irelia_common"
+version = "0.0.1"
+dependencies = [
+ "clap 4.5.17",
+ "config",
+ "glob",
+ "opentelemetry",
+ "opentelemetry-otlp",
+ "opentelemetry-semantic-conventions",
+ "opentelemetry_sdk",
+ "prost 0.13.2",
+ "serde",
+ "tokio",
+ "tonic 0.12.3",
+ "tracing",
+ "tracing-bunyan-formatter",
+ "tracing-opentelemetry",
+ "tracing-subscriber 0.3.18",
+]
+
+[[package]]
+name = "irelia_core"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "aptos-sdk",
+ "async-trait",
+ "ethers",
+ "num-bigint 0.4.6",
+ "regex",
+ "serde",
+ "serde_json",
+ "stone-cli",
+ "thiserror",
+ "uuid 1.10.0",
+]
+
+[[package]]
+name = "irelia_worker"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "axum 0.8.0-alpha.1",
  "clap 4.5.17",
- "common",
  "graphile_worker",
+ "irelia_common",
+ "irelia_core",
  "opentelemetry",
  "rand 0.9.0-alpha.2",
  "readonly",
- "rust_core",
  "serde",
  "serde_json",
  "sqlx",
@@ -5552,6 +5573,7 @@ dependencies = [
  "tokio",
  "tower-http",
  "tracing",
+ "tracing-opentelemetry",
 ]
 
 [[package]]
@@ -7173,9 +7195,9 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry"
-version = "0.24.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c365a63eec4f55b7efeceb724f1336f26a9cf3427b70e59e2cd2a5b947fba96"
+checksum = "570074cc999d1a58184080966e5bd3bf3a9a4af650c3b05047c2621e7405cd17"
 dependencies = [
  "futures-core",
  "futures-sink",
@@ -7187,9 +7209,9 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry-otlp"
-version = "0.17.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b925a602ffb916fb7421276b86756027b37ee708f9dce2dbdcc51739f07e727"
+checksum = "29e1f9c8b032d4f635c730c0efcf731d5e2530ea13fa8bef7939ddc8420696bd"
 dependencies = [
  "async-trait",
  "futures-core",
@@ -7205,9 +7227,9 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry-proto"
-version = "0.7.0"
+version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30ee9f20bff9c984511a02f082dc8ede839e4a9bf15cc2487c8d6fea5ad850d9"
+checksum = "c9d3968ce3aefdcca5c27e3c4ea4391b37547726a70893aab52d3de95d5f8b34"
 dependencies = [
  "opentelemetry",
  "opentelemetry_sdk",
@@ -7217,15 +7239,15 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry-semantic-conventions"
-version = "0.16.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cefe0543875379e47eb5f1e68ff83f45cc41366a92dfd0d073d513bf68e9a05"
+checksum = "db945c1eaea8ac6a9677185357480d215bb6999faa9f691d0c4d4d641eab7a09"
 
 [[package]]
 name = "opentelemetry_sdk"
-version = "0.24.1"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "692eac490ec80f24a17828d49b40b60f5aeaccdfe6a503f939713afd22bc28df"
+checksum = "d2c627d9f4c9cdc1f21a29ee4bfbd6028fcb8bcf2a857b43f3abdf72c9c862f3"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -8755,23 +8777,6 @@ checksum = "7e2a3bcec1f113553ef1c88aae6c020a369d03d55b58de9869a0908930385091"
 dependencies = [
  "cfg-if",
  "ordered-multimap",
-]
-
-[[package]]
-name = "rust_core"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "aptos-sdk",
- "async-trait",
- "ethers",
- "num-bigint 0.4.6",
- "regex",
- "serde",
- "serde_json",
- "stone-cli",
- "thiserror",
- "uuid 1.10.0",
 ]
 
 [[package]]
@@ -10997,9 +11002,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-opentelemetry"
-version = "0.25.0"
+version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9784ed4da7d921bc8df6963f8c80a0e4ce34ba6ba76668acadd3edbd985ff3b"
+checksum = "dc58af5d3f6c5811462cabb3289aec0093f7338e367e5a33d28c0433b3c7360b"
 dependencies = [
  "js-sys",
  "once_cell",

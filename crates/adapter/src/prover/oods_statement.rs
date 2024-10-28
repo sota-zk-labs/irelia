@@ -5,11 +5,11 @@ use ethers::{
     types::U256,
     utils::{hex, keccak256},
 };
+use irelia_core::entities::annotated_proof::{MemorySegment, PublicInput, PublicMemory};
+use irelia_core::entities::gps_statement::MainProof;
+use irelia_core::entities::memory_statement::ContinuousMemoryPage;
 use num_bigint::BigInt;
 use num_traits::{Num, One};
-use rust_core::entities::annotated_proof::{MemorySegment, PublicInput, PublicMemory};
-use rust_core::entities::gps_statement::MainProof;
-use rust_core::entities::memory_statement::ContinuousMemoryPage;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 

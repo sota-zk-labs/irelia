@@ -9,8 +9,8 @@ use aptos_sdk::transaction_builder::TransactionBuilder;
 use aptos_sdk::types::chain_id::ChainId;
 use aptos_sdk::types::transaction::{SignedTransaction, TransactionPayload};
 use aptos_sdk::types::LocalAccount;
+use irelia_core::common::aptos_writer_error::AptosWriterError;
 use rand_core::OsRng;
-use rust_core::common::aptos_writer_error::AptosWriterError;
 
 #[inline]
 pub fn str_to_u256(s: &str) -> Result<U256, AptosWriterError> {

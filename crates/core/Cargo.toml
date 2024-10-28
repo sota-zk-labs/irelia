@@ -1,14 +1,11 @@
 [package]
-autobenches = true
-autobins = true
-autoexamples = true
-autotests = true
 edition = "2021"
-name = "rust_core"
+name = "irelia_core"
 version = "0.0.1"
 
 [dependencies]
 anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
 async-trait = { workspace = true }
 ethers = { workspace = true }
 num-bigint = { workspace = true }
@@ -17,6 +14,5 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 stone-cli = { workspace = true }
 thiserror = { workspace = true }
-aptos-sdk = {workspace = true}
 #diesel = {workspace = true, features = ["uuid"]}
 uuid = { workspace = true, features = ["v4"] }

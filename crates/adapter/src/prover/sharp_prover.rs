@@ -1,7 +1,7 @@
-use rust_core::common::prover_error::ProverError;
-use rust_core::common::prover_error::ProverError::{JsonValueError, UnsupportedLayoutError};
-use rust_core::entities::annotated_proof::{AnnotatedProof, SplitProofs};
-use rust_core::entities::sharp_proof::SharpProof;
+use irelia_core::common::prover_error::ProverError;
+use irelia_core::common::prover_error::ProverError::{JsonValueError, UnsupportedLayoutError};
+use irelia_core::entities::annotated_proof::{AnnotatedProof, SplitProofs};
+use irelia_core::entities::sharp_proof::SharpProof;
 
 use crate::prover::annotation_parser::split_fri_merkle_statements;
 use crate::prover::default_prime;

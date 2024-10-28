@@ -1,14 +1,14 @@
 use std::path::PathBuf;
 
 use async_trait::async_trait;
-use rust_core::common::prover_error::ProverError;
-use rust_core::common::prover_error::ProverError::{
+use irelia_core::common::prover_error::ProverError;
+use irelia_core::common::prover_error::ProverError::{
     BootloaderError, JsonValueError, SerializationError, StoneProverError, TempDirError,
     UnsupportedLayoutError, VerifierError,
 };
-use rust_core::entities::annotated_proof::AnnotatedProof;
-use rust_core::entities::sharp_proof::SharpProof;
-use rust_core::ports::prover::ProverPort;
+use irelia_core::entities::annotated_proof::AnnotatedProof;
+use irelia_core::entities::sharp_proof::SharpProof;
+use irelia_core::ports::prover::ProverPort;
 use scopeguard::defer;
 use stone_cli::args::Network::ethereum;
 use stone_cli::args::{LayoutName, SerializeArgs, VerifyArgs};
@@ -137,12 +137,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_generate_proof() {
-        let cairo_pie = vec![PathBuf::from("./src/prover/test_samples/fibonacci_with_output.zip")];
+        let cairo_pie = vec![PathBuf::from(
+            "./src/prover/test_samples/fibonacci_with_output.zip",
+        )];
         let layout = LayoutName::starknet;
-        let stone_prover = StoneProver {
-            layout,
-            cairo_pie
-        };
+        let stone_prover = StoneProver { layout, cairo_pie };
         assert!(stone_prover.generate_proof().await.is_ok());
         // println!("vjp");
     }

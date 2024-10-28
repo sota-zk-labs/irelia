@@ -7,11 +7,13 @@ BUILD_VERSION=$(shell git describe --long)
 BUILD_RELEASE=$(shell git describe --tags --abbrev=0)
 
 cargo-fmt:
-	taplo fmt -o reorder_keys=true
+	taplo fmt --config taplo/taplo.toml
 
 lint:
+	cargo fmt
+	cargo fix --allow-dirty --allow-staged
 	cargo clippy --fix --allow-dirty --allow-staged
-
+	
 setup-db:
 	diesel setup --database-url ${DATABASE_URL} \
      --migration-dir ${POSTGRES_DIR}/migrations \

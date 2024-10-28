@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::Instant;
 
-use adapter::proof::Proof;
+use irelia_adapter::proof::Proof;
 use aptos_sdk::types::LocalAccount;
 use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
 use deployer::config::{AppConfig, EnvConfig};

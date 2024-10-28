@@ -4,9 +4,9 @@ use diesel::{
     delete, insert_into, update, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
-use rust_core::common::core_error::CoreError;
-use rust_core::entities::job::{JobEntity, JobId};
-use rust_core::ports::job::JobPort;
+use irelia_core::common::core_error::CoreError;
+use irelia_core::entities::job::{JobEntity, JobId};
+use irelia_core::ports::job::JobPort;
 
 use crate::repositories::postgres::models::job::JobModel;
 use crate::repositories::postgres::schema::jobs::dsl::jobs;

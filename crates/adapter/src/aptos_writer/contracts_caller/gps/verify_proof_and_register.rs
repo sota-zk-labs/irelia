@@ -7,10 +7,10 @@ use aptos_sdk::move_types::value::{serialize_values, MoveValue};
 use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::rest_client::error::RestError;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
-use log::{debug, info};
-use rust_core::common::aptos_writer_error::AptosWriterError::{
+use irelia_core::common::aptos_writer_error::AptosWriterError::{
     FlowNotFinished, TransactionNotSucceed,
 };
+use log::{debug, info};
 
 use crate::aptos_writer::config::AppConfig;
 use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::VerifyProofAndRegisterData;

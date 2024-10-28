@@ -3,14 +3,14 @@ use std::collections::{HashMap, HashSet};
 use ethers::abi::Token;
 use ethers::utils::keccak256;
 use ethers::{types::U256, utils::hex};
+use irelia_core::common::prover_error::ParseError;
+use irelia_core::entities::annotated_proof::{AnnotatedProof, SplitProofs};
+use irelia_core::entities::fri_statement::FRIMerkleStatement;
+use irelia_core::entities::gps_statement::MainProof;
+use irelia_core::entities::merkle_statement::MerkleStatement;
 use num_bigint::BigUint;
 use num_traits::{Num, One};
 use regex::Regex;
-use rust_core::common::prover_error::ParseError;
-use rust_core::entities::annotated_proof::{AnnotatedProof, SplitProofs};
-use rust_core::entities::fri_statement::FRIMerkleStatement;
-use rust_core::entities::gps_statement::MainProof;
-use rust_core::entities::merkle_statement::MerkleStatement;
 use serde::{Deserialize, Serialize};
 
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/annotation_parser.rs

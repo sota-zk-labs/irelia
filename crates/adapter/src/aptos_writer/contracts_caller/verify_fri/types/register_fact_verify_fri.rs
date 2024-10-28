@@ -1,6 +1,6 @@
 use aptos_sdk::rest_client::aptos_api_types::Event;
-use rust_core::common::aptos_writer_error::AptosWriterError;
-use rust_core::common::aptos_writer_error::AptosWriterError::PropertyNotFound;
+use irelia_core::common::aptos_writer_error::AptosWriterError;
+use irelia_core::common::aptos_writer_error::AptosWriterError::PropertyNotFound;
 
 use crate::aptos_writer::contracts_caller::transaction_helper::str_to_u64;
 

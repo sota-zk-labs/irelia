@@ -10,11 +10,11 @@ members = [
 ]
 
 [workspace.dependencies]
-adapter = { path = "crates/adapter" }
-common = { path = "crates/common" }
-rust_core = { path = "crates/core" }
+irelia_adapter = { path = "crates/adapter" }
+irelia_common = { path = "crates/common" }
+irelia_core = { path = "crates/core" }
 verifier = { path = "crates/temp/verifier" }
-worker = {path = "crates/worker"}
+irelia_worker = { path = "crates/worker" }
 
 anyhow = { version = "1.0.87" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
@@ -36,10 +36,10 @@ num-bigint = { version = "0.4.6" }
 num-traits = { version = "0.2.19" }
 once_cell = { version = "1.19.0" }
 openssl = { version = "0.10.66" }
-opentelemetry = { version = "0.24.0" }
-opentelemetry-otlp = { version = "0.17.0" }
-opentelemetry-semantic-conventions = { version = "0.16.0" }
-opentelemetry_sdk = { version = "0.24.1" }
+opentelemetry = { version = "0.26.0" }
+opentelemetry-otlp = { version = "0.26.0" }
+opentelemetry-semantic-conventions = { version = "0.26.0" }
+opentelemetry_sdk = { version = "0.26.0" }
 prost = { version = "0.13.2" }
 rand = { version = "0.9.0-alpha.2" }
 rand_core = { version = "0.5.1" }
@@ -61,10 +61,10 @@ tonic = { version = "0.12.2" }
 tower-http = { version = "0.6.1" }
 tracing = { version = "0.1.40" }
 tracing-bunyan-formatter = { version = "0.3.9" }
-tracing-opentelemetry = { version = "0.25.0" }
+tracing-opentelemetry = { version = "0.27.0" }
 tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.4.0", features = ["serde"] }
-uuid = { version = "1.10.0"}
+uuid = { version = "1.10.0" }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
