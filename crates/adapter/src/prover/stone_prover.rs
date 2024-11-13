@@ -80,8 +80,8 @@ impl ProverPort for StoneProver {
             layout: self.layout.clone(),
             prover_config_file: Default::default(),
             parameter_file,
-            output: PathBuf::from(proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME)),
-            fact_topologies_output: PathBuf::from(proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH)),
+            output: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
+            fact_topologies_output: proof_tmp_dir.path().join(FACT_TOPOLOGIES_PATH),
             parameter_config: Default::default(),
             prover_config: Default::default(),
         };
@@ -101,19 +101,19 @@ impl ProverPort for StoneProver {
 
         // verify proof
         let verify_args = VerifyArgs {
-            proof: PathBuf::from(proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME)),
-            annotation_file: Some(PathBuf::from(proof_tmp_dir.path().join(ANNOTATION_PATH))),
-            extra_output_file: Some(PathBuf::from(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH))),
+            proof: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
+            annotation_file: Some(proof_tmp_dir.path().join(ANNOTATION_PATH)),
+            extra_output_file: Some(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH)),
         };
         run_stone_verifier(verify_args).map_err(|e| VerifierError(e.to_string()))?;
 
         // serialize proof
         let serialize_args = SerializeArgs {
-            proof: PathBuf::from(proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME)),
+            proof: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
             network: ethereum,
-            output: PathBuf::from(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH)),
-            annotation_file: Some(PathBuf::from(proof_tmp_dir.path().join(ANNOTATION_PATH))),
-            extra_output_file: Some(PathBuf::from(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH))),
+            output: proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH),
+            annotation_file: Some(proof_tmp_dir.path().join(ANNOTATION_PATH)),
+            extra_output_file: Some(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH)),
         };
         serialize_proof(serialize_args).map_err(|e| SerializationError(e.to_string()))?;
 

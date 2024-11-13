@@ -34,4 +34,15 @@ tempfile = { workspace = true }
 test-log = { workspace = true }
 testcontainers-modules = { workspace = true, features = ["postgres", "redis"] }
 tokio = { workspace = true, features = ["full"] }
-uuid = { version = "1.10.0", features = ["v4"] }
+uuid = { version = "1.10.0", features = ["v4", "serde"] }
+graphile_worker = { workspace = true }
+sqlx = { workspace = true, features = [
+  "chrono",
+  "postgres",
+  "json",
+  "macros",
+  "runtime-tokio",
+] }
+tracing = { workspace = true }
+opentelemetry = { workspace = true }
+tracing-opentelemetry = {workspace = true}

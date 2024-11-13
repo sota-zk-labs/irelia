@@ -40,14 +40,14 @@ impl TryFrom<JobEntity> for JobModel {
     }
 }
 
-impl Into<JobEntity> for JobModel {
-    fn into(self) -> JobEntity {
+impl From<JobModel> for JobEntity {
+    fn from(val: JobModel) -> Self {
         JobEntity {
-            id: JobId(self.id.try_into().unwrap()),
-            customer_id: self.customer_id,
-            cairo_job_key: self.cairo_job_key,
-            offchain_proof: self.offchain_proof,
-            proof_layout: self.proof_layout,
+            id: JobId(val.id.try_into().unwrap()),
+            customer_id: val.customer_id,
+            cairo_job_key: val.cairo_job_key,
+            offchain_proof: val.offchain_proof,
+            proof_layout: val.proof_layout,
             cairo_pie: "".to_string(),
         }
     }

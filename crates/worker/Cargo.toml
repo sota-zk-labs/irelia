@@ -1,23 +1,20 @@
 [package]
-autobenches = true
-autobins = true
-autoexamples = true
-autotests = true
 build = "build.rs"
 edition = "2021"
-name = "irelia-worker"
+name = "irelia_worker"
 version = "0.0.1"
 
 [dependencies]
+irelia_common = { workspace = true }
+irelia_core = { workspace = true }
+
 anyhow = { workspace = true }
 axum = { workspace = true, features = ["macros"] }
 clap = { workspace = true, features = ["derive"] }
-common = { workspace = true }
 graphile_worker = { workspace = true }
 opentelemetry = { workspace = true }
 rand = { workspace = true }
 readonly = { workspace = true }
-rust_core = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 sqlx = { workspace = true, features = [
@@ -32,3 +29,4 @@ thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tower-http = { workspace = true, features = ["timeout", "trace"] }
 tracing = { workspace = true }
+tracing-opentelemetry = { workspace = true }

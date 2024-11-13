@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 
-use crate::controllers::app_state::AppState;
+use crate::app_state::AppState;
 use crate::controllers::job::add_job;
 
 pub fn routes(app_state: AppState) -> Router {

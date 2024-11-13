@@ -12,8 +12,9 @@ pub struct Options {
     /// Configuration for the server.
     pub server: Server,
     /// Specifies the configuration of database will be connected.
-    // pub db: Database,
     pub pg: DBConfig,
+    /// Configuration for the worker.
+    pub worker: Worker,
     /// The endpoint for the exporter.
     pub exporter_endpoint: String,
     /// The name of the service.
@@ -30,4 +31,11 @@ pub struct Server {
     pub port: u16,
     /// URL for the server.
     pub url: String,
+}
+
+/// Represents worker configuration.
+#[derive(Debug, Deserialize, Clone)]
+pub struct Worker {
+    /// The postgresql schema to use for the worker.
+    pub schema: String,
 }

@@ -5478,6 +5478,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-opentelemetry",
+ "uuid 1.10.0",
 ]
 
 [[package]]
@@ -5499,6 +5500,7 @@ dependencies = [
  "log",
  "num-bigint 0.4.6",
  "num-traits",
+ "opentelemetry",
  "rand_core 0.5.1",
  "redis-async",
  "regex",
@@ -5511,6 +5513,8 @@ dependencies = [
  "test-log",
  "testcontainers-modules",
  "tokio",
+ "tracing",
+ "tracing-opentelemetry",
  "uuid 1.10.0",
 ]
 
@@ -11393,6 +11397,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
 dependencies = [
  "getrandom 0.2.15",
+ "serde",
 ]
 
 [[package]]

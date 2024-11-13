@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 /// Identifier for a question.
-#[derive(Debug, Eq, Hash, PartialEq, Clone)]
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
 pub struct JobId(pub Uuid);
 
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct JobEntity {
     pub id: JobId,
     pub customer_id: String,

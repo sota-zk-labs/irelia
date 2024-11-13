@@ -30,3 +30,6 @@ thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tower-http = { workspace = true, features = ["timeout", "trace"] }
 tracing = { workspace = true }
+tracing-opentelemetry = { workspace = true }
+graphile_worker = { workspace = true }
+uuid = { version = "1.10.0", features = ["v4"] }

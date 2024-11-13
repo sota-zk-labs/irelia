@@ -1,28 +1,23 @@
-#[cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
-use openssl;
-#[rustfmt::skip]
-#[cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
-use diesel;
-
 use std::sync::Arc;
 use std::time::Duration;
 
-use adapter::repositories::postgres::job_db::JobDBRepository;
 use clap::{Parser, Subcommand};
-use common::kill_signals;
-use common::loggers::telemetry::init_telemetry;
-use common::options::parse_options;
 use deadpool_diesel::postgres::Pool;
 use deadpool_diesel::{Manager, Runtime};
-use irelia::controllers::app_state::AppState;
+use irelia::app_state::AppState;
 use irelia::options::Options;
 use irelia::router::routes;
+use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
+use irelia_adapter::worker::WorkerAdapter;
+use irelia_common::cli_args::CliArgs;
+use irelia_common::kill_signals;
+use irelia_common::loggers::telemetry::init_telemetry;
+use irelia_core::ports::worker::WorkerPort;
 use opentelemetry::global;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-use common::cli_args::CliArgs;
-use worker
+
 #[tokio::main]
 async fn main() {
     let options: Options = CliArgs::default_run_or_get_options(env!("APP_VERSION"));
@@ -34,7 +29,6 @@ async fn main() {
     );
 
     let server = tokio::spawn(serve(options));
-    run_workers(options.pg.clone()).await;
 
     // Wait for the server to finish shutting down
     tokio::try_join!(server).expect("Failed to run server");
@@ -43,7 +37,7 @@ async fn main() {
     info!("Shutdown successfully!");
 }
 
-/// Simple REST server.
+/// Irelia Rest API.
 #[derive(Parser, Debug)]
 #[command(about, long_about = None)]
 struct Args {
@@ -70,9 +64,19 @@ pub async fn serve(options: Options) {
         .max_size(options.pg.max_size)
         .build()
         .unwrap();
-    let job_port = Arc::new(JobDBRepository::new(pool));
 
-    let routes = routes(AppState { job_port }).layer((
+    // TODO: use the same DB pool for the worker_adapter
+
+    let job_repository = Arc::new(JobDBRepository::new(pool.clone()));
+    let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
+        WorkerAdapter::new(
+            &options.pg.url,
+            options.pg.max_size as u32,
+            options.worker.schema.clone(),
+        )
+        .await,
+    );
+    let routes = routes(AppState::new(job_repository, worker_adapter)).layer((
         TraceLayer::new_for_http(),
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.
