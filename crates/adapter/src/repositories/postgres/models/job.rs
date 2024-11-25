@@ -1,4 +1,4 @@
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
@@ -14,7 +14,6 @@ pub struct JobModel {
     pub offchain_proof: bool,
     pub proof_layout: String,
     pub cairo_pie: String,
-
     pub created_on: SystemTime,
 }
 
@@ -24,9 +23,7 @@ impl TryFrom<JobEntity> for JobModel {
     fn try_from(entity: JobEntity) -> Result<JobModel, Self::Error> {
         let id = entity
             .id
-            .0
-            .try_into()
-            .map_err(|_| Error::new(ErrorKind::InvalidInput, "Invalid ID"))?;
+            .0;
 
         Ok(JobModel {
             id,
@@ -43,12 +40,12 @@ impl TryFrom<JobEntity> for JobModel {
 impl From<JobModel> for JobEntity {
     fn from(val: JobModel) -> Self {
         JobEntity {
-            id: JobId(val.id.try_into().unwrap()),
+            id: JobId(val.id),
             customer_id: val.customer_id,
             cairo_job_key: val.cairo_job_key,
             offchain_proof: val.offchain_proof,
             proof_layout: val.proof_layout,
-            cairo_pie: "".to_string(),
+            cairo_pie: val.cairo_pie,
         }
     }
 }

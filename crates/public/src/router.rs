@@ -6,7 +6,8 @@ use axum::{
 };
 
 use crate::app_state::AppState;
-use crate::controllers::job::add_job;
+use crate::controllers::job::add_job::add_job;
+// use crate::controllers::job::get_status::get_status;
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
@@ -15,6 +16,7 @@ pub fn routes(app_state: AppState) -> Router {
             "/v1/gateway",
             Router::new()
                 .route("/add_job", post(add_job))
+                // .route("/get_status", post(get_status))
                 .with_state(app_state),
         )
         .fallback(handler_404)

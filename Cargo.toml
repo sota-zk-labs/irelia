@@ -51,10 +51,10 @@ scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
 sqlx = { version = "*" }
 serde_json = { version = "1.0.128" }
-stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
+stone-cli = { git = "https://github.com/zksecurity/stone-cli.git" }
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
-testcontainers-modules = { version = "0.11.2" }
+testcontainers-modules = { version = "0.11.3" }
 thiserror = { version = "1.0.64" }
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 tonic = { version = "0.12.2" }
@@ -65,6 +65,9 @@ tracing-opentelemetry = { version = "0.27.0" }
 tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.4.0", features = ["serde"] }
 uuid = { version = "1.10.0" }
+base64 = "0.22.1"
+serde_with = "3.11.0"
+zip = "2.2.1"
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

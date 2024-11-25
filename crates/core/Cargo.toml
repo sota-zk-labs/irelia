@@ -15,3 +15,4 @@ serde_json = { workspace = true }
 stone-cli = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["v4", "serde"] }
+serde_with = { workspace = true}

@@ -12,8 +12,13 @@ pub struct JobEntity {
     pub offchain_proof: bool,
     pub proof_layout: String,
     pub cairo_pie: String,
+    // pub status: String,
+    // pub invalid_reason: Option<String>,
+    // pub error_log: Option<String>,
+    // pub validation_done: Option<bool>,
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JobResponse {
     pub code: Option<String>,
