@@ -2,22 +2,40 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-/// Identifier for a question.
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
-pub struct JobId(pub Uuid);
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct JobEntity {
-    pub id: JobId,
-    pub customer_id: String,
-    pub cairo_job_key: String,
-    pub offchain_proof: bool,
-    pub proof_layout: String,
-    pub cairo_pie: String,
+use crate::entities::worker_job::JobId;
+
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
+pub struct StatusId(pub Uuid);
+
+pub enum JobStatus {
+    Pending,
+    InProgress,
+    Completed,
+    Failed,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct JobResponse {
-    pub code: Option<String>,
-    pub message: Option<String>,
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct StatusEntity {
+    pub id: StatusId,
+    pub customer_id: String,
+    pub cairo_job_key: String,
+    pub status: String,
+    pub validation_done: bool,
+}
+impl fmt::Display for JobStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            JobStatus::Pending => write!(f, "PENDING"),
+            JobStatus::InProgress => write!(f, "IN_PROGRESS"),
+            JobStatus::Completed => write!(f, "COMPLETED"),
+            JobStatus::Failed => write!(f, "FAILED"),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct StatusReponse {
+    pub status: Option<String>,
+    pub validation: Option<String>,
 }

@@ -1,14 +1,17 @@
 use std::collections::HashMap;
-use std::str;
 
-use axum::body::Bytes;
-use axum::extract::rejection::JsonRejection;
 use axum::extract::{Query, State};
-use irelia_adapter::repositories::postgres::status_db::StatusJobDBRepository;
-use irelia_core::entities::job::{JobEntity, JobId, JobResponse};
-use irelia_core::entities::status::{StatusEntity, StatusId};
-use irelia_core::ports::status::StatusPort;
-use openssl::pkey::Params;
+use diesel::row::NamedRow;
+use diesel::{
+    ExpressionMethods, OptionalExtension, QueryDsl, Queryable, RunQueryDsl, SelectableHelper,
+};
+use irelia_adapter::repositories::postgres::models::job::StatusModel;
+use irelia_adapter::repositories::postgres::schema::job_status::dsl::job_status;
+use irelia_adapter::repositories::postgres::schema::jobs::{cairo_job_key, customer_id};
+use irelia_core::common::core_error::CoreError;
+use irelia_core::entities::worker_job::{JobId, JobResponse};
+use irelia_core::entities::job::StatusResponse;
+use serde::Deserialize;
 use tracing::instrument;
 use tracing::log::info;
 use uuid::Uuid;
@@ -17,40 +20,38 @@ use crate::app_state::AppState;
 use crate::errors::AppError;
 use crate::json_response::JsonResponse;
 
+#[derive(Debug, Deserialize)]
+pub struct GetStatusParams {
+    customer_id: String,
+    cairo_job_key: String,
+}
+
 #[instrument(level = "info", skip(app_state))]
-pub async fn add_job(
+#[axum::debug_handler]
+pub async fn get_status(
     State(app_state): State<AppState>,
-    body: Bytes,
-) -> Result<JsonResponse<Vec<JobResponse>>, AppError> {
-    // TODO: Process the data
-    let data = str::from_utf8(&body).unwrap();
-    info!("{}", data);
+    Query(params): Query<GetStatusParams>,
+) -> Result<JsonResponse<StatusResponse>, AppError> {
+    let db = app_state.db.clone();
 
-    let job_entity = app_state
-        .worker_port
-        .add(JobEntity {
-            id: JobId(Uuid::new_v4()),
-            customer_id: "1".to_string(),
-            cairo_job_key: "1".to_string(),
-            offchain_proof: false,
-            proof_layout: "1".to_string(),
-            cairo_pie: "1".to_string(),
+    let job_status_entity = db
+        .get()
+        .await
+        .unwrap()
+        .interact(move |conn| {
+            use irelia_adapter::repositories::postgres::schema::job_status::dsl::*;
+            job_status
+                .select(StatusModel::as_select())
+                .filter(customer_id.eq(params.customer_id))
+                .filter(cairo_job_key.eq(params.cairo_job_key))
+                .first::<StatusModel>(conn)
+                .optional()
         })
-        .await?;
-
-    let job_status_repo = StatusJobDBRepository::new(app_state.db.clone());
-    let job_status = job_status_repo
-        .add(StatusEntity {
-            id: StatusId(Uuid::new_v4()),
-            customer_id: job_entity.customer_id.clone(),
-            cairo_job_key: job_entity.cairo_job_key.clone(),
-            status: "Pending".to_string(),
-            validation_done: false,
-        })
-        .await?;
-
-    Ok(JsonResponse(vec![JobResponse {
-        code: Some("JOB_RECEIVED_SUCCESSFULLY".to_string()),
-        message: Some(job_entity.id.0.to_string()),
-    }]))
+        .await
+        .unwrap()
+        .unwrap();
+    Ok(JsonResponse(StatusResponse {
+        status: Some(job_status_entity.clone().unwrap().status.to_string()),
+        validation: Some(job_status_entity.unwrap().validation_done.to_string()),
+    }))
 }

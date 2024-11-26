@@ -2,54 +2,51 @@ use std::io::{Error, ErrorKind};
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use irelia_core::entities::job::{JobEntity, JobId};
+use irelia_core::entities::worker_job::JobId;
+use irelia_core::entities::job::Job;
 use uuid::Uuid;
 
-#[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable)]
-#[diesel(table_name = super::super::schema::jobs)]
+#[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]
+#[diesel(table_name = super::super::schema::job_status)]
 pub struct JobModel {
     pub id: Uuid,
     pub customer_id: String,
     pub cairo_job_key: String,
-    pub offchain_proof: bool,
-    pub proof_layout: String,
-    pub cairo_pie: String,
+    pub status: String,
+    pub validation_done: bool,
 
     pub created_on: SystemTime,
 }
 
-impl TryFrom<JobEntity> for JobModel {
+impl TryFrom<Job> for JobModel {
     type Error = Error;
 
-    fn try_from(entity: JobEntity) -> Result<JobModel, Self::Error> {
+    fn try_from(entity: Job) -> Result<Self, Self::Error> {
         let id = entity
             .id
             .0
             .try_into()
             .map_err(|_| Error::new(ErrorKind::InvalidInput, "Invalid ID"))?;
-
         Ok(JobModel {
             id,
             customer_id: entity.customer_id,
             cairo_job_key: entity.cairo_job_key,
-            offchain_proof: entity.offchain_proof,
-            proof_layout: entity.proof_layout,
-            cairo_pie: entity.cairo_pie,
+            status: entity.status,
+            validation_done: entity.validation_done,
 
             created_on: SystemTime::now(),
         })
     }
 }
 
-impl From<JobModel> for JobEntity {
+impl From<JobModel> for Job {
     fn from(val: JobModel) -> Self {
-        JobEntity {
+        Job {
             id: JobId(val.id.try_into().unwrap()),
             customer_id: val.customer_id,
             cairo_job_key: val.cairo_job_key,
-            offchain_proof: val.offchain_proof,
-            proof_layout: val.proof_layout,
-            cairo_pie: "".to_string(),
+            status: val.status,
+            validation_done: val.validation_done,
         }
     }
 }
