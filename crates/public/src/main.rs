@@ -76,7 +76,7 @@ pub async fn serve(options: Options) {
         )
         .await,
     );
-    let routes = routes(AppState::new(job_repository, worker_adapter)).layer((
+    let routes = routes(AppState::new(job_repository, worker_adapter, pool)).layer((
         TraceLayer::new_for_http(),
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.

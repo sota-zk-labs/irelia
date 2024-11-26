@@ -9,7 +9,7 @@ members = [
   "crates/worker",
 ]
 
-[workspace.dependencies]
+  [workspace.dependencies]
 irelia_adapter = { path = "crates/adapter" }
 irelia_common = { path = "crates/common" }
 irelia_core = { path = "crates/core" }
@@ -51,10 +51,10 @@ scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
 sqlx = { version = "*" }
 serde_json = { version = "1.0.128" }
-stone-cli = { git = "https://github.com/sota-zk-labs/stone-cli" }
+stone-cli = { git = "https://github.com/zksecurity/stone-cli.git" }
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
-testcontainers-modules = { version = "0.11.2" }
+testcontainers-modules = { version = "0.11.3" }
 thiserror = { version = "1.0.64" }
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
 tonic = { version = "0.12.2" }

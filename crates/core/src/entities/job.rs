@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 /// Identifier for a question.

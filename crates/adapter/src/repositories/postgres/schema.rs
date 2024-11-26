@@ -12,3 +12,14 @@ diesel::table! {
         created_on -> Timestamp,
     }
 }
+
+diesel::table! {
+    job_status (id) {
+        id -> Uuid,
+        customer_id -> Varchar,
+        cairo_job_key -> Varchar,
+        status -> Varchar,
+        validation_done -> Bool,
+        created_on -> Timestamp,
+    }
+}

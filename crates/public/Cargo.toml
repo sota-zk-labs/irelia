@@ -14,9 +14,9 @@ axum = { workspace = true, features = ["macros"] }
 clap = { workspace = true, features = ["derive"] }
 deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
 diesel = { workspace = true, features = [
-  "postgres",
-  "postgres_backend",
-  "uuid",
+    "postgres",
+    "postgres_backend",
+    "uuid",
 ] }
 diesel_migrations = { workspace = true }
 openssl = { workspace = true }
@@ -33,3 +33,4 @@ tracing = { workspace = true }
 tracing-opentelemetry = { workspace = true }
 graphile_worker = { workspace = true }
 uuid = { version = "1.10.0", features = ["v4"] }
+chrono = "0.4.38"

@@ -35,6 +35,7 @@ impl TryFrom<JobEntity> for JobModel {
             offchain_proof: entity.offchain_proof,
             proof_layout: entity.proof_layout,
             cairo_pie: entity.cairo_pie,
+
             created_on: SystemTime::now(),
         })
     }

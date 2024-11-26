@@ -8,7 +8,7 @@ use tokio::time::sleep;
 use tracing::{info, instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct JobWorker(Worker<JobEntity>);
 
 impl TaskHandler for JobWorker {
@@ -21,6 +21,9 @@ impl TaskHandler for JobWorker {
             propagator.extract(&self.0.tracing)
         });
 
+        eprintln!("span = {:#?}", span);
+        eprintln!("parent_cx = {:#?}", parent_cx);
+        eprintln!("self = {:#?}", self);
         span.set_parent(parent_cx);
 
         sleep(Duration::from_secs(5)).await;

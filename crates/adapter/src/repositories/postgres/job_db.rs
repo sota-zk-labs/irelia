@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use deadpool_diesel::postgres::Pool;
+use diesel::dsl::select;
 use diesel::{
     delete, insert_into, update, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper,
 };
@@ -7,6 +8,7 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations};
 use irelia_core::common::core_error::CoreError;
 use irelia_core::entities::job::{JobEntity, JobId};
 use irelia_core::ports::job::JobPort;
+use uuid::Uuid;
 
 use crate::repositories::postgres::models::job::JobModel;
 use crate::repositories::postgres::schema::jobs::dsl::jobs;
@@ -117,4 +119,24 @@ impl JobPort for JobDBRepository {
             .await
             .unwrap()
     }
+
+    // async fn get_job_id(&self, params: &Vec<String>) -> Result<JobId, CoreError> {
+    //     let customer_id = &params[0];
+    //     let cairo_job_key = &params[1];
+    //
+    //     self.db.get().await.unwrap().interact(move |conn| {
+    //         use crate::repositories::postgres::schema::jobs::dsl::{jobs, customer_id as db_customer_id, cairo_job_key as db_cairo_job_key, id};
+    //
+    //         let job_id: Uuid = jobs
+    //             .filter(db_customer_id.eq(customer_id))
+    //             .filter(db_cairo_job_key.eq(cairo_job_key))
+    //             .select(id)
+    //             .first(conn)
+    //             .map_err(|err| match err {
+    //                 diesel::result::Error::NotFound => CoreError::NotFound,
+    //                 _ => CoreError::InternalError(err.into()),
+    //             })?;
+    //         Ok(JobId(job_id))
+    //     }).await.unwrap()
+    // }
 }

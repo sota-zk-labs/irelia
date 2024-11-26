@@ -1,8 +1,14 @@
+use std::collections::HashMap;
 use std::str;
 
 use axum::body::Bytes;
-use axum::extract::State;
+use axum::extract::rejection::JsonRejection;
+use axum::extract::{Query, State};
+use irelia_adapter::repositories::postgres::status_db::StatusJobDBRepository;
 use irelia_core::entities::job::{JobEntity, JobId, JobResponse};
+use irelia_core::entities::status::{StatusEntity, StatusId};
+use irelia_core::ports::status::StatusPort;
+use openssl::pkey::Params;
 use tracing::instrument;
 use tracing::log::info;
 use uuid::Uuid;
@@ -29,6 +35,17 @@ pub async fn add_job(
             offchain_proof: false,
             proof_layout: "1".to_string(),
             cairo_pie: "1".to_string(),
+        })
+        .await?;
+
+    let job_status_repo = StatusJobDBRepository::new(app_state.db.clone());
+    let job_status = job_status_repo
+        .add(StatusEntity {
+            id: StatusId(Uuid::new_v4()),
+            customer_id: job_entity.customer_id.clone(),
+            cairo_job_key: job_entity.cairo_job_key.clone(),
+            status: "Pending".to_string(),
+            validation_done: false,
         })
         .await?;
 
