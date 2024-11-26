@@ -19,7 +19,7 @@ services:
     depends_on:
       - quickwit
     environment:
-      SPAN_STORAGE_TYPE: 'grpc-plugin'
+      SPAN_STORAGE_TYPE: 'grpc'
       GRPC_STORAGE_SERVER: 'quickwit:7281'
     ports:
       - '16686:16686'

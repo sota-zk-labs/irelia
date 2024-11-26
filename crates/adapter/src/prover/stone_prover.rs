@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::str::FromStr;
 
 use async_trait::async_trait;
 use irelia_core::common::prover_error::ProverError;
@@ -33,13 +34,15 @@ const SERIALIZED_PROOF_PATH: &str = "bootloader_serialized_proof.json";
 /// Generate proof from cairo pies or cairo programs
 pub struct StoneProver {
     pub cairo_pie: Vec<PathBuf>,
-    pub layout: LayoutName,
+    pub layout: String,
 }
 
 #[async_trait]
 impl ProverPort for StoneProver {
     async fn generate_proof(&self) -> Result<SharpProof, ProverError> {
-        if self.layout != LayoutName::starknet {
+        let layout = LayoutName::from_str(&self.layout).unwrap();
+
+        if layout != LayoutName::starknet {
             return Err(UnsupportedLayoutError);
         }
 
@@ -76,7 +79,7 @@ impl ProverPort for StoneProver {
         let proof_args = stone_cli::args::ProveBootloaderArgs {
             cairo_programs: None,
             cairo_pies: Some(self.cairo_pie.clone()),
-            layout: self.layout.clone(),
+            layout: layout.clone(),
             prover_config_file: Default::default(),
             parameter_file,
             output: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
@@ -143,7 +146,7 @@ mod tests {
         let cairo_pie = vec![PathBuf::from(
             "./src/prover/test_samples/fibonacci_with_output.zip",
         )];
-        let layout = LayoutName::starknet;
+        let layout = "starknet".to_string();
         let stone_prover = StoneProver { layout, cairo_pie };
         assert!(stone_prover.generate_proof().await.is_ok());
     }

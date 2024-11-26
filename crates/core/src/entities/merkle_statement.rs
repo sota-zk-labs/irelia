@@ -1,15 +1,24 @@
+use aptos_sdk::move_types::value::MoveValue;
 use ethers::prelude::U256;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MerkleStatement {
-    expected_root: U256,
-    n_unique_queries: usize,
-    merkle_height: usize,
-    merkle_queue_indices: Vec<U256>,
-    merkle_queue_values: Vec<U256>,
-    proof: Vec<U256>,
+    pub expected_root: U256,
+    pub n_unique_queries: usize,
+    pub merkle_height: usize,
+    pub merkle_queue_indices: Vec<U256>,
+    pub merkle_queue_values: Vec<U256>,
+    pub proof: Vec<U256>,
+}
+
+#[derive(Serialize, Debug)]
+pub struct VerifyMerkleTransactionInput {
+    pub merkle_view: MoveValue,
+    pub initial_merkle_queue: MoveValue,
+    pub height: MoveValue,
+    pub expected_root: MoveValue,
 }
 
 impl MerkleStatement {

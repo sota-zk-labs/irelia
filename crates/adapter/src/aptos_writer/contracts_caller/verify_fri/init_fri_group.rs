@@ -10,7 +10,7 @@ use crate::aptos_writer::contracts_caller::verify_fri::types::init_fri_group::In
 
 pub async fn init_fri_group(config: &AppConfig, data: InitFriGroup) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new("fri_layer")?),
+        ModuleId::new(config.verifier_address, Identifier::new("fri_layer")?),
         Identifier::new("init_fri_group")?,
         vec![],
         serialize_values(&vec![MoveValue::U64(data.fri_ctx)]),

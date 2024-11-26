@@ -27,7 +27,7 @@ pub async fn verify_proof_and_register(
 
     // Prepush task metadata transaction
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new(module_name)?),
+        ModuleId::new(config.verifier_address, Identifier::new(module_name)?),
         Identifier::new("prepush_task_metadata")?,
         vec![],
         serialize_values(&vec![MoveValue::Vector(
@@ -42,7 +42,7 @@ pub async fn verify_proof_and_register(
 
     // Prepush data to verify proof and register transaction
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new(module_name)?),
+        ModuleId::new(config.verifier_address, Identifier::new(module_name)?),
         Identifier::new("prepush_data_to_verify_proof_and_register")?,
         vec![],
         serialize_values(&vec![
@@ -69,7 +69,7 @@ pub async fn verify_proof_and_register(
     for cnt_loop in 1..=12 {
         debug!("verify_proof_and_register {}", cnt_loop);
         let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-            ModuleId::new(config.module_address, Identifier::new(module_name)?),
+            ModuleId::new(config.verifier_address, Identifier::new(module_name)?),
             Identifier::new("verify_proof_and_register")?,
             vec![],
             serialize_values(&vec![]),
@@ -77,6 +77,15 @@ pub async fn verify_proof_and_register(
         let tx = build_transaction(payload, &config.account, config.chain_id);
         txs.push((format!("verify_proof_and_register {}", cnt_loop), tx));
     }
+
+    let payload = TransactionPayload::EntryFunction(EntryFunction::new(
+        ModuleId::new(config.verifier_address, Identifier::new(module_name)?),
+        Identifier::new("reset_data")?,
+        vec![],
+        serialize_values(&vec![]),
+    ));
+    let tx = build_transaction(payload, &config.account, config.chain_id);
+    txs.push(("reset_data".to_string(), tx));
 
     let pending_transactions = txs
         .into_iter()
@@ -127,14 +136,14 @@ pub async fn verify_proof_and_register(
         transactions.push(transaction);
     }
 
-    let last_transaction = transactions.last().unwrap();
+    let last_transaction = transactions.iter().nth_back(1).unwrap();
 
     // Get the event from the last transaction
     let event = get_event_from_transaction(
         last_transaction,
         MoveType::from_str(&format!(
             "{}::{}::VparFinished",
-            config.module_address, module_name
+            config.verifier_address, module_name
         ))?,
     );
     ensure!(

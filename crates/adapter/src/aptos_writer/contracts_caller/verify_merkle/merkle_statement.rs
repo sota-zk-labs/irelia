@@ -5,6 +5,7 @@ use aptos_sdk::move_types::language_storage::ModuleId;
 use aptos_sdk::move_types::value::serialize_values;
 use aptos_sdk::rest_client::aptos_api_types::MoveType;
 use aptos_sdk::types::transaction::{EntryFunction, TransactionPayload};
+use irelia_core::entities::merkle_statement::VerifyMerkleTransactionInput;
 use log::info;
 
 use crate::aptos_writer::config::AppConfig;
@@ -13,7 +14,6 @@ use crate::aptos_writer::contracts_caller::transaction_helper::{
 };
 use crate::aptos_writer::contracts_caller::types::VerifyMerkle;
 use crate::aptos_writer::contracts_caller::verify_merkle::types::register_fact_verify_merkle::RegisterFactVerifyMerkle;
-use crate::aptos_writer::contracts_caller::verify_merkle::types::verify_merkle_input::VerifyMerkleTransactionInput;
 
 pub async fn verify_merkle_statement(
     config: &AppConfig,
@@ -21,7 +21,7 @@ pub async fn verify_merkle_statement(
 ) -> anyhow::Result<(VerifyMerkle, RegisterFactVerifyMerkle)> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
-            config.module_address,
+            config.verifier_address,
             Identifier::new("merkle_statement_contract")?,
         ),
         Identifier::new("verify_merkle")?,
@@ -33,6 +33,7 @@ pub async fn verify_merkle_statement(
             data.expected_root,
         ]),
     ));
+
     let tx = build_transaction(payload, &config.account, config.chain_id);
     let transaction = config.client.submit_and_wait(&tx).await?.into_inner();
     let transaction_info = transaction.transaction_info()?;
@@ -45,14 +46,14 @@ pub async fn verify_merkle_statement(
 
     let verify_merkle_event_type = MoveType::from_str(&format!(
         "{}::merkle_statement_contract::VerifyMerkle",
-        config.module_address
+        config.verifier_address
     ))?;
     let verify_merkle_data =
         get_event_from_transaction(&transaction, verify_merkle_event_type)?.clone();
 
     let register_fact_event_type = MoveType::from_str(&format!(
         "{}::merkle_statement_contract::RegisterFactVerifyMerkle",
-        config.module_address
+        config.verifier_address
     ))?;
     let register_fact_data =
         get_event_from_transaction(&transaction, register_fact_event_type)?.clone();

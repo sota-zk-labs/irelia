@@ -22,7 +22,7 @@ pub async fn register_continuous_memory_page(
 
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
-            config.module_address,
+            config.verifier_address,
             Identifier::new("memory_page_fact_registry")?,
         ),
         Identifier::new("register_continuous_memorypage")?,

@@ -13,7 +13,7 @@ pub async fn compute_next_layer(
     data: &ComputeNextLayer,
 ) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new("fri_layer")?),
+        ModuleId::new(config.verifier_address, Identifier::new("fri_layer")?),
         Identifier::new("compute_next_layer")?,
         vec![],
         serialize_values(&vec![

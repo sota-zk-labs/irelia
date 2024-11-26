@@ -38,6 +38,7 @@ impl WorkerJobService {
 
     pub async fn add_worker_job(
         &self,
+        job_service: Arc<JobService>,
         params: WorkerJob,
         cairo_pie_req: String,
     ) -> Result<WorkerJobResponse, AppError> {
