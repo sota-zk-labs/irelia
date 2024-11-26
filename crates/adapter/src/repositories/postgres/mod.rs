@@ -1,5 +1,5 @@
 pub mod config;
-pub mod job_db;
+pub mod worker_job_db;
 pub mod models;
 pub mod schema;
-pub mod status_db;
+pub mod job_db;

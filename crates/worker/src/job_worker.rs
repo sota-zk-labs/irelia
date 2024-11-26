@@ -2,14 +2,14 @@ use std::time::Duration;
 
 use graphile_worker::{IntoTaskHandlerResult, TaskHandler, WorkerContext};
 use irelia_common::workers::{Worker, ADD_JOB_WORKER_IDENTIFIER};
-use irelia_core::entities::job::JobEntity;
+use irelia_core::entities::worker_job::WorkerJob;
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 use tracing::{info, instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct JobWorker(Worker<JobEntity>);
+pub struct JobWorker(Worker<WorkerJob>);
 
 impl TaskHandler for JobWorker {
     const IDENTIFIER: &'static str = ADD_JOB_WORKER_IDENTIFIER;

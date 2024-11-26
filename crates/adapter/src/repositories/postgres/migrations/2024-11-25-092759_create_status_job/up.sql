@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE job_status (
+CREATE TABLE jobs (
                             id UUID PRIMARY KEY,
                             customer_id VARCHAR NOT NULL,
                             cairo_job_key VARCHAR NOT NULL,

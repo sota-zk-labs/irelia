@@ -1,12 +1,6 @@
 use std::fmt;
-
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-use crate::entities::worker_job::JobId;
-
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
-pub struct StatusId(pub Uuid);
 
 pub enum JobStatus {
     Pending,
@@ -15,9 +9,12 @@ pub enum JobStatus {
     Failed,
 }
 
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
+pub struct JobId(pub Uuid);
+
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct StatusEntity {
-    pub id: StatusId,
+pub struct Job {
+    pub id: JobId,
     pub customer_id: String,
     pub cairo_job_key: String,
     pub status: String,
@@ -35,7 +32,7 @@ impl fmt::Display for JobStatus {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct StatusReponse {
+pub struct JobResponse {
     pub status: Option<String>,
     pub validation: Option<String>,
 }

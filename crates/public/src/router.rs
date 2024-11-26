@@ -6,8 +6,8 @@ use axum::{
 };
 
 use crate::app_state::AppState;
-use crate::controllers::job::add_job;
-use crate::controllers::job_status::get_status;
+use crate::controllers::worker_job::add_job;
+use crate::controllers::job::get_status;
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()

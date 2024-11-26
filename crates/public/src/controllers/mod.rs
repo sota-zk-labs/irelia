@@ -1,3 +1,3 @@
-pub mod job;
+pub mod worker_job;
 
-pub mod job_status;
+pub mod job;

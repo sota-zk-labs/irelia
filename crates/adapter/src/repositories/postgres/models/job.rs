@@ -2,12 +2,11 @@ use std::io::{Error, ErrorKind};
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use irelia_core::entities::worker_job::JobId;
-use irelia_core::entities::job::Job;
+use irelia_core::entities::job::{Job, JobId};
 use uuid::Uuid;
 
 #[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]
-#[diesel(table_name = super::super::schema::job_status)]
+#[diesel(table_name = super::super::schema::jobs)]
 pub struct JobModel {
     pub id: Uuid,
     pub customer_id: String,

@@ -4,7 +4,7 @@ use crate::common::core_error::CoreError;
 use crate::entities::worker_job::{WorkerJob, WorkerJobId};
 
 #[async_trait]
-pub trait WorkedJobPort {
+pub trait WorkerJobPort {
     async fn add(&self, job: WorkerJob) -> Result<WorkerJob, CoreError>;
     async fn update(&self, job: WorkerJob) -> Result<WorkerJob, CoreError>;
     async fn delete(&self, job_id: &WorkerJobId) -> Result<(), CoreError>;

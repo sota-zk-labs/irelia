@@ -7,7 +7,7 @@ use deadpool_diesel::{Manager, Runtime};
 use irelia::app_state::AppState;
 use irelia::options::Options;
 use irelia::router::routes;
-use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
+use irelia_adapter::repositories::postgres::worker_job_db::WorkerJobDBRepository;
 use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
 use irelia_common::kill_signals;
@@ -17,6 +17,7 @@ use opentelemetry::global;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
+use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
 
 #[tokio::main]
 async fn main() {
@@ -67,7 +68,10 @@ pub async fn serve(options: Options) {
 
     // TODO: use the same DB pool for the worker_adapter
 
+    let worker_job_repository = Arc::new(WorkerJobDBRepository::new(pool.clone()));
     let job_repository = Arc::new(JobDBRepository::new(pool.clone()));
+
+
     let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
         WorkerAdapter::new(
             &options.pg.url,
@@ -76,7 +80,7 @@ pub async fn serve(options: Options) {
         )
         .await,
     );
-    let routes = routes(AppState::new(job_repository, worker_adapter, pool)).layer((
+    let routes = routes(AppState::new(worker_job_repository, worker_adapter, pool, job_repository)).layer((
         TraceLayer::new_for_http(),
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.

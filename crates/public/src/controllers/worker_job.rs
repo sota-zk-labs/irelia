@@ -6,14 +6,15 @@ use axum::extract::rejection::JsonRejection;
 use axum::extract::{Query, State};
 use axum::Json;
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
-use irelia_core::entities::worker_job::{WorkerJob, WorkerJobId, JobResponse, NewWorkerJob};
-use irelia_core::entities::job::{Job, StatusId};
-use irelia_core::ports::job::StatusPort;
+use irelia_core::entities::worker_job::{WorkerJob, WorkerJobId, WorkerJobResponse, NewWorkerJob};
+use irelia_core::entities::job::{Job, JobId, JobStatus};
+use irelia_core::ports::job::JobPort;
 use openssl::pkey::Params;
 use tracing::instrument;
 use tracing::log::info;
 use uuid::Uuid;
-use irelia_adapter::repositories::postgres::schema::jobs::{cairo_job_key, proof_layout};
+use irelia_adapter::repositories::postgres::schema::worker_job::{cairo_job_key, proof_layout};
+use irelia_core::entities::job::JobStatus::Pending;
 use crate::app_state::AppState;
 use crate::errors::AppError;
 use crate::json_response::JsonResponse;
@@ -22,11 +23,11 @@ use crate::json_response::JsonResponse;
 pub async fn add_job(
     State(app_state): State<AppState>,
     Json(req): Json<NewWorkerJob>,
-) -> Result<JsonResponse<Vec<JobResponse>>, AppError> {
+) -> Result<JsonResponse<Vec<WorkerJobResponse>>, AppError> {
     // TODO: Process the data
     info!("{:?}", req);
 
-    let worked_job = app_state
+    let worker_job = app_state
         .worker_port
         .add(WorkerJob {
             id: WorkerJobId(Uuid::new_v4()),
@@ -38,20 +39,19 @@ pub async fn add_job(
         })
         .await?;
 
-    let job_status_repo = JobDBRepository::new(app_state.db.clone());
-
-    let _ = job_status_repo
+    let _ = app_state
+        .job_port
         .add(Job {
-            id: StatusId(Uuid::new_v4()),
-            customer_id: worked_job.customer_id.clone(),
-            cairo_job_key: worked_job.cairo_job_key.clone(),
-            status: "Pending".to_string(),
+            id: JobId(Uuid::new_v4()),
+            customer_id: worker_job.customer_id.clone(),
+            cairo_job_key: worker_job.cairo_job_key.clone(),
+            status: Pending.to_string(),
             validation_done: false,
         })
         .await?;
 
-    Ok(JsonResponse(vec![JobResponse {
+    Ok(JsonResponse(vec![WorkerJobResponse {
         code: Some("JOB_RECEIVED_SUCCESSFULLY".to_string()),
-        message: Some(worked_job.id.0.to_string()),
+        message: Some(worker_job.id.0.to_string()),
     }]))
 }
