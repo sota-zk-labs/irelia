@@ -8,7 +8,7 @@ use tokio::time::sleep;
 use tracing::{info, instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
-use irelia_core::entities::job::{Job, JobId, JobPayload};
+use irelia_core::entities::job::{JobEntity, JobId, JobEntityPayload};
 use irelia_core::entities::job::JobStatus::InProgress;
 use crate::state::State;
 
@@ -25,9 +25,6 @@ impl TaskHandler for JobWorker {
             propagator.extract(&self.0.tracing)
         });
 
-        eprintln!("span = {:#?}", span);
-        eprintln!("parent_cx = {:#?}", parent_cx);
-        eprintln!("self = {:#?}", self);
         span.set_parent(parent_cx);
 
         sleep(Duration::from_secs(10)).await;
@@ -38,7 +35,7 @@ impl TaskHandler for JobWorker {
 
         let _ = State::new()
             .job_port
-            .update( JobPayload {
+            .update( JobEntityPayload {
                 customer_id: worker_job.clone().customer_id,
                 cairo_job_key: worker_job.clone().cairo_job_key,
                 status: InProgress,

@@ -5,13 +5,12 @@ use diesel::{
     delete, insert_into, update, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
-use sqlx::types::chrono;
 use irelia_core::common::core_error::CoreError;
-use irelia_core::entities::job::{Job, JobId, JobPayload, JobStatus};
+use irelia_core::entities::job::{JobEntity, JobId, JobEntityPayload};
 use irelia_core::ports::job::JobPort;
 use crate::repositories::postgres::models::job::JobModel;
 use crate::repositories::postgres::schema::jobs::dsl::jobs;
-use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id, updated_on};
+use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
 
 // NOTE: path relative to Cargo.toml
 
@@ -31,7 +30,7 @@ impl JobDBRepository {
 
 #[async_trait]
 impl JobPort for JobDBRepository {
-    async fn add(&self, job: Job) -> Result<Job, CoreError> {
+    async fn add(&self, job: JobEntity) -> Result<JobEntity, CoreError> {
         self.db
             .get()
             .await
@@ -53,7 +52,7 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn update(&self, job: JobPayload) -> Result<Job, CoreError> {
+    async fn update(&self, job: JobEntityPayload) -> Result<JobEntity, CoreError> {
         let job_model : Result<JobModel, CoreError> = self
             .db
             .get()
@@ -81,7 +80,6 @@ impl JobPort for JobDBRepository {
         job_model.validation_done = job.validation_done;
         job_model.updated_on = SystemTime::now();
 
-        println!("Hey job_model after update: {:?}", job_model);
         self.db
             .get()
             .await
@@ -122,15 +120,15 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn get(&self, _customer_id: String, _cairo_job_key: String) -> Result<Job, CoreError> {
+    async fn get(&self, customer_id_value: String, cairo_job_key_value: String) -> Result<JobEntity, CoreError> {
         self.db
             .get()
             .await
             .unwrap()
             .interact(move |conn| {
                 let response = jobs
-                    .filter(customer_id.eq(_customer_id))
-                    .filter(cairo_job_key.eq(_cairo_job_key))
+                    .filter(customer_id.eq(customer_id_value))
+                    .filter(cairo_job_key.eq(cairo_job_key_value))
                     .select(JobModel::as_select())
                     .first(conn)
                     .map_err(|err| match err {

@@ -5,19 +5,25 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum JobStatus {
-    Pending,
-    InProgress,
-    Completed,
     Failed,
+    Invalid,
+    Unknown,
+    InProgress,
+    NotCreated,
+    Processed,
+    Onchain,
 }
 
 impl fmt::Display for JobStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            JobStatus::Pending => write!(f, "PENDING"),
-            JobStatus::InProgress => write!(f, "IN_PROGRESS"),
-            JobStatus::Completed => write!(f, "COMPLETED"),
             JobStatus::Failed => write!(f, "FAILED"),
+            JobStatus::Invalid => write!(f, "INVALID"),
+            JobStatus::Unknown => write!(f, "UNKNOWN"),
+            JobStatus::InProgress => write!(f, "IN_PROGRESS"),
+            JobStatus::NotCreated => write!(f, "NOT_CREATED"),
+            JobStatus::Processed => write!(f, "PROCESSED"),
+            JobStatus::Onchain => write!(f, "ONCHAIN"),
         }
     }
 }
@@ -27,10 +33,13 @@ impl FromStr for JobStatus {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_uppercase().as_str() {
-            "PENDING" => Ok(JobStatus::Pending),
-            "IN_PROGRESS" => Ok(JobStatus::InProgress),
-            "COMPLETED" => Ok(JobStatus::Completed),
             "FAILED" => Ok(JobStatus::Failed),
+            "INVALID" => Ok(JobStatus::Invalid),
+            "UNKNOWN" => Ok(JobStatus::Unknown),
+            "IN_PROGRESS" => Ok(JobStatus::InProgress),
+            "NOT_CREATED" => Ok(JobStatus::NotCreated),
+            "PROCESSED" => Ok(JobStatus::Processed),
+            "ONCHAIN" => Ok(JobStatus::Onchain),
             _ => Err(format!("'{}' is not a valid value of job status", s)),
         }
     }
@@ -40,7 +49,7 @@ impl FromStr for JobStatus {
 pub struct JobId(pub Uuid);
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct Job {
+pub struct JobEntity {
     pub id: JobId,
     pub customer_id: String,
     pub cairo_job_key: String,
@@ -49,14 +58,14 @@ pub struct Job {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct JobPayload {
+pub struct JobEntityPayload {
     pub customer_id: String,
     pub cairo_job_key: String,
     pub status: JobStatus,
     pub validation_done: bool,
 }
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct JobResponse {
+pub struct JobEntityResponse {
     pub status: Option<String>,
     pub validation: Option<String>,
 }

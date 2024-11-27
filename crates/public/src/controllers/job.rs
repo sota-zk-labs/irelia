@@ -7,9 +7,8 @@ use diesel::{
 };
 use irelia_adapter::repositories::postgres::models::job::JobModel;
 use irelia_adapter::repositories::postgres::schema::jobs::dsl::jobs;
-use irelia_adapter::repositories::postgres::schema::worker_job::{cairo_job_key, customer_id};
 use irelia_core::common::core_error::CoreError;
-use irelia_core::entities::job::JobResponse;
+use irelia_core::entities::job::{JobEntity, JobEntityResponse};
 use serde::Deserialize;
 use tracing::instrument;
 use tracing::log::info;
@@ -30,27 +29,15 @@ pub struct GetStatusParams {
 pub async fn get_status(
     State(app_state): State<AppState>,
     Query(params): Query<GetStatusParams>,
-) -> Result<JsonResponse<JobResponse>, AppError> {
-    let db = app_state.db.clone();
+) -> Result<JsonResponse<JobEntityResponse>, AppError> {
+    let job : JobEntity= app_state
+        .job_port
+        .get(params.customer_id, params.cairo_job_key)
+        .await?;
 
-    let job_entity = db
-        .get()
-        .await
-        .unwrap()
-        .interact(move |conn| {
-            use irelia_adapter::repositories::postgres::schema::jobs::dsl::*;
-            jobs
-                .select(JobModel::as_select())
-                .filter(customer_id.eq(params.customer_id))
-                .filter(cairo_job_key.eq(params.cairo_job_key))
-                .first::<JobModel>(conn)
-                .optional()
-        })
-        .await
-        .unwrap()
-        .unwrap();
-    Ok(JsonResponse(JobResponse {
-        status: Some(job_entity.clone().unwrap().status.to_string()),
-        validation: Some(job_entity.unwrap().validation_done.to_string()),
+
+    Ok(JsonResponse(JobEntityResponse {
+        status: Some(job.status.to_string()),
+        validation: Some(job.validation_done.to_string()),
     }))
 }

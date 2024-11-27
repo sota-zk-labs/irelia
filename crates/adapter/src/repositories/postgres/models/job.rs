@@ -3,7 +3,7 @@ use std::str::FromStr;
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use irelia_core::entities::job::{Job, JobId, JobStatus};
+use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
 use uuid::Uuid;
 
 #[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]
@@ -19,10 +19,10 @@ pub struct JobModel {
     pub created_on: SystemTime,
 }
 
-impl TryFrom<Job> for JobModel {
+impl TryFrom<JobEntity> for JobModel {
     type Error = Error;
 
-    fn try_from(entity: Job) -> Result<Self, Self::Error> {
+    fn try_from(entity: JobEntity) -> Result<Self, Self::Error> {
         let id = entity
             .id
             .0
@@ -41,9 +41,9 @@ impl TryFrom<Job> for JobModel {
     }
 }
 
-impl From<JobModel> for Job {
+impl From<JobModel> for JobEntity {
     fn from(val: JobModel) -> Self {
-        Job {
+        JobEntity {
             id: JobId(val.id.try_into().unwrap()),
             customer_id: val.customer_id,
             cairo_job_key: val.cairo_job_key,

@@ -9,7 +9,7 @@ members = [
   "crates/worker",
 ]
 
-  [workspace.dependencies]
+[workspace.dependencies]
 irelia_adapter = { path = "crates/adapter" }
 irelia_common = { path = "crates/common" }
 irelia_core = { path = "crates/core" }
