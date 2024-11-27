@@ -15,7 +15,6 @@ use sqlx::postgres::PgConnectOptions;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-
 use crate::options::Options;
 
 #[tokio::main]

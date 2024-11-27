@@ -7,6 +7,10 @@ use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 use tracing::{info, instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
+use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
+use irelia_core::entities::job::{Job, JobId, JobPayload};
+use irelia_core::entities::job::JobStatus::InProgress;
+use crate::state::State;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct JobWorker(Worker<WorkerJob>);
@@ -26,7 +30,27 @@ impl TaskHandler for JobWorker {
         eprintln!("self = {:#?}", self);
         span.set_parent(parent_cx);
 
+        sleep(Duration::from_secs(10)).await;
+
+        ///TODO: Processing Data
+        //Set processing
+        let worker_job = self.0.data;
+
+        let _ = State::new()
+            .job_port
+            .update( JobPayload {
+                customer_id: worker_job.clone().customer_id,
+                cairo_job_key: worker_job.clone().cairo_job_key,
+                status: InProgress,
+                validation_done: false,
+            })
+            .await
+            .unwrap();
+
+        // Process data
+
+
         sleep(Duration::from_secs(5)).await;
-        info!("data: {:?}", self.0.data);
+        info!("data: {:?}", worker_job);
     }
 }

@@ -9,6 +9,7 @@ diesel::table! {
         offchain_proof -> Bool,
         proof_layout -> Varchar,
         cairo_pie -> Text,
+
         created_on -> Timestamp,
     }
 }
@@ -20,6 +21,8 @@ diesel::table! {
         cairo_job_key -> Varchar,
         status -> Varchar,
         validation_done -> Bool,
+
+        updated_on -> Timestamp,
         created_on -> Timestamp,
     }
 }

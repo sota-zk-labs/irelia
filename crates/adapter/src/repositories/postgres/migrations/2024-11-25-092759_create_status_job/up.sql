@@ -5,5 +5,6 @@ CREATE TABLE jobs (
                             cairo_job_key VARCHAR NOT NULL,
                             status VARCHAR NOT NULL,
                             validation_done BOOLEAN NOT NULL,
-                            created_on TIMESTAMP NOT NULL DEFAULT NOW()
+                            created_on TIMESTAMP NOT NULL DEFAULT NOW(),
+                            updated_on TIMESTAMP NOT NULL DEFAULT NOW()
 );

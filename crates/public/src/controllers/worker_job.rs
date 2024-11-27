@@ -34,7 +34,7 @@ pub async fn add_job(
             customer_id: req.customer_id,
             cairo_job_key: req.cairo_job_key,
             offchain_proof: req.offchain_proof,
-            proof_layout: req.proof_layout,
+            proof_layout: req.proof_layout.to_string(),
             cairo_pie: req.cairo_pie,
         })
         .await?;
@@ -45,7 +45,7 @@ pub async fn add_job(
             id: JobId(Uuid::new_v4()),
             customer_id: worker_job.customer_id.clone(),
             cairo_job_key: worker_job.cairo_job_key.clone(),
-            status: Pending.to_string(),
+            status: Pending,
             validation_done: false,
         })
         .await?;

@@ -5,12 +5,19 @@ name = "irelia_worker"
 version = "0.0.1"
 
 [dependencies]
+irelia_adapter = { workspace = true }
 irelia_common = { workspace = true }
 irelia_core = { workspace = true }
 
 anyhow = { workspace = true }
 axum = { workspace = true, features = ["macros"] }
 clap = { workspace = true, features = ["derive"] }
+deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
+diesel = { workspace = true, features = [
+  "postgres",
+  "postgres_backend",
+  "uuid",
+] }
 graphile_worker = { workspace = true }
 opentelemetry = { workspace = true }
 rand = { workspace = true }
