@@ -172,7 +172,7 @@ async fn post_request(client: Client, url: String, body: Value) -> Value {
 }
 
 async fn setup_database() {
-    let (client, connection) = tokio_postgres::connect("postgres://postgres:changeme@10.20.10.122:5432/postgres", NoTls)
+    let (client, connection) = tokio_postgres::connect("postgres://postgres:changeme@postgres:5432/postgres", NoTls)
         .await
         .expect("Failed to connect to database");
 
