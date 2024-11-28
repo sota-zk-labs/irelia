@@ -3,15 +3,17 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum JobStatus {
-    Failed,
-    Invalid,
-    Unknown,
-    InProgress,
+    Failed, // Stone failed
+    Invalid, // Wrong pie format
+    Unknown, //
+    InProgress, // init status
     NotCreated,
-    Processed,
-    Onchain,
+    Processed, // stone completed => to submit on chain
+    Onchain,  // stone completed and submit on chain completed
 }
 
 impl fmt::Display for JobStatus {
@@ -19,7 +21,7 @@ impl fmt::Display for JobStatus {
         match self {
             JobStatus::Failed => write!(f, "FAILED"),
             JobStatus::Invalid => write!(f, "INVALID"),
-            JobStatus::Unknown => write!(f, "UNKNOWN"),
+            JobStatus::Unknown => write!(f, "FAILED"),
             JobStatus::InProgress => write!(f, "IN_PROGRESS"),
             JobStatus::NotCreated => write!(f, "NOT_CREATED"),
             JobStatus::Processed => write!(f, "PROCESSED"),
@@ -63,9 +65,4 @@ pub struct JobEntityPayload {
     pub cairo_job_key: String,
     pub status: JobStatus,
     pub validation_done: bool,
-}
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct JobEntityResponse {
-    pub status: Option<String>,
-    pub validation: Option<String>,
 }

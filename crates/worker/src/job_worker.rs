@@ -46,7 +46,6 @@ impl TaskHandler for JobWorker {
 
         // Process data
 
-
         sleep(Duration::from_secs(5)).await;
         info!("data: {:?}", worker_job);
     }
