@@ -13,8 +13,7 @@ pub fn check_worker_job(params: NewWorkerJob) -> (WorkerJobStatus, bool) {
     };
 
     //Todo: bad flag
-
-    if params.cairo_job_key.is_empty() {
+    if params.cairo_job_key == None {
         return (NoCairoJobId, false)
     };
 
@@ -24,25 +23,3 @@ pub fn check_worker_job(params: NewWorkerJob) -> (WorkerJobStatus, bool) {
 
     (Successfully, true)
 }
-
-pub fn check_status_job(params: NewWorkerJob) -> (WorkerJobStatus, bool) {
-    //Todo: Faulty
-
-    let proof_layout: String = String::from(PROOF_LAYOUT).to_lowercase();
-    if params.proof_layout.to_lowercase() !=  proof_layout {
-        return (IncorrectLayout, false)
-    };
-
-    //Todo: bad flag
-
-    if params.cairo_job_key.is_empty() {
-        return (NoCairoJobId, false)
-    };
-
-    if !params.offchain_proof {
-        return (IncorrectOffchainProof, false)
-    };
-
-    (Successfully, true)
-}
-

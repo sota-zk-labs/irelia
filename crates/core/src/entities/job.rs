@@ -21,7 +21,7 @@ impl fmt::Display for JobStatus {
         match self {
             JobStatus::Failed => write!(f, "FAILED"),
             JobStatus::Invalid => write!(f, "INVALID"),
-            JobStatus::Unknown => write!(f, "FAILED"),
+            JobStatus::Unknown => write!(f, "UNKNOWN"),
             JobStatus::InProgress => write!(f, "IN_PROGRESS"),
             JobStatus::NotCreated => write!(f, "NOT_CREATED"),
             JobStatus::Processed => write!(f, "PROCESSED"),

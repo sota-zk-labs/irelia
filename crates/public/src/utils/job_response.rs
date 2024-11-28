@@ -4,7 +4,7 @@ use irelia_core::entities::job::JobStatus;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JobResponse {
-    pub status: JobStatus,
+    pub status: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invalid_reason: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -13,9 +13,10 @@ pub struct JobResponse {
     pub validation_done: Option<bool>,
 }
 
+
 pub fn failed() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("FAILED").unwrap(),
+        status:"FAILED".to_string(),
         invalid_reason: None,
         error_log: Some("Sharp task failed".to_string()),
         validation_done: None,
@@ -24,7 +25,7 @@ pub fn failed() -> JobResponse {
 
 pub fn invalid() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("INVALID").unwrap(),
+        status:"INVALID".to_string(),
         invalid_reason: Some("INVALID_CAIRO_PIE_FILE_FORMAT".to_string()),
         error_log: Some("The Cairo PIE file has a wrong format. \
                         Deserialization ended with \
@@ -35,7 +36,7 @@ pub fn invalid() -> JobResponse {
 
 pub fn unknown() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("FAILED").unwrap(),
+        status:"FAILED".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: None,
@@ -44,7 +45,7 @@ pub fn unknown() -> JobResponse {
 
 pub fn in_progress() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("IN_PROGRESS").unwrap(),
+        status:"IN_PROGRESS".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: Some(false),
@@ -53,7 +54,7 @@ pub fn in_progress() -> JobResponse {
 
 pub fn not_created() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("NOT_CREATED").unwrap(),
+        status:"NOT_CREATED".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: Some(false),
@@ -62,7 +63,7 @@ pub fn not_created() -> JobResponse {
 
 pub fn processed() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("PROCESSED").unwrap(),
+        status:"PROCESSED".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: Some(false),
@@ -72,7 +73,7 @@ pub fn processed() -> JobResponse {
 
 pub fn onchain() -> JobResponse {
     JobResponse {
-        status: JobStatus::from_str("ONCHAIN").unwrap(),
+        status:"ONCHAIN".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: Some(true),

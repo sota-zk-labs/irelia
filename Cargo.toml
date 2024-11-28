@@ -66,6 +66,7 @@ tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.4.0", features = ["serde"] }
 uuid = { version = "1.10.0" }
 reqwest = "0.12.9"
+tokio-postgres = "0.7.12"
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
