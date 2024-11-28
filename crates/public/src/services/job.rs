@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use irelia_core::entities::job::{CairoJobStatus, JobEntity, JobId};
+use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
 use irelia_core::ports::job::JobPort;
 use serde::{Deserialize, Serialize};
 use tracing::log::info;
 use uuid::Uuid;
 
 use crate::controllers::job::GetStatusParams;
-use crate::controllers::worker_job::WorkerJob;
+use crate::controllers::worker_job::NewWorkerJob;
 use crate::errors::AppError;
 
 pub struct JobService {
@@ -21,8 +21,8 @@ impl JobService {
 
     pub async fn add_job(
         &self,
-        params: WorkerJob,
-        job_status: CairoJobStatus,
+        params: NewWorkerJob,
+        job_status: JobStatus,
         validation_done_value: bool,
     ) -> Result<(), AppError> {
         let job = self

@@ -1,9 +1,9 @@
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 use std::str::FromStr;
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use irelia_core::entities::job::{CairoJobStatus, JobEntity, JobId};
+use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
 use uuid::Uuid;
 
 #[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]
@@ -46,7 +46,7 @@ impl From<JobModel> for JobEntity {
             id: JobId(val.id),
             customer_id: val.customer_id,
             cairo_job_key: val.cairo_job_key,
-            status: CairoJobStatus::from_str(val.status.as_str()).unwrap(),
+            status: JobStatus::from_str(val.status.as_str()).unwrap(),
             invalid_reason: val.invalid_reason,
             error_log: val.error_log,
             validation_done: val.validation_done,

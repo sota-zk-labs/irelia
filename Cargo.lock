@@ -2656,7 +2656,7 @@ dependencies = [
  "rust-ini",
  "serde",
  "serde_json",
- "toml 0.8.19",
+ "toml 0.8.13",
  "yaml-rust",
 ]
 
@@ -3811,7 +3811,7 @@ dependencies = [
  "serde",
  "serde_json",
  "syn 2.0.64",
- "toml 0.8.19",
+ "toml 0.8.13",
  "walkdir",
 ]
 
@@ -5449,28 +5449,28 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "axum 0.8.0-alpha.1",
- "base64 0.22.1",
+ "chrono",
  "clap 4.5.17",
  "deadpool-diesel",
  "diesel",
  "diesel_migrations",
+ "graphile_worker",
  "irelia_adapter",
  "irelia_common",
  "irelia_core",
+ "openssl",
  "opentelemetry",
  "readonly",
  "reqwest 0.12.9",
  "serde",
  "serde_json",
- "stone-cli",
  "thiserror",
  "tokio",
  "tokio-postgres",
- "toml 0.8.19",
  "tower-http",
  "tracing",
+ "tracing-opentelemetry",
  "uuid 1.10.0",
- "zip",
 ]
 
 [[package]]
@@ -5503,6 +5503,7 @@ dependencies = [
  "stone-cli",
  "tempfile",
  "test-log",
+ "testcontainers-modules",
  "tokio",
  "tracing",
  "tracing-opentelemetry",
@@ -5542,6 +5543,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "stone-cli",
  "thiserror",
  "uuid 1.10.0",
 ]
@@ -6048,7 +6050,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd01039851e82f8799046eabbb354056283fb265c8ec0996af940f4e85a380ff"
 dependencies = [
  "serde",
- "toml 0.8.19",
+ "toml 0.8.13",
 ]
 
 [[package]]
@@ -10041,7 +10043,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "stone-cli"
 version = "0.1.0"
-source = "git+https://github.com/zksecurity/stone-cli.git?branch=main#e12447e22cca70ec43a9154ce7c506bd3aa69f42"
+source = "git+https://github.com/zksecurity/stone-cli.git#e12447e22cca70ec43a9154ce7c506bd3aa69f42"
 dependencies = [
  "anyhow",
  "bincode 2.0.0-rc.3",
@@ -11009,9 +11011,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.19"
+version = "0.8.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1ed1f98e3fdc28d6d910e6737ae6ab1a93bf1985935a1193e68f93eeb68d24e"
+checksum = "a4e43f8cc456c9704c851ae29c67e17ef65d2c30017c17a9765b89c382dc8bba"
 dependencies = [
  "serde",
  "serde_spanned",
