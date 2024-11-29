@@ -4,7 +4,7 @@ mod annotation_parser;
 mod builtin_info;
 mod oods_statement;
 mod sharp_prover;
-mod stone_prover;
+pub mod stone_prover;
 
 /// Default prime field for cairo. This prime will be used when modular operations are needed.
 pub fn default_prime() -> U256 {

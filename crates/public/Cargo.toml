@@ -36,3 +36,4 @@ uuid = { version = "1.10.0", features = ["v4"] }
 chrono = "0.4.38"
 reqwest = { workspace = true, features = ["json"] }
 tokio-postgres = { workspace = true}
+zip = "0.6.6"

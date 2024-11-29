@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use irelia_core::entities::worker_job::WorkerJobStatus;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct WorkerJobResponse {
@@ -11,14 +11,14 @@ pub struct WorkerJobResponse {
 pub fn successfully() -> WorkerJobResponse {
     WorkerJobResponse {
         code: "JOB_RECEIVED_SUCCESSFULLY".to_string(),
-        message: None
+        message: None,
     }
 }
 
 pub fn internal_server_error() -> WorkerJobResponse {
     WorkerJobResponse {
         code: "500".to_string(),
-        message: Some("Internal server error".to_string())
+        message: Some("Internal server error".to_string()),
     }
 }
 
@@ -30,25 +30,25 @@ pub fn get_worker_job_response(code: WorkerJobStatus) -> WorkerJobResponse {
         WorkerJobStatus::NoCairoJobId => internal_server_error(),
         WorkerJobStatus::IncorrectOffchainProof => internal_server_error(),
 
-        WorkerJobStatus::Successfully => successfully()
+        WorkerJobStatus::Successfully => successfully(),
     }
 }
 
 #[cfg(test)]
-mod test{
-    use irelia_core::entities::worker_job::WorkerJobStatus;
+mod test {
     use crate::utils::worker_job_response::{get_worker_job_response, WorkerJobResponse};
+    use irelia_core::entities::worker_job::WorkerJobStatus;
 
     #[test]
     fn test_get_worker_job_response() {
         let success = WorkerJobResponse {
             code: "JOB_RECEIVED_SUCCESSFULLY".to_string(),
-            message: None
+            message: None,
         };
 
         let error = WorkerJobResponse {
             code: "500".to_string(),
-            message: Some("Internal server error".to_string())
+            message: Some("Internal server error".to_string()),
         };
 
         let test_faulty_cairo_pie = get_worker_job_response(WorkerJobStatus::FaultyCairoPie);
@@ -63,12 +63,11 @@ mod test{
         let test_no_cairo_job_id = get_worker_job_response(WorkerJobStatus::NoCairoJobId);
         assert_eq!(error, test_no_cairo_job_id);
 
-        let test_incorrect_offchain_proof = get_worker_job_response(WorkerJobStatus::IncorrectOffchainProof);
+        let test_incorrect_offchain_proof =
+            get_worker_job_response(WorkerJobStatus::IncorrectOffchainProof);
         assert_eq!(error, test_incorrect_offchain_proof);
 
         let test_successfully = get_worker_job_response(WorkerJobStatus::Successfully);
         assert_eq!(success, test_faulty_cairo_pie);
     }
 }
-
-

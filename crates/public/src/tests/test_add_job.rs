@@ -1,8 +1,8 @@
 use reqwest::Client;
 use serde_json::{json, Value};
-use uuid::Uuid;
 use tokio;
 use tokio_postgres::NoTls;
+use uuid::Uuid;
 #[tokio::test]
 async fn test_add_job() {
     let client = Client::new();
@@ -36,14 +36,14 @@ async fn test_faulty_cairo_pie(client: Client) {
         Uuid::new_v4().to_string(), Uuid::new_v4().to_string(), true, "small".to_string()
     );
     let incorrect_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": ""
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": ""
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
     );
     let res = post_request(client, url, incorrect_body).await;
@@ -56,14 +56,15 @@ async fn test_incorrect_layout(client: Client) {
         Uuid::new_v4().to_string(), Uuid::new_v4().to_string(), true, "smal".to_string()
     );
     let correct_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": "./src/prover/test_samples/fibonacci_with_output.zip"
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": "/home/andrew/workspace/irelia/crates/\
+                    adapter/src/prover/test_samples/fibonacci_with_output.zip"
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {
             "code": "500",
             "message": "Internal server error"
@@ -79,14 +80,15 @@ async fn test_additional_bad_flag(client: Client) {
         Uuid::new_v4().to_string(), Uuid::new_v4().to_string(), true, "small".to_string(), true
     );
     let correct_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": "./src/prover/test_samples/fibonacci_with_output.zip"
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": "/home/andrew/workspace/irelia/crates/\
+                    adapter/src/prover/test_samples/fibonacci_with_output.zip"
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
     );
     let res = post_request(client, url, correct_body).await;
@@ -94,19 +96,21 @@ async fn test_additional_bad_flag(client: Client) {
 }
 
 async fn test_no_cairo_job_id(client: Client) {
-    let url = format!(
+    let url =
+        format!(
         "http://localhost:8000/v1/gateway/add_job?customer_id={}&offchain_proof={}&proof_layout={}",
         Uuid::new_v4().to_string(), true, "small".to_string()
     );
     let correct_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": "./src/prover/test_samples/fibonacci_with_output.zip"
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": "/home/andrew/workspace/irelia/crates/\
+                    adapter/src/prover/test_samples/fibonacci_with_output.zip"
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {
             "code": "500",
             "message": "Internal server error"
@@ -122,14 +126,15 @@ async fn test_incorrect_offchain_proof(client: Client) {
         Uuid::new_v4().to_string(), Uuid::new_v4().to_string(), false, "small".to_string()
     );
     let correct_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": "./src/prover/test_samples/fibonacci_with_output.zip"
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": "/home/andrew/workspace/irelia/crates/\
+                    adapter/src/prover/test_samples/fibonacci_with_output.zip"
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {
             "code": "500",
             "message": "Internal server error"
@@ -145,14 +150,15 @@ async fn test_successfully(client: Client) {
         Uuid::new_v4().to_string(), Uuid::new_v4().to_string(), true, "small".to_string()
     );
     let correct_body = json!(
-            {
-                "action": "add_job",
-                "request": {
-                    "cairo_pie": "./src/prover/test_samples/fibonacci_with_output.zip"
-                }
+        {
+            "action": "add_job",
+            "request": {
+                "cairo_pie": "/home/andrew/workspace/irelia/crates/\
+                    adapter/src/prover/test_samples/fibonacci_with_output.zip"
             }
-        );
-    let expected =json!(
+        }
+    );
+    let expected = json!(
         {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
     );
     let res = post_request(client, url, correct_body).await;
@@ -172,9 +178,12 @@ async fn post_request(client: Client, url: String, body: Value) -> Value {
 }
 
 async fn setup_database() {
-    let (client, connection) = tokio_postgres::connect("postgres://postgres:changeme@postgres:5432/postgres", NoTls)
-        .await
-        .expect("Failed to connect to database");
+    let (client, connection) = tokio_postgres::connect(
+        "postgres://postgres:changeme@localhost:5432/postgres",
+        NoTls,
+    )
+    .await
+    .expect("Failed to connect to database");
 
     // Spawn the connection in the background
     tokio::spawn(async move {

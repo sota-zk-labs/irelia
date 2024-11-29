@@ -1,11 +1,11 @@
-use std::sync::Arc;
+use crate::options::Options;
 use deadpool_diesel::postgres::Pool;
 use deadpool_diesel::{Manager, Runtime};
-use tracing::info;
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
 use irelia_common::cli_args::CliArgs;
 use irelia_core::ports::job::JobPort;
-use crate::options::Options;
+use std::sync::Arc;
+use tracing::info;
 
 #[derive(Clone)]
 pub struct State {
@@ -24,8 +24,6 @@ impl State {
 
         let job_port = Arc::new(JobDBRepository::new(pool.clone()));
 
-        State {
-            job_port,
-        }
+        State { job_port }
     }
 }

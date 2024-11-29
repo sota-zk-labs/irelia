@@ -1,6 +1,6 @@
-use std::str::FromStr;
+use irelia_core::entities::job::{JobEntity, JobStatus};
 use serde::{Deserialize, Serialize};
-use irelia_core::entities::job::JobStatus;
+use std::str::FromStr;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JobResponse {
@@ -13,81 +13,82 @@ pub struct JobResponse {
     pub validation_done: Option<bool>,
 }
 
-
-pub fn failed() -> JobResponse {
+pub fn failed(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"FAILED".to_string(),
+        status: job.status.to_string(),
         invalid_reason: None,
         error_log: Some("Sharp task failed".to_string()),
         validation_done: None,
     }
 }
 
-pub fn invalid() -> JobResponse {
+pub fn invalid(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"INVALID".to_string(),
+        status: job.status.to_string(),
         invalid_reason: Some("INVALID_CAIRO_PIE_FILE_FORMAT".to_string()),
-        error_log: Some("The Cairo PIE file has a wrong format. \
+        error_log: Some(
+            "The Cairo PIE file has a wrong format. \
                         Deserialization ended with \
-                        exception: Invalid prefix for zip file..".to_string()),
+                        exception: Invalid prefix for zip file.."
+                .to_string(),
+        ),
         validation_done: None,
     }
 }
 
-pub fn unknown() -> JobResponse {
+pub fn unknown(_: JobEntity) -> JobResponse {
     JobResponse {
-        status:"FAILED".to_string(),
+        status: "FAILED".to_string(),
         invalid_reason: None,
         error_log: None,
         validation_done: None,
     }
 }
 
-pub fn in_progress() -> JobResponse {
+pub fn in_progress(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"IN_PROGRESS".to_string(),
+        status: job.status.to_string(),
         invalid_reason: None,
         error_log: None,
-        validation_done: Some(false),
+        validation_done: Some(job.validation_done),
     }
 }
 
-pub fn not_created() -> JobResponse {
+pub fn not_created(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"NOT_CREATED".to_string(),
+        status: job.status.to_string(),
         invalid_reason: None,
         error_log: None,
-        validation_done: Some(false),
+        validation_done: Some(job.validation_done),
     }
 }
 
-pub fn processed() -> JobResponse {
+pub fn processed(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"PROCESSED".to_string(),
+        status: job.status.to_string(),
         invalid_reason: None,
         error_log: None,
-        validation_done: Some(false),
+        validation_done: Some(job.validation_done),
     }
 }
 
-
-pub fn onchain() -> JobResponse {
+pub fn onchain(job: JobEntity) -> JobResponse {
     JobResponse {
-        status:"ONCHAIN".to_string(),
+        status: job.status.to_string(),
         invalid_reason: None,
         error_log: None,
-        validation_done: Some(true),
+        validation_done: Some(job.validation_done),
     }
 }
 
-pub fn get_job_response(status: JobStatus) -> JobResponse {
-    match status {
-        JobStatus::Failed => failed(),
-        JobStatus::Invalid => invalid(),
-        JobStatus::Unknown => unknown(),
-        JobStatus::InProgress => in_progress(),
-        JobStatus::NotCreated => not_created(),
-        JobStatus::Processed => processed(),
-        JobStatus::Onchain => onchain(),
+pub fn get_job_response(job: JobEntity) -> JobResponse {
+    match job.status {
+        JobStatus::Failed => failed(job),
+        JobStatus::Invalid => invalid(job),
+        JobStatus::Unknown => unknown(job),
+        JobStatus::InProgress => in_progress(job),
+        JobStatus::NotCreated => not_created(job),
+        JobStatus::Processed => processed(job),
+        JobStatus::Onchain => onchain(job),
     }
 }

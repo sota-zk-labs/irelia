@@ -6,8 +6,8 @@ use axum::{
 };
 
 use crate::app_state::AppState;
+use crate::controllers::job::{get_proof, get_status};
 use crate::controllers::worker_job::add_job;
-use crate::controllers::job::get_status;
 
 pub fn routes(app_state: AppState) -> Router {
     Router::new()
@@ -17,6 +17,7 @@ pub fn routes(app_state: AppState) -> Router {
             Router::new()
                 .route("/add_job", post(add_job))
                 .route("/get_status", get(get_status))
+                .route("/get_proof", get(get_proof))
                 .with_state(app_state),
         )
         .fallback(handler_404)

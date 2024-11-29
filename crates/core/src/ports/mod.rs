@@ -1,4 +1,4 @@
 pub mod cache;
-pub mod prover;
 pub mod job;
+pub mod prover;
 pub mod worker;

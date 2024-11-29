@@ -1,8 +1,49 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::fmt::Display;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 /// Identifier for a question.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub enum ProofLayout {
+    Plain,
+    Small,
+    Dex,
+    Recursive,
+    Starknet,
+    StarknetWithKeccak,
+    RecursiveLargeOutput,
+    RecursiveWithPoseidon,
+    AllSolidity,
+    AllCairo,
+    Dynamic,
+}
+
+impl Display for ProofLayout {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::str::FromStr for ProofLayout {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "plain" => Ok(ProofLayout::Plain),
+            "small" => Ok(ProofLayout::Small),
+            "dex" => Ok(ProofLayout::Dex),
+            "recursive" => Ok(ProofLayout::Recursive),
+            "starknet" => Ok(ProofLayout::Starknet),
+            "starknet_with_keccak" => Ok(ProofLayout::StarknetWithKeccak),
+            "recursive_large_output" => Ok(ProofLayout::RecursiveLargeOutput),
+            "recursive_with_poseidon" => Ok(ProofLayout::RecursiveWithPoseidon),
+            "all_solidity" => Ok(ProofLayout::AllSolidity),
+            "all_cairo" => Ok(ProofLayout::AllCairo),
+            "dynamic" => Ok(ProofLayout::Dynamic),
+            _ => Err(()),
+        }
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum WorkerJobStatus {
@@ -12,7 +53,7 @@ pub enum WorkerJobStatus {
     NoCairoJobId,
     IncorrectOffchainProof,
 
-    Successfully
+    Successfully,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]

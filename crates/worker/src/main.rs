@@ -3,6 +3,7 @@ mod options;
 use std::str::FromStr;
 use std::time::Duration;
 
+use crate::options::Options;
 use clap::{Parser, Subcommand};
 use graphile_worker::WorkerOptions;
 use irelia_common::cli_args::CliArgs;
@@ -15,7 +16,6 @@ use sqlx::postgres::PgConnectOptions;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-use crate::options::Options;
 
 #[tokio::main]
 async fn main() {

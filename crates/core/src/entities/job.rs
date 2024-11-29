@@ -1,19 +1,17 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum JobStatus {
-    Failed, // Stone failed
-    Invalid, // Wrong pie format
-    Unknown, //
+    Failed,     // Stone failed
+    Invalid,    // Wrong pie format
+    Unknown,    //
     InProgress, // init status
-    NotCreated,
-    Processed, // stone completed => to submit on chain
-    Onchain,  // stone completed and submit on chain completed
+    NotCreated, //
+    Processed,  // stone completed => to submit on chain
+    Onchain,    // stone completed and submit on chain completed
 }
 
 impl fmt::Display for JobStatus {
