@@ -43,7 +43,9 @@ async fn test_failed(client: Client) {
     let expected = json!(
         {
             "status" : "FAILED",
+            "invalid_reason" : "",
             "error_log": "Sharp task failed",
+            "validation_done": false
         }
     );
     let res = get_response(client, customer_id, cairo_job_key).await;
@@ -61,6 +63,7 @@ async fn test_invalid(client: Client) {
             "error_log": "The Cairo PIE file has a wrong format. \
                         Deserialization ended with \
                         exception: Invalid prefix for zip file..",
+            "validation_done": false
         }
     );
     let res = get_response(client, customer_id, cairo_job_key).await;
@@ -73,7 +76,10 @@ async fn test_unknown(client: Client) {
 
     let expected = json!(
         {
-            "status" : "FAILED",
+            "status" : "UNKNOWN",
+            "invalid_reason" : "",
+            "error_log": "",
+            "validation_done": false
         }
     );
     let res = get_response(client, customer_id, cairo_job_key).await;
@@ -87,6 +93,8 @@ async fn test_in_progress(client: Client) {
     let expected = json!(
         {
             "status" : "IN_PROGRESS",
+            "invalid_reason" : "",
+            "error_log": "",
             "validation_done": false
         }
     );
@@ -101,6 +109,8 @@ async fn test_additional_bad_flag(client: Client) {
     let expected = json!(
         {
             "status" : "IN_PROGRESS",
+            "invalid_reason" : "",
+            "error_log": "",
             "validation_done": true
         }
     );
@@ -115,6 +125,8 @@ async fn test_not_created(client: Client) {
     let expected = json!(
         {
             "status" : "NOT_CREATED",
+            "invalid_reason" : "",
+            "error_log": "",
             "validation_done": false
         }
     );
@@ -129,6 +141,8 @@ async fn test_processed(client: Client) {
     let expected = json!(
         {
             "status" : "PROCESSED",
+            "invalid_reason" : "",
+            "error_log": "",
             "validation_done": false
         }
     );
@@ -143,6 +157,8 @@ async fn test_onchain(client: Client) {
     let expected = json!(
         {
             "status" : "ONCHAIN",
+            "invalid_reason" : "",
+            "error_log": "",
             "validation_done": true
         }
     );
@@ -183,34 +199,35 @@ async fn setup_database() {
     // SQL to drop and recreate the table
     let reset_queries = r#"
         DROP TABLE IF EXISTS jobs;
-
         CREATE TABLE jobs (
-            id UUID PRIMARY KEY,
-            customer_id VARCHAR NOT NULL,
-            cairo_job_key VARCHAR NOT NULL,
-            status VARCHAR NOT NULL,
-            validation_done BOOLEAN NOT NULL,
-            created_on TIMESTAMP NOT NULL DEFAULT NOW(),
-            updated_on TIMESTAMP NOT NULL DEFAULT NOW()
+                      id UUID PRIMARY KEY,
+                      customer_id VARCHAR NOT NULL,
+                      cairo_job_key VARCHAR NOT NULL,
+                      status VARCHAR NOT NULL,
+                      invalid_reason VARCHAR NOT NULL,
+                      error_log VARCHAR NOT NULL,
+                      validation_done BOOLEAN NOT NULL,
+                      created_on TIMESTAMP NOT NULL DEFAULT NOW(),
+                      updated_on TIMESTAMP NOT NULL DEFAULT NOW()
         );
 
-        INSERT INTO jobs (id, customer_id, cairo_job_key, status, validation_done)
+        INSERT INTO jobs (id, customer_id, cairo_job_key, status, invalid_reason, error_log, validation_done)
         VALUES
-        ('2a3ee88d-e19d-43ed-a79e-da9a28dc9525', '93bc3373-5115-4f99-aecc-1bc57997bfd3', '11395dd2-b874-4c11-8744-ba6482da997d', 'FAILED', false),
+            ('2a3ee88d-e19d-43ed-a79e-da9a28dc9525', '93bc3373-5115-4f99-aecc-1bc57997bfd3', '11395dd2-b874-4c11-8744-ba6482da997d','FAILED', '', 'Sharp task failed', false),
 
-        ('58f667ea-67b3-4b32-b4f8-ef24ea1c8f12', '18dc4b30-8b46-42d1-8b51-aba8c8abc7b0', '09a10775-7294-4e5d-abbc-7659caa1a330', 'INVALID', false),
+            ('58f667ea-67b3-4b32-b4f8-ef24ea1c8f12', '18dc4b30-8b46-42d1-8b51-aba8c8abc7b0', '09a10775-7294-4e5d-abbc-7659caa1a330', 'INVALID', 'INVALID_CAIRO_PIE_FILE_FORMAT', 'The Cairo PIE file has a wrong format. Deserialization ended with exception: Invalid prefix for zip file..', false),
 
-        ('f2c604b7-52c5-4b69-9a67-de1276f9b8f8', '2dd71442-58ca-4c35-a6de-8e637ff3c24b', 'f946ec7d-c3bf-42df-8bf0-9bcc751a8b3e', 'UNKNOWN', false),
+            ('f2c604b7-52c5-4b69-9a67-de1276f9b8f8', '2dd71442-58ca-4c35-a6de-8e637ff3c24b', 'f946ec7d-c3bf-42df-8bf0-9bcc751a8b3e', 'UNKNOWN', '', '', false),
 
-        ('d7045419-2b0f-4210-9e3d-7fb002839202', 'e703be2c-9ffe-4992-b968-da75da75d0b8', '37e9d193-8e94-4df3-893a-cafa62a418c0', 'IN_PROGRESS', false),
+            ('d7045419-2b0f-4210-9e3d-7fb002839202', 'e703be2c-9ffe-4992-b968-da75da75d0b8', '37e9d193-8e94-4df3-893a-cafa62a418c0', 'IN_PROGRESS', '', '', false),
 
-        ('18ef16cd-4511-4f29-a1d8-cd117d801f77', '0581368e-2a32-4e93-b211-3f0ac9bae790', 'b01d3ad5-10db-4fcd-8746-fdc886de50bc', 'IN_PROGRESS', true),
+            ('18ef16cd-4511-4f29-a1d8-cd117d801f77', '0581368e-2a32-4e93-b211-3f0ac9bae790', 'b01d3ad5-10db-4fcd-8746-fdc886de50bc', 'IN_PROGRESS', '', '', true),
 
-        ('549139a0-b288-401c-afb4-0f1018fd99f8', '040832f8-245f-4f05-a165-e2810e30047f', '803eac13-3dbb-4ad2-a1df-311cfc2829cf', 'NOT_CREATED', false),
+            ('549139a0-b288-401c-afb4-0f1018fd99f8', '040832f8-245f-4f05-a165-e2810e30047f', '803eac13-3dbb-4ad2-a1df-311cfc2829cf', 'NOT_CREATED', '', '', false),
 
-        ('2283042d-f102-4ee6-a92f-73f3a86850e8', '8758d917-bbdc-4573-97ae-817e94fa31fb', '59732e57-5722-4eb7-98db-8b90b89276f8', 'PROCESSED', false),
+            ('2283042d-f102-4ee6-a92f-73f3a86850e8', '8758d917-bbdc-4573-97ae-817e94fa31fb', '59732e57-5722-4eb7-98db-8b90b89276f8', 'PROCESSED', '', '', false),
 
-        ('69f7ae7a-e981-44d2-9eb2-dfa551474870', 'e3133ecb-e6e9-493a-ad64-ab9a4495af57', '39af2c49-0c81-450e-91a9-aeff8dba2318', 'ONCHAIN', true);
+            ('69f7ae7a-e981-44d2-9eb2-dfa551474870', 'e3133ecb-e6e9-493a-ad64-ab9a4495af57', '39af2c49-0c81-450e-91a9-aeff8dba2318', 'ONCHAIN', '', '', true);
     "#;
 
     client

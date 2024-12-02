@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use graphile_worker::WorkerUtils;
 use irelia_common::workers::{Worker, ADD_JOB_WORKER_IDENTIFIER};
 use irelia_core::common::core_error::CoreError;
-use irelia_core::entities::worker_job::WorkerJob;
+use irelia_core::entities::worker_job::WorkerJobEntity;
 use irelia_core::ports::worker::WorkerPort;
 use sqlx::postgres::PgConnectOptions;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
@@ -30,7 +30,7 @@ impl WorkerAdapter {
 
 #[async_trait]
 impl WorkerPort for WorkerAdapter {
-    async fn add(&self, job: WorkerJob) -> Result<WorkerJob, CoreError> {
+    async fn add(&self, job: WorkerJobEntity) -> Result<WorkerJobEntity, CoreError> {
         // retrieve the current span
         let span = tracing::Span::current();
         // retrieve the current context

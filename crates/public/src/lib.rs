@@ -6,4 +6,3 @@ pub mod options;
 pub mod router;
 pub mod services;
 pub mod tests;
-pub mod utils;

@@ -1,6 +1,7 @@
-use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
+
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -54,13 +55,38 @@ pub struct JobEntity {
     pub customer_id: String,
     pub cairo_job_key: String,
     pub status: JobStatus,
+    pub invalid_reason: String,
+    pub error_log: String,
     pub validation_done: bool,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct JobEntityPayload {
-    pub customer_id: String,
-    pub cairo_job_key: String,
-    pub status: JobStatus,
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct JobResponse {
+    pub status: String,
+    pub invalid_reason: String,
+    pub error_log: String,
     pub validation_done: bool,
+}
+
+impl JobResponse {
+    pub fn response(job: JobEntity) -> Self {
+        JobResponse {
+            status: job.status.to_string(),
+            invalid_reason: job.invalid_reason,
+            error_log: job.error_log,
+            validation_done: job.validation_done,
+        }
+    }
+
+    pub fn get_job_response(job: JobEntity) -> Self {
+        match job.status {
+            JobStatus::Failed => Self::response(job),
+            JobStatus::Invalid => Self::response(job),
+            JobStatus::Unknown => Self::response(job),
+            JobStatus::InProgress => Self::response(job),
+            JobStatus::NotCreated => Self::response(job),
+            JobStatus::Processed => Self::response(job),
+            JobStatus::Onchain => Self::response(job),
+        }
+    }
 }

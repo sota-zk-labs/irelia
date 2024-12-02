@@ -20,22 +20,17 @@ diesel = { workspace = true, features = [
 diesel_migrations = { workspace = true }
 dotenv = { workspace = true }
 ethers = { workspace = true }
+graphile_worker = { workspace = true }
 log = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }
+opentelemetry = { workspace = true }
 rand_core = { workspace = true }
 redis-async = { workspace = true }
 regex = { workspace = true }
 scopeguard = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-stone-cli = { workspace = true }
-tempfile = { workspace = true }
-test-log = { workspace = true }
-testcontainers-modules = { workspace = true, features = ["postgres", "redis"] }
-tokio = { workspace = true, features = ["full"] }
-uuid = { version = "1.10.0", features = ["v4", "serde"] }
-graphile_worker = { workspace = true }
 sqlx = { workspace = true, features = [
   "chrono",
   "postgres",
@@ -43,6 +38,11 @@ sqlx = { workspace = true, features = [
   "macros",
   "runtime-tokio",
 ] }
+stone-cli = { workspace = true }
+tempfile = { workspace = true }
+test-log = { workspace = true }
+testcontainers-modules = { workspace = true, features = ["postgres", "redis"] }
+tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-opentelemetry = { workspace = true }
-tracing-opentelemetry = {workspace = true}
+tracing-opentelemetry = { workspace = true }
+uuid = { version = "1.10.0", features = ["v4", "serde"] }

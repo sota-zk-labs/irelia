@@ -1,18 +1,18 @@
-use crate::app_state::AppState;
-use crate::errors::AppError;
-use crate::json_response::JsonResponse;
-use crate::utils::job_response::{get_job_response, JobResponse};
 use axum::extract::{Query, State};
-use irelia_core::entities::job::JobEntity;
+use irelia_core::entities::job::{JobEntity, JobResponse};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use tracing::instrument;
 use tracing::log::info;
 
+use crate::app_state::AppState;
+use crate::errors::AppError;
+use crate::json_response::JsonResponse;
+
 #[derive(Debug, Deserialize)]
 pub struct GetStatusParams {
-    customer_id: String,
-    cairo_job_key: String,
+    pub customer_id: String,
+    pub cairo_job_key: String,
 }
 
 #[instrument(level = "info", skip(app_state))]
@@ -21,12 +21,9 @@ pub async fn get_status(
     Query(params): Query<GetStatusParams>,
 ) -> Result<JsonResponse<JobResponse>, AppError> {
     info!("params: {:?}", params);
-    let job: JobEntity = app_state
-        .job_port
-        .get(params.customer_id, params.cairo_job_key)
-        .await?;
+    let res = app_state.job_service.get_job_status(params).await?;
 
-    Ok(JsonResponse(get_job_response(job)))
+    Ok(JsonResponse(res))
 }
 
 #[instrument(level = "info", skip(app_state))]
@@ -34,6 +31,7 @@ pub async fn get_proof(
     State(app_state): State<AppState>,
     Query(params): Query<GetStatusParams>,
 ) -> Result<JsonResponse<Value>, AppError> {
+    // TODO: process get proof
     info!("params: {:?}", params);
     let res = json!({
         "code" : "NO_OFFCHAIN_PROOF_FOR_JOB"

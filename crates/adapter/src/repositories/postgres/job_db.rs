@@ -1,6 +1,6 @@
-use crate::repositories::postgres::models::job::JobModel;
-use crate::repositories::postgres::schema::jobs::dsl::jobs;
-use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
+use std::fmt::{Debug, Formatter};
+use std::time::SystemTime;
+
 use async_trait::async_trait;
 use deadpool_diesel::postgres::Pool;
 use diesel::{
@@ -8,9 +8,12 @@ use diesel::{
 };
 use diesel_migrations::{embed_migrations, EmbeddedMigrations};
 use irelia_core::common::core_error::CoreError;
-use irelia_core::entities::job::{JobEntity, JobEntityPayload, JobId};
+use irelia_core::entities::job::{JobEntity, JobId};
 use irelia_core::ports::job::JobPort;
-use std::time::SystemTime;
+
+use crate::repositories::postgres::models::job::JobModel;
+use crate::repositories::postgres::schema::jobs::dsl::jobs;
+use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
 
 // NOTE: path relative to Cargo.toml
 
@@ -25,6 +28,12 @@ pub struct JobDBRepository {
 impl JobDBRepository {
     pub fn new(db: Pool) -> Self {
         JobDBRepository { db }
+    }
+}
+
+impl Debug for JobDBRepository {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("JobDBRepository").finish()
     }
 }
 
@@ -52,39 +61,14 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn update(&self, job: JobEntityPayload) -> Result<JobEntity, CoreError> {
-        let job_model: Result<JobModel, CoreError> = self
-            .db
-            .get()
-            .await
-            .unwrap()
-            .interact(move |conn| {
-                let response = jobs
-                    .filter(customer_id.eq(job.customer_id))
-                    .filter(cairo_job_key.eq(job.cairo_job_key))
-                    .select(JobModel::as_select())
-                    .first(conn)
-                    .map_err(|err| match err {
-                        diesel::result::Error::NotFound => CoreError::NotFound,
-                        _ => CoreError::InternalError(err.into()),
-                    })?
-                    .into();
-
-                Ok(response)
-            })
-            .await
-            .unwrap();
-
-        let mut job_model = job_model?;
-        job_model.status = job.status.to_string();
-        job_model.validation_done = job.validation_done;
-        job_model.updated_on = SystemTime::now();
-
+    async fn update(&self, job: JobEntity) -> Result<JobEntity, CoreError> {
         self.db
             .get()
             .await
             .unwrap()
             .interact(move |conn| {
+                let job_model =
+                    JobModel::try_from(job).map_err(|err| CoreError::InternalError(err.into()))?;
                 let response = update(jobs.filter(id.eq(job_model.id)))
                     .set(&job_model)
                     .get_result::<JobModel>(conn)
@@ -121,7 +105,7 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn get(
+    async fn get_by_customer_id_and_cairo_job_key_value(
         &self,
         customer_id_value: String,
         cairo_job_key_value: String,

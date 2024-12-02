@@ -7,6 +7,8 @@ use deadpool_diesel::{Manager, Runtime};
 use irelia::app_state::AppState;
 use irelia::options::Options;
 use irelia::router::routes;
+use irelia::services::job::JobService;
+use irelia::services::worker_job::WorkerJobService;
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
 use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
@@ -66,9 +68,6 @@ pub async fn serve(options: Options) {
         .unwrap();
 
     // TODO: use the same DB pool for the worker_adapter
-
-    let job_repository = Arc::new(JobDBRepository::new(pool.clone()));
-
     let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
         WorkerAdapter::new(
             &options.pg.url,
@@ -77,7 +76,12 @@ pub async fn serve(options: Options) {
         )
         .await,
     );
-    let routes = routes(AppState::new(worker_adapter, job_repository, pool)).layer((
+    let worker_job_service = Arc::new(WorkerJobService::new(worker_adapter));
+
+    let job_repository = Arc::new(JobDBRepository::new(pool.clone()));
+    let job_service = Arc::new(JobService::new(job_repository));
+
+    let routes = routes(AppState::new(worker_job_service, job_service)).layer((
         TraceLayer::new_for_http(),
         // Graceful shutdown will wait for outstanding requests to complete. Add a timeout so
         // requests don't hang forever.
