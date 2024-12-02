@@ -5,14 +5,19 @@ use irelia_core::entities::worker_job::WorkerJobStatus::{
     AdditionalBadFlag, IncorrectLayout, IncorrectOffchainProof, NoCairoJobId, Successfully,
 };
 use irelia_core::entities::worker_job::{
-    ProofLayout, WorkerJobEntity, WorkerJobId, WorkerJobResponse, WorkerJobStatus,
+    ProofLayout, WorkerJobEntity, WorkerJobId, WorkerJobStatus,
 };
 use irelia_core::ports::worker::WorkerPort;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::controllers::worker_job::{CairoPieReq, NewWorkerJob};
 use crate::errors::AppError;
 use crate::services::job::JobService;
+
+const SUCCESSFULLY_CODE: &str = "JOB_RECEIVED_SUCCESSFULLY";
+const INTERNAL_SERVER_ERROR_CODE: &str = "500";
+const INTERNAL_SERVER_ERROR_MESSAGE: &str = "Internal server error";
 
 pub struct WorkerJobService {
     worker_job: Arc<dyn WorkerPort + Send + Sync>,
@@ -66,13 +71,13 @@ impl WorkerJobService {
                 return IncorrectLayout;
             }
         }
-        // Check additional bad flag X
-        if params.bla != None && params.bla.unwrap() == true {
+        // Check additional bad flag
+        if params.bla.is_some() && params.bla.unwrap() {
             return AdditionalBadFlag;
         }
 
         // Check no cairo job id
-        if params.cairo_job_key == None {
+        if params.cairo_job_key.is_none() {
             return NoCairoJobId;
         };
 
@@ -81,7 +86,42 @@ impl WorkerJobService {
             return IncorrectOffchainProof;
         };
 
-        // Successfully X
+        // Successfully
         Successfully
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct WorkerJobResponse {
+    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+}
+
+impl WorkerJobResponse {
+    pub fn successfully() -> Self {
+        WorkerJobResponse {
+            code: SUCCESSFULLY_CODE.to_string(),
+            message: None,
+        }
+    }
+
+    pub fn internal_server_error() -> Self {
+        WorkerJobResponse {
+            code: INTERNAL_SERVER_ERROR_CODE.to_string(),
+            message: Some(INTERNAL_SERVER_ERROR_MESSAGE.to_string()),
+        }
+    }
+
+    pub fn get_worker_job_response(code: WorkerJobStatus) -> Self {
+        match code {
+            WorkerJobStatus::FaultyCairoPie => Self::successfully(),
+            IncorrectLayout => Self::internal_server_error(),
+            AdditionalBadFlag => Self::successfully(),
+            NoCairoJobId => Self::internal_server_error(),
+            IncorrectOffchainProof => Self::internal_server_error(),
+
+            Successfully => Self::successfully(),
+        }
     }
 }

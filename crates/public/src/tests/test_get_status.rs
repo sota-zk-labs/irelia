@@ -1,42 +1,56 @@
+use std::fs;
+
 use reqwest::Client;
 use serde_json::{json, Value};
 use tokio;
 use tokio_postgres::NoTls;
 
+use crate::options::Options;
+
 #[tokio::test]
 async fn test_get_status() {
     let client = Client::new();
 
+    let config_content =
+        fs::read_to_string("./config/00-default.toml").expect("Failed to read config file");
+
+    let options: Options = toml::from_str(&config_content).expect("Failed to parse config file");
+
+    let base_url = format!(
+        "http://{}:{}",
+        options.server.url.as_str(),
+        options.server.port
+    );
     // Set up the database
-    setup_database().await;
+    setup_database(&*options.pg.url).await;
     println!("✅ Database setup completed");
 
-    test_failed(client.clone()).await;
+    test_failed(client.clone(), base_url.clone()).await;
     println!("✅ test_failed completed");
 
-    test_invalid(client.clone()).await;
+    test_invalid(client.clone(), base_url.clone()).await;
     println!("✅ test_invalid completed");
 
-    test_unknown(client.clone()).await;
+    test_unknown(client.clone(), base_url.clone()).await;
     println!("✅ test_unknown completed");
 
-    test_in_progress(client.clone()).await;
+    test_in_progress(client.clone(), base_url.clone()).await;
     println!("✅ test_in_progress completed");
 
-    test_additional_bad_flag(client.clone()).await;
+    test_additional_bad_flag(client.clone(), base_url.clone()).await;
     println!("✅ test_additional_bad_flag completed");
 
-    test_not_created(client.clone()).await;
+    test_not_created(client.clone(), base_url.clone()).await;
     println!("✅ test_not_created completed");
 
-    test_processed(client.clone()).await;
+    test_processed(client.clone(), base_url.clone()).await;
     println!("✅ test_processed completed");
 
-    test_onchain(client.clone()).await;
+    test_onchain(client.clone(), base_url.clone()).await;
     println!("✅ test_onchain completed");
 }
 
-async fn test_failed(client: Client) {
+async fn test_failed(client: Client, base_url: String) {
     let customer_id = "93bc3373-5115-4f99-aecc-1bc57997bfd3".to_string();
     let cairo_job_key = "11395dd2-b874-4c11-8744-ba6482da997d".to_string();
 
@@ -48,11 +62,11 @@ async fn test_failed(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_invalid(client: Client) {
+async fn test_invalid(client: Client, base_url: String) {
     let customer_id = "18dc4b30-8b46-42d1-8b51-aba8c8abc7b0".to_string();
     let cairo_job_key = "09a10775-7294-4e5d-abbc-7659caa1a330".to_string();
 
@@ -66,11 +80,11 @@ async fn test_invalid(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_unknown(client: Client) {
+async fn test_unknown(client: Client, base_url: String) {
     let customer_id = "2dd71442-58ca-4c35-a6de-8e637ff3c24b".to_string();
     let cairo_job_key = "f946ec7d-c3bf-42df-8bf0-9bcc751a8b3e".to_string();
 
@@ -82,11 +96,11 @@ async fn test_unknown(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_in_progress(client: Client) {
+async fn test_in_progress(client: Client, base_url: String) {
     let customer_id = "e703be2c-9ffe-4992-b968-da75da75d0b8".to_string();
     let cairo_job_key = "37e9d193-8e94-4df3-893a-cafa62a418c0".to_string();
 
@@ -98,11 +112,11 @@ async fn test_in_progress(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_additional_bad_flag(client: Client) {
+async fn test_additional_bad_flag(client: Client, base_url: String) {
     let customer_id = "0581368e-2a32-4e93-b211-3f0ac9bae790".to_string();
     let cairo_job_key = "b01d3ad5-10db-4fcd-8746-fdc886de50bc".to_string();
 
@@ -114,11 +128,11 @@ async fn test_additional_bad_flag(client: Client) {
             "validation_done": true
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_not_created(client: Client) {
+async fn test_not_created(client: Client, base_url: String) {
     let customer_id = "040832f8-245f-4f05-a165-e2810e30047f".to_string();
     let cairo_job_key = "803eac13-3dbb-4ad2-a1df-311cfc2829cf".to_string();
 
@@ -130,11 +144,11 @@ async fn test_not_created(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_processed(client: Client) {
+async fn test_processed(client: Client, base_url: String) {
     let customer_id = "8758d917-bbdc-4573-97ae-817e94fa31fb".to_string();
     let cairo_job_key = "59732e57-5722-4eb7-98db-8b90b89276f8".to_string();
 
@@ -146,11 +160,11 @@ async fn test_processed(client: Client) {
             "validation_done": false
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_onchain(client: Client) {
+async fn test_onchain(client: Client, base_url: String) {
     let customer_id = "e3133ecb-e6e9-493a-ad64-ab9a4495af57".to_string();
     let cairo_job_key = "39af2c49-0c81-450e-91a9-aeff8dba2318".to_string();
 
@@ -162,14 +176,19 @@ async fn test_onchain(client: Client) {
             "validation_done": true
         }
     );
-    let res = get_response(client, customer_id, cairo_job_key).await;
+    let res = get_response(client, base_url, customer_id, cairo_job_key).await;
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn get_response(client: Client, customer_id: String, cairo_job_key: String) -> Value {
+async fn get_response(
+    client: Client,
+    base_url: String,
+    customer_id: String,
+    cairo_job_key: String,
+) -> Value {
     let url = format!(
-        "http://localhost:8000/v1/gateway/get_status?customer_id={}&cairo_job_key={}",
-        customer_id, cairo_job_key
+        "{}/v1/gateway/get_status?customer_id={}&cairo_job_key={}",
+        base_url, customer_id, cairo_job_key
     );
     client
         .get(&url)
@@ -181,13 +200,10 @@ async fn get_response(client: Client, customer_id: String, cairo_job_key: String
         .expect("Failed to parse response body as JSON")
 }
 
-async fn setup_database() {
-    let (client, connection) = tokio_postgres::connect(
-        "postgres://postgres:changeme@localhost:5432/postgres",
-        NoTls,
-    )
-    .await
-    .expect("Failed to connect to database");
+async fn setup_database(url: &str) {
+    let (client, connection) = tokio_postgres::connect(url, NoTls)
+        .await
+        .expect("Failed to connect to database");
 
     // Spawn the connection in the background
     tokio::spawn(async move {

@@ -1,5 +1,4 @@
 use std::fmt::{Debug, Formatter};
-use std::time::SystemTime;
 
 use async_trait::async_trait;
 use deadpool_diesel::postgres::Pool;
@@ -105,7 +104,7 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn get_by_customer_id_and_cairo_job_key_value(
+    async fn get_job(
         &self,
         customer_id_value: String,
         cairo_job_key_value: String,

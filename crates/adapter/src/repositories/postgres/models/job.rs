@@ -25,13 +25,8 @@ impl TryFrom<JobEntity> for JobModel {
     type Error = Error;
 
     fn try_from(entity: JobEntity) -> Result<Self, Self::Error> {
-        let id = entity
-            .id
-            .0
-            .try_into()
-            .map_err(|_| Error::new(ErrorKind::InvalidInput, "Invalid ID"))?;
         Ok(JobModel {
-            id,
+            id: entity.id.0,
             customer_id: entity.customer_id,
             cairo_job_key: entity.cairo_job_key,
             status: entity.status.to_string(),
@@ -48,7 +43,7 @@ impl TryFrom<JobEntity> for JobModel {
 impl From<JobModel> for JobEntity {
     fn from(val: JobModel) -> Self {
         JobEntity {
-            id: JobId(val.id.try_into().unwrap()),
+            id: JobId(val.id),
             customer_id: val.customer_id,
             cairo_job_key: val.cairo_job_key,
             status: JobStatus::from_str(val.status.as_str()).unwrap(),

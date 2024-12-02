@@ -59,34 +59,3 @@ pub struct JobEntity {
     pub error_log: String,
     pub validation_done: bool,
 }
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct JobResponse {
-    pub status: String,
-    pub invalid_reason: String,
-    pub error_log: String,
-    pub validation_done: bool,
-}
-
-impl JobResponse {
-    pub fn response(job: JobEntity) -> Self {
-        JobResponse {
-            status: job.status.to_string(),
-            invalid_reason: job.invalid_reason,
-            error_log: job.error_log,
-            validation_done: job.validation_done,
-        }
-    }
-
-    pub fn get_job_response(job: JobEntity) -> Self {
-        match job.status {
-            JobStatus::Failed => Self::response(job),
-            JobStatus::Invalid => Self::response(job),
-            JobStatus::Unknown => Self::response(job),
-            JobStatus::InProgress => Self::response(job),
-            JobStatus::NotCreated => Self::response(job),
-            JobStatus::Processed => Self::response(job),
-            JobStatus::Onchain => Self::response(job),
-        }
-    }
-}

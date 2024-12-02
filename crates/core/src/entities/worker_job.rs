@@ -1,12 +1,5 @@
-use std::fmt;
-use std::fmt::Display;
-
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-const SUCCESSFULLY_CODE: &str = "JOB_RECEIVED_SUCCESSFULLY";
-const INTERNAL_SERVER_ERROR_CODE: &str = "500";
-const INTERNAL_SERVER_ERROR_MESSAGE: &str = "Internal server error";
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum ProofLayout {
@@ -21,12 +14,6 @@ pub enum ProofLayout {
     AllSolidity,
     AllCairo,
     Dynamic,
-}
-
-impl Display for ProofLayout {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
 }
 
 impl std::str::FromStr for ProofLayout {
@@ -72,39 +59,4 @@ pub struct WorkerJobEntity {
     pub offchain_proof: bool,
     pub proof_layout: String,
     pub cairo_pie: String,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct WorkerJobResponse {
-    pub code: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
-}
-
-impl WorkerJobResponse {
-    pub fn successfully() -> Self {
-        WorkerJobResponse {
-            code: SUCCESSFULLY_CODE.to_string(),
-            message: None,
-        }
-    }
-
-    pub fn internal_server_error() -> Self {
-        WorkerJobResponse {
-            code: INTERNAL_SERVER_ERROR_CODE.to_string(),
-            message: Some(INTERNAL_SERVER_ERROR_MESSAGE.to_string()),
-        }
-    }
-
-    pub fn get_worker_job_response(code: WorkerJobStatus) -> Self {
-        match code {
-            WorkerJobStatus::FaultyCairoPie => Self::successfully(),
-            WorkerJobStatus::IncorrectLayout => Self::internal_server_error(),
-            WorkerJobStatus::AdditionalBadFlag => Self::successfully(),
-            WorkerJobStatus::NoCairoJobId => Self::internal_server_error(),
-            WorkerJobStatus::IncorrectOffchainProof => Self::internal_server_error(),
-
-            WorkerJobStatus::Successfully => Self::successfully(),
-        }
-    }
 }

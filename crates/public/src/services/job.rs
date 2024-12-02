@@ -1,15 +1,13 @@
 use std::sync::Arc;
 
-use irelia_core::entities::job::{JobEntity, JobId, JobResponse, JobStatus};
-use irelia_core::entities::worker_job::WorkerJobResponse;
+use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
 use irelia_core::ports::job::JobPort;
 use serde::{Deserialize, Serialize};
-use tracing::instrument;
 use tracing::log::info;
 use uuid::Uuid;
 
 use crate::controllers::job::GetStatusParams;
-use crate::controllers::worker_job::{CairoPieReq, NewWorkerJob};
+use crate::controllers::worker_job::NewWorkerJob;
 use crate::errors::AppError;
 
 pub struct JobService {
@@ -47,8 +45,27 @@ impl JobService {
     pub async fn get_job_status(&self, params: GetStatusParams) -> Result<JobResponse, AppError> {
         let job = self
             .job
-            .get_by_customer_id_and_cairo_job_key_value(params.customer_id, params.cairo_job_key)
+            .get_job(params.customer_id, params.cairo_job_key)
             .await?;
         Ok(JobResponse::get_job_response(job))
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct JobResponse {
+    pub status: String,
+    pub invalid_reason: String,
+    pub error_log: String,
+    pub validation_done: bool,
+}
+
+impl JobResponse {
+    pub fn get_job_response(job: JobEntity) -> Self {
+        JobResponse {
+            status: job.status.to_string(),
+            invalid_reason: job.invalid_reason,
+            error_log: job.error_log,
+            validation_done: job.validation_done,
+        }
     }
 }
