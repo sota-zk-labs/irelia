@@ -11,6 +11,7 @@ irelia_core = { workspace = true }
 
 anyhow = { workspace = true }
 axum = { workspace = true, features = ["macros"] }
+base64 = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
 diesel = { workspace = true, features = [
@@ -19,18 +20,17 @@ diesel = { workspace = true, features = [
   "uuid",
 ] }
 diesel_migrations = { workspace = true }
-graphile_worker = { workspace = true }
-openssl = { workspace = true }
 opentelemetry = { workspace = true }
 readonly = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+stone-cli = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-postgres = { workspace = true }
 toml = { workspace = true }
 tower-http = { workspace = true, features = ["timeout", "trace"] }
 tracing = { workspace = true }
-tracing-opentelemetry = { workspace = true }
 uuid = { workspace = true }
+zip = { workspace = true }
