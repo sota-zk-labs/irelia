@@ -13,5 +13,6 @@ regex = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 stone-cli = { workspace = true }
+starknet-os = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["v4", "serde"] }

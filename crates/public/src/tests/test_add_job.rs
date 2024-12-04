@@ -22,51 +22,30 @@ async fn test_add_job() {
         options.server.url.as_str(),
         options.server.port
     );
+
+    let cairo_pie = fs::read_to_string("./src/assets/test_data/encoded_cairo_pie.txt").unwrap();
+
     // Set up the database
     setup_database(&*options.pg.url).await;
     println!("✅ Database setup completed");
 
-    test_faulty_cairo_pie(client.clone(), base_url.clone()).await;
-    println!("✅ test_faulty_cairo_pie completed");
-
-    test_incorrect_layout(client.clone(), base_url.clone()).await;
+    test_incorrect_layout(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_incorrect_layout completed");
 
-    test_additional_bad_flag(client.clone(), base_url.clone()).await;
+    test_additional_bad_flag(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_additional_bad_flag completed");
 
-    test_no_cairo_job_id(client.clone(), base_url.clone()).await;
+    test_no_cairo_job_id(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_no_cairo_job_id completed");
 
-    test_incorrect_offchain_proof(client.clone(), base_url.clone()).await;
+    test_incorrect_offchain_proof(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_incorrect_offchain_proof completed");
 
-    test_successfully(client.clone(), base_url.clone()).await;
-    println!("✅ test_faulty_cairo_pie completed");
+    test_successfully(client.clone(), base_url.clone(), cairo_pie.clone()).await;
+    println!("✅ test_successfully completed");
 }
 
-async fn test_faulty_cairo_pie(client: Client, base_url: String) {
-    let url =
-        format!(
-        "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
-        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small"
-    );
-    let incorrect_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": ""
-            }
-        }
-    );
-    let expected = json!(
-        {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
-    );
-    let res = post_request(client, url, incorrect_body).await;
-    assert_eq!(res, expected, "Response did not match expected value");
-}
-
-async fn test_incorrect_layout(client: Client, base_url: String) {
+async fn test_incorrect_layout(client: Client, base_url: String, cairo_pie: String) {
     let url =
         format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
@@ -76,7 +55,7 @@ async fn test_incorrect_layout(client: Client, base_url: String) {
         {
             "action": "add_job",
             "request": {
-                "cairo_pie": "./src/tests/test_samples/fibonacci_with_output.zip"
+                "cairo_pie": cairo_pie
             }
         }
     );
@@ -90,7 +69,7 @@ async fn test_incorrect_layout(client: Client, base_url: String) {
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_additional_bad_flag(client: Client, base_url: String) {
+async fn test_additional_bad_flag(client: Client, base_url: String, cairo_pie: String) {
     let url = format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}&bla={}",
         base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small", true
@@ -99,7 +78,7 @@ async fn test_additional_bad_flag(client: Client, base_url: String) {
         {
             "action": "add_job",
             "request": {
-                "cairo_pie": "./src/tests/test_samples/fibonacci_with_output.zip"
+                "cairo_pie": cairo_pie
             }
         }
     );
@@ -110,7 +89,7 @@ async fn test_additional_bad_flag(client: Client, base_url: String) {
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_no_cairo_job_id(client: Client, base_url: String) {
+async fn test_no_cairo_job_id(client: Client, base_url: String, cairo_pie: String) {
     let url = format!(
         "{}/v1/gateway/add_job?customer_id={}&offchain_proof={}&proof_layout={}",
         base_url,
@@ -122,7 +101,7 @@ async fn test_no_cairo_job_id(client: Client, base_url: String) {
         {
             "action": "add_job",
             "request": {
-                "cairo_pie": "./src/tests/test_samples/fibonacci_with_output.zip"
+                "cairo_pie": cairo_pie
             }
         }
     );
@@ -136,7 +115,7 @@ async fn test_no_cairo_job_id(client: Client, base_url: String) {
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_incorrect_offchain_proof(client: Client, base_url: String) {
+async fn test_incorrect_offchain_proof(client: Client, base_url: String, cairo_pie: String) {
     let url =
         format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
@@ -146,7 +125,7 @@ async fn test_incorrect_offchain_proof(client: Client, base_url: String) {
         {
             "action": "add_job",
             "request": {
-                "cairo_pie": "./src/tests/test_samples/fibonacci_with_output.zip"
+                "cairo_pie": cairo_pie
             }
         }
     );
@@ -160,7 +139,7 @@ async fn test_incorrect_offchain_proof(client: Client, base_url: String) {
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_successfully(client: Client, base_url: String) {
+async fn test_successfully(client: Client, base_url: String, cairo_pie: String) {
     let url =
         format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
@@ -170,7 +149,7 @@ async fn test_successfully(client: Client, base_url: String) {
         {
             "action": "add_job",
             "request": {
-                "cairo_pie": "./src/tests/test_samples/fibonacci_with_output.zip"
+                "cairo_pie": cairo_pie
             }
         }
     );

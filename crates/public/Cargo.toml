@@ -26,6 +26,8 @@ readonly = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+stone-cli = { workspace = true }
+starknet-os = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-postgres = { workspace = true }
@@ -34,3 +36,5 @@ tower-http = { workspace = true, features = ["timeout", "trace"] }
 tracing = { workspace = true }
 tracing-opentelemetry = { workspace = true }
 uuid = { workspace = true }
+base64 = { workspace = true }
+zip = { workspace = true }

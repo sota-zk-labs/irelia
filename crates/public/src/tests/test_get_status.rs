@@ -21,6 +21,7 @@ async fn test_get_status() {
         options.server.url.as_str(),
         options.server.port
     );
+
     // Set up the database
     setup_database(&*options.pg.url).await;
     println!("✅ Database setup completed");

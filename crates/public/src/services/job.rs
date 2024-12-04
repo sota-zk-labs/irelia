@@ -3,6 +3,7 @@ use std::sync::Arc;
 use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
 use irelia_core::ports::job::JobPort;
 use serde::{Deserialize, Serialize};
+use starknet_os::sharp::CairoJobStatus;
 use tracing::log::info;
 use uuid::Uuid;
 
@@ -22,7 +23,7 @@ impl JobService {
     pub async fn add_job(
         &self,
         params: NewWorkerJob,
-        job_status: JobStatus,
+        job_status: CairoJobStatus,
         validation_done_value: bool,
     ) -> Result<(), AppError> {
         let job = self

@@ -1,45 +1,8 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
-pub enum ProofLayout {
-    Plain,
-    Small,
-    Dex,
-    Recursive,
-    Starknet,
-    StarknetWithKeccak,
-    RecursiveLargeOutput,
-    RecursiveWithPoseidon,
-    AllSolidity,
-    AllCairo,
-    Dynamic,
-}
-
-impl std::str::FromStr for ProofLayout {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "plain" => Ok(ProofLayout::Plain),
-            "small" => Ok(ProofLayout::Small),
-            "dex" => Ok(ProofLayout::Dex),
-            "recursive" => Ok(ProofLayout::Recursive),
-            "starknet" => Ok(ProofLayout::Starknet),
-            "starknet_with_keccak" => Ok(ProofLayout::StarknetWithKeccak),
-            "recursive_large_output" => Ok(ProofLayout::RecursiveLargeOutput),
-            "recursive_with_poseidon" => Ok(ProofLayout::RecursiveWithPoseidon),
-            "all_solidity" => Ok(ProofLayout::AllSolidity),
-            "all_cairo" => Ok(ProofLayout::AllCairo),
-            "dynamic" => Ok(ProofLayout::Dynamic),
-            _ => Err(()),
-        }
-    }
-}
-
 #[derive(Clone, Debug, PartialEq)]
 pub enum WorkerJobStatus {
-    FaultyCairoPie,
     IncorrectLayout,
     AdditionalBadFlag,
     NoCairoJobId,

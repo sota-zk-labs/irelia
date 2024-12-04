@@ -52,6 +52,8 @@ serde = { version = "1.0.210", features = ["derive"] }
 sqlx = { version = "*" }
 serde_json = { version = "1.0.128" }
 stone-cli = { git = "https://github.com/zksecurity/stone-cli.git" }
+starknet-os = { git = "https://github.com/keep-starknet-strange/snos" }
+#starknet-os = { git = "https://github.com/keep-starknet-strange/snos", branch = "main"}
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
 testcontainers-modules = { version = "0.11.3" }
@@ -68,6 +70,9 @@ url = { version = "2.4.0", features = ["serde"] }
 uuid = { version = "1.10.0", features = ["v4"] }
 reqwest = "0.12.9"
 tokio-postgres = "0.7.12"
+base64 = "0.22.1"
+zip = "0.6.6"
+
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }
