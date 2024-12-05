@@ -4,7 +4,6 @@ use uuid::Uuid;
 #[derive(Clone, Debug, PartialEq)]
 pub enum WorkerJobStatus {
     IncorrectLayout,
-    AdditionalBadFlag,
     NoCairoJobId,
     IncorrectOffchainProof,
 

@@ -1,7 +1,7 @@
 use std::{str::FromStr, sync::Arc};
 
 use irelia_core::entities::worker_job::WorkerJobStatus::{
-    AdditionalBadFlag, IncorrectLayout, IncorrectOffchainProof, NoCairoJobId, Successfully,
+    IncorrectLayout, IncorrectOffchainProof, NoCairoJobId, Successfully,
 };
 use irelia_core::entities::worker_job::{
     WorkerJobEntity, WorkerJobId, WorkerJobStatus,
@@ -9,10 +9,9 @@ use irelia_core::entities::worker_job::{
 use irelia_core::ports::worker::WorkerPort;
 use serde::{Deserialize, Serialize};
 use stone_cli::args::LayoutName;
-use starknet_os::sharp::CairoJobStatus::IN_PROGRESS;
 use uuid::Uuid;
-
-use crate::controllers::worker_job::{CairoPieReq, NewWorkerJob};
+use irelia_core::entities::job::CairoJobStatus::IN_PROGRESS;
+use crate::controllers::worker_job::{NewWorkerJob};
 use crate::errors::AppError;
 use crate::services::job::JobService;
 use crate::utils::save_cairo_pie;
@@ -34,7 +33,7 @@ impl WorkerJobService {
         &self,
         job_service: Arc<JobService>,
         params: NewWorkerJob,
-        req: CairoPieReq,
+        cairo_pie_req: String,
     ) -> Result<WorkerJobResponse, AppError> {
         let response_code = Self::check_job(params.clone());
 
@@ -45,7 +44,7 @@ impl WorkerJobService {
             return Ok(WorkerJobResponse::get_worker_job_response(response_code));
         }
 
-        let cairo_pie = save_cairo_pie(&req.request.cairo_pie, &*params.clone().cairo_job_key.unwrap())
+        let cairo_pie = save_cairo_pie(&cairo_pie_req, &*params.clone().cairo_job_key.unwrap())
             .expect("Failed to save cairo pie")
             .to_string_lossy()
             .to_string();
@@ -62,11 +61,6 @@ impl WorkerJobService {
             })
             .await?;
 
-        if response_code == AdditionalBadFlag {
-            let _ = job_service.add_job(params.clone(), IN_PROGRESS, true).await;
-            return Ok(WorkerJobResponse::get_worker_job_response(response_code))
-        }
-
         let _ = job_service.add_job(params, IN_PROGRESS, false).await;
         Ok(WorkerJobResponse::get_worker_job_response(response_code))
     }
@@ -79,11 +73,6 @@ impl WorkerJobService {
                 return IncorrectLayout;
             }
         }
-        // Check additional bad flag
-        if params.bla.is_some() && params.bla.unwrap() {
-            return AdditionalBadFlag;
-        }
-
         // Check no cairo job id
         if params.cairo_job_key.is_none() {
             return NoCairoJobId;
@@ -124,7 +113,6 @@ impl WorkerJobResponse {
     pub fn get_worker_job_response(code: WorkerJobStatus) -> Self {
         match code {
             IncorrectLayout => Self::internal_server_error(),
-            AdditionalBadFlag => Self::successfully(),
             NoCairoJobId => Self::internal_server_error(),
             IncorrectOffchainProof => Self::internal_server_error(),
 

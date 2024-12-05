@@ -24,7 +24,7 @@ axum = { version = "0.8.0-alpha.1" }
 clap = { version = "4.5.17" }
 config = { version = "0.14.0" }
 deadpool-diesel = { version = "0.6.1" }
-diesel = { version = "2.2.4" }
+diesel = { version = "2.2.4", features = ["uuid", "postgres"] }
 diesel_migrations = { version = "2.2.0" }
 dotenv = { version = "0.15.0" }
 ethers = { version = "2.0.14" }
@@ -51,9 +51,7 @@ scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
 sqlx = { version = "*" }
 serde_json = { version = "1.0.128" }
-stone-cli = { git = "https://github.com/zksecurity/stone-cli.git" }
-starknet-os = { git = "https://github.com/keep-starknet-strange/snos" }
-#starknet-os = { git = "https://github.com/keep-starknet-strange/snos", branch = "main"}
+stone-cli = { git = "https://github.com/zksecurity/stone-cli.git", branch = "main"}
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
 testcontainers-modules = { version = "0.11.3" }

@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::fs;
 
 use reqwest::Client;
@@ -51,14 +52,7 @@ async fn test_incorrect_layout(client: Client, base_url: String, cairo_pie: Stri
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
         base_url, Uuid::new_v4(), Uuid::new_v4(), true, "smal"
     );
-    let correct_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": cairo_pie
-            }
-        }
-    );
+    let correct_body = format!("{}", cairo_pie);
     let expected = json!(
         {
             "code": "500",
@@ -74,14 +68,7 @@ async fn test_additional_bad_flag(client: Client, base_url: String, cairo_pie: S
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}&bla={}",
         base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small", true
     );
-    let correct_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": cairo_pie
-            }
-        }
-    );
+    let correct_body = format!("{}", cairo_pie);
     let expected = json!(
         {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
     );
@@ -97,14 +84,7 @@ async fn test_no_cairo_job_id(client: Client, base_url: String, cairo_pie: Strin
         true,
         "small"
     );
-    let correct_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": cairo_pie
-            }
-        }
-    );
+    let correct_body = format!("{}", cairo_pie);
     let expected = json!(
         {
             "code": "500",
@@ -121,14 +101,7 @@ async fn test_incorrect_offchain_proof(client: Client, base_url: String, cairo_p
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
         base_url, Uuid::new_v4(), Uuid::new_v4(), false, "small"
     );
-    let correct_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": cairo_pie
-            }
-        }
-    );
+    let correct_body = format!("{}", cairo_pie);
     let expected = json!(
         {
             "code": "500",
@@ -145,14 +118,9 @@ async fn test_successfully(client: Client, base_url: String, cairo_pie: String) 
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
         base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small"
     );
-    let correct_body = json!(
-        {
-            "action": "add_job",
-            "request": {
-                "cairo_pie": cairo_pie
-            }
-        }
-    );
+
+    let correct_body = format!("{}", cairo_pie);
+
     let expected = json!(
         {"code" : "JOB_RECEIVED_SUCCESSFULLY"}
     );
@@ -160,10 +128,10 @@ async fn test_successfully(client: Client, base_url: String, cairo_pie: String) 
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn post_request(client: Client, url: String, body: Value) -> Value {
+async fn post_request(client: Client, url: String, body:String) -> Value {
     client
         .post(&url)
-        .json(&body)
+        .body(body)
         .send()
         .await
         .expect("Failed to send POST request")

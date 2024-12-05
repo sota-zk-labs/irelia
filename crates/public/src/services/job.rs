@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
-use irelia_core::entities::job::{JobEntity, JobId, JobStatus};
+use irelia_core::entities::job::{JobEntity, JobId, CairoJobStatus};
 use irelia_core::ports::job::JobPort;
 use serde::{Deserialize, Serialize};
-use starknet_os::sharp::CairoJobStatus;
 use tracing::log::info;
 use uuid::Uuid;
 
