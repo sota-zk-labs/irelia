@@ -3,7 +3,7 @@ use std::str::FromStr;
 use std::time::SystemTime;
 
 use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
-use irelia_core::entities::job::{JobEntity, JobId, CairoJobStatus};
+use irelia_core::entities::job::{CairoJobStatus, JobEntity, JobId};
 use uuid::Uuid;
 
 #[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]

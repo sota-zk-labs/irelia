@@ -1,17 +1,16 @@
 use std::{str::FromStr, sync::Arc};
 
+use irelia_core::entities::job::CairoJobStatus::IN_PROGRESS;
 use irelia_core::entities::worker_job::WorkerJobStatus::{
     IncorrectLayout, IncorrectOffchainProof, NoCairoJobId, Successfully,
 };
-use irelia_core::entities::worker_job::{
-    WorkerJobEntity, WorkerJobId, WorkerJobStatus,
-};
+use irelia_core::entities::worker_job::{WorkerJobEntity, WorkerJobId, WorkerJobStatus};
 use irelia_core::ports::worker::WorkerPort;
 use serde::{Deserialize, Serialize};
 use stone_cli::args::LayoutName;
 use uuid::Uuid;
-use irelia_core::entities::job::CairoJobStatus::IN_PROGRESS;
-use crate::controllers::worker_job::{NewWorkerJob};
+
+use crate::controllers::worker_job::WorkerJob;
 use crate::errors::AppError;
 use crate::services::job::JobService;
 use crate::utils::save_cairo_pie;
@@ -32,7 +31,7 @@ impl WorkerJobService {
     pub async fn add_worker_job(
         &self,
         job_service: Arc<JobService>,
-        params: NewWorkerJob,
+        params: WorkerJob,
         cairo_pie_req: String,
     ) -> Result<WorkerJobResponse, AppError> {
         let response_code = Self::check_job(params.clone());
@@ -44,7 +43,7 @@ impl WorkerJobService {
             return Ok(WorkerJobResponse::get_worker_job_response(response_code));
         }
 
-        let cairo_pie = save_cairo_pie(&cairo_pie_req, &*params.clone().cairo_job_key.unwrap())
+        let cairo_pie = save_cairo_pie(&cairo_pie_req, &params.clone().cairo_job_key.unwrap())
             .expect("Failed to save cairo pie")
             .to_string_lossy()
             .to_string();
@@ -57,7 +56,7 @@ impl WorkerJobService {
                 cairo_job_key: params.clone().cairo_job_key.unwrap(),
                 offchain_proof: params.clone().offchain_proof,
                 proof_layout: params.clone().proof_layout,
-                cairo_pie
+                cairo_pie,
             })
             .await?;
 
@@ -65,7 +64,7 @@ impl WorkerJobService {
         Ok(WorkerJobResponse::get_worker_job_response(response_code))
     }
 
-    pub fn check_job(params: NewWorkerJob) -> WorkerJobStatus {
+    pub fn check_job(params: WorkerJob) -> WorkerJobStatus {
         // Check incorrect layout
         match LayoutName::from_str(params.proof_layout.to_lowercase().as_str()) {
             Ok(_) => (),

@@ -31,7 +31,6 @@ const SERIALIZED_PROOF_PATH: &str = "bootloader_serialized_proof.json";
 
 /// This code is adapted from: https://github.com/zksecurity/stone-cli/blob/main/src/main.rs
 /// Generate proof from cairo pies or cairo programs
-
 pub struct StoneProver {
     pub cairo_pie: Vec<PathBuf>,
     pub layout: LayoutName,

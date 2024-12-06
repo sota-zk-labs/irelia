@@ -23,8 +23,6 @@ impl TaskHandler for JobWorker {
 
         span.set_parent(parent_cx);
 
-        sleep(Duration::from_secs(10)).await;
-
         //TODO: Processing Data
 
         sleep(Duration::from_secs(5)).await;

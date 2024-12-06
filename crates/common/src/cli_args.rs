@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 use std::process::exit;
 
-use clap::builder::TypedValueParser;
 use clap::{Parser, Subcommand};
 use serde::Deserialize;
 

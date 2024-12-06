@@ -5,14 +5,15 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[allow(non_camel_case_types)]
 pub enum CairoJobStatus {
-    FAILED,             // Stone failed
-    INVALID,            // Wrong pie format
-    UNKNOWN,            //
-    IN_PROGRESS,        // init status
-    NOT_CREATED,        //
-    PROCESSED,          // stone completed => to submit on chain
-    ONCHAIN,            // stone completed and submit on chain completed
+    FAILED,      // Stone failed
+    INVALID,     // Wrong pie format
+    UNKNOWN,     //
+    IN_PROGRESS, // init status
+    NOT_CREATED, //
+    PROCESSED,   // stone completed => to submit on chain
+    ONCHAIN,     // stone completed and submit on chain completed
 }
 
 impl fmt::Display for CairoJobStatus {

@@ -26,7 +26,6 @@ use crate::options::Options;
 #[tokio::main]
 async fn main() {
     let options: Options = CliArgs::default_run_or_get_options(env!("APP_VERSION"));
-    println!("options: {:?}", options);
     init_telemetry(
         options.service_name.as_str(),
         options.exporter_endpoint.as_str(),

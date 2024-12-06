@@ -33,6 +33,11 @@ services:
       - postgres:/data/postgres
     ports:
       - '5432:5432'
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   redis:
     image: redis:latest
     restart: always
@@ -41,16 +46,29 @@ services:
     ports:
       - '6379:6379'
   public_server:
-    image: rust-api-server
+    image: public-server
     build:
       context: ../..
-      target: public-dev
+      target: public-server
     ports:
-      - '8888:8888'
+      - '8000:8000'
     volumes:
-      - ./01_public_custom.toml:/user/01_custom.toml:ro
+      - ./01_public_server_custom.toml:/user/01_custom.toml:ro
     depends_on:
       - postgres
+    restart: on-failure:3
+  public_worker:
+    image: public-worker
+    build:
+      context: ../..
+      target: public-worker
+    ports:
+      - '8001:8001'
+    volumes:
+      - ./01_public_worker_custom.toml:/user/01_custom.toml:ro
+    depends_on:
+      - postgres
+    restart: on-failure:3
 volumes:
   postgres:
   redis:

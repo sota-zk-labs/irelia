@@ -51,19 +51,14 @@ mod test {
 
     #[test]
     fn test_save_cairo_pie() {
-        let encoded_origin =
-            encode_zip("./src/assets/test_data/fibonacci_with_output.zip");
+        let encoded_origin = encode_zip("./src/assets/test_data/fibonacci_with_output.zip");
         let written_path = save_cairo_pie(&encoded_origin, "test").unwrap();
         let encoded_written = encode_zip(written_path.to_str().unwrap());
 
         assert_eq!(encoded_origin, encoded_written);
 
         let cairo_pie = fs::read_to_string("./src/assets/test_data/encoded_cairo_pie.txt").unwrap();
-        save_cairo_pie(
-            &cairo_pie,
-            "test2",
-        )
-            .unwrap();
+        save_cairo_pie(&cairo_pie, "test2").unwrap();
     }
 
     fn encode_zip(path: &str) -> String {

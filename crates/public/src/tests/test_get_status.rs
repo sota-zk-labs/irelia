@@ -215,19 +215,6 @@ async fn setup_database(url: &str) {
 
     // SQL to drop and recreate the table
     let reset_queries = r#"
-        DROP TABLE IF EXISTS jobs;
-        CREATE TABLE jobs (
-                      id UUID PRIMARY KEY,
-                      customer_id VARCHAR NOT NULL,
-                      cairo_job_key VARCHAR NOT NULL,
-                      status VARCHAR NOT NULL,
-                      invalid_reason VARCHAR NOT NULL,
-                      error_log VARCHAR NOT NULL,
-                      validation_done BOOLEAN NOT NULL,
-                      created_on TIMESTAMP NOT NULL DEFAULT NOW(),
-                      updated_on TIMESTAMP NOT NULL DEFAULT NOW()
-        );
-
         INSERT INTO jobs (id, customer_id, cairo_job_key, status, invalid_reason, error_log, validation_done)
         VALUES
             ('2a3ee88d-e19d-43ed-a79e-da9a28dc9525', '93bc3373-5115-4f99-aecc-1bc57997bfd3', '11395dd2-b874-4c11-8744-ba6482da997d','FAILED', '', 'Sharp task failed', false),

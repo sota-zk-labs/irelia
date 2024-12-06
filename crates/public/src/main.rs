@@ -1,15 +1,17 @@
+use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 
 use clap::{Parser, Subcommand};
 use deadpool_diesel::postgres::Pool;
 use deadpool_diesel::{Manager, Runtime};
+use diesel_migrations::MigrationHarness;
 use irelia::app_state::AppState;
 use irelia::options::Options;
 use irelia::router::routes;
 use irelia::services::job::JobService;
 use irelia::services::worker_job::WorkerJobService;
-use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
+use irelia_adapter::repositories::postgres::job_db::{JobDBRepository, MIGRATIONS};
 use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
 use irelia_common::kill_signals;
@@ -65,6 +67,18 @@ pub async fn serve(options: Options) {
         .max_size(options.pg.max_size)
         .build()
         .unwrap();
+
+    // Migration the database
+    let conn = pool.get().await.unwrap();
+    let _ = conn
+        .interact(|connection| {
+            let result = MigrationHarness::run_pending_migrations(connection, MIGRATIONS);
+            match result {
+                Ok(_) => Ok(()),
+                Err(err) => Err(err),
+            }
+        })
+        .await;
 
     // TODO: use the same DB pool for the worker_adapter
     let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(

@@ -22,11 +22,11 @@ pub async fn register_continuous_page_batch(
     data: MemoryPageEntries,
 ) -> anyhow::Result<()> {
     let ContinuousMemoryPage {
+        start_addr: _,
+        values: _,
         z,
         alpha,
-        prime,
-        values,
-        start_addr,
+        prime: _,
     } = data.memory_page_entries.first().unwrap();
 
     let z = MoveValue::U256(U256::from_str(z)?);

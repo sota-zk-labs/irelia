@@ -1,8 +1,8 @@
 POSTGRES_DIR="./src/adapter/src/repositories/postgres"
 DATABASE_URL="postgres://postgres:changeme@127.0.0.1:5432/postgres"
 
-PKG_NAME=rust-api-server
-PKG_NAME_GRPC=rust-grpc-server
+PKG_NAME=irelia-public-server
+PKG_NAME_WORKER=irelia-public-worker
 BUILD_VERSION=$(shell git describe --long)
 BUILD_RELEASE=$(shell git describe --tags --abbrev=0)
 
@@ -30,17 +30,13 @@ migrate-redo:
      --config-file ${POSTGRES_DIR}/diesel.toml
 
 build:
-	PKG_NAME=rust-api-server
-	PKG_NAME_GRPC=rust-grpc-server
-	BUILD_VERSION=$(shell git describe --long)
-	BUILD_RELEASE=$(shell git describe --tags --abbrev=0)
-	BUILDKIT_PROGRESS=plain
-	DOCKER_BUILDKIT=1
-	docker build -t $(PKG_NAME):$(BUILD_VERSION) --target=public-prod .
-	docker build -t $(PKG_NAME_GRPC):$(BUILD_VERSION) --target=gpt-prod .
+	export BUILDKIT_PROGRESS=plain
+	export DOCKER_BUILDKIT=1
+	docker build -t $(PKG_NAME):$(BUILD_VERSION) --target=public-server .
+	docker build -t $(PKG_NAME_WORKER):$(BUILD_VERSION) --target=public-worker .
 
 build-dev:
-	BUILDKIT_PROGRESS=plain DOCKER_BUILDKIT=1 docker build -t $(PKG_NAME):$(BUILD_VERSION) --target=public-dev .
+	BUILDKIT_PROGRESS=plain DOCKER_BUILDKIT=1 docker build -t $(PKG_NAME):$(BUILD_VERSION) --target=public-dev . && \
 	BUILDKIT_PROGRESS=plain DOCKER_BUILDKIT=1 docker build -t $(PKG_NAME_GRPC):$(BUILD_VERSION) --target=gpt-dev .
 
 profiling-public:

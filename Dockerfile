@@ -18,6 +18,7 @@ RUN apt install -y build-essential libssl-dev pkg-config protobuf-compiler libcl
     libudev-dev
 RUN rm -rf /var/lib/apt/lists/*
 
+COPY .stone-cli /root/.stone-cli
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
@@ -26,6 +27,7 @@ RUN mv target/${CARGO_BUILD_TARGET}/release /out
 
 FROM debian:bookworm-slim AS public-server
 WORKDIR /user
+RUN apt update
 RUN apt install -y libssl-dev libpq-dev
 
 COPY crates/public/config/00-default.toml 00-default.toml
