@@ -10,7 +10,6 @@ pub const POSEIDON_BUILTIN_BIT: usize = 7;
 pub const N_BUILTINS: usize = 9;
 
 pub const BOOTLOADER_LEN: usize = 728;
-#[allow(dead_code)]
 pub fn get_layout7_selected_builtins() -> usize {
     let selected_builtins = (1 << OUTPUT_BUILTIN_BIT)
         | (1 << PEDERSEN_BUILTIN_BIT)

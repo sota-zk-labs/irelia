@@ -51,7 +51,7 @@ tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
 thiserror = { version = "1.0.64" }
 tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
-tokio-postgres = "0.7.12"
+tokio-postgres = { version = "0.7.12" }
 toml = { version = "0.8.19" }
 tower-http = { version = "0.6.1" }
 tracing = { version = "0.1.40" }

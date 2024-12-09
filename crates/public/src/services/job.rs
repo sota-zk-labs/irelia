@@ -36,8 +36,7 @@ impl JobService {
                 error_log: Default::default(),
                 validation_done: validation_done_value,
             })
-            .await
-            .expect("Cannot initial job");
+            .await?;
         debug!("{:?}", job);
         Ok(())
     }
