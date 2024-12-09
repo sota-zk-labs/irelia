@@ -5,15 +5,18 @@ use aptos_sdk::move_types::value::MoveValue;
 
 use crate::aptos_writer::contracts_caller::verify_fri::types::fri_verify_input::FriVerifyInput;
 
-type FriVerifyInputVec = Vec<(
-    FriVerifyInput,
-    MoveValue,
-    MoveValue,
-    MoveValue,
-    MoveValue,
-    MoveValue,
-)>;
-pub fn extract_verify_fri_input(fri_inputs: &[String]) -> anyhow::Result<FriVerifyInputVec> {
+pub fn extract_verify_fri_input(
+    fri_inputs: &[String],
+) -> anyhow::Result<
+    Vec<(
+        FriVerifyInput,
+        MoveValue,
+        MoveValue,
+        MoveValue,
+        MoveValue,
+        MoveValue,
+    )>,
+> {
     let mut res: Vec<(
         FriVerifyInput,
         MoveValue,

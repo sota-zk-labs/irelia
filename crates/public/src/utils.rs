@@ -52,6 +52,7 @@ mod test {
     #[test]
     fn test_save_cairo_pie() {
         let encoded_origin = encode_zip("./src/assets/test_data/fibonacci_with_output.zip");
+
         let written_path = save_cairo_pie(&encoded_origin, "test").unwrap();
         let encoded_written = encode_zip(written_path.to_str().unwrap());
 

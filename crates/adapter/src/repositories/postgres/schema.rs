@@ -10,7 +10,7 @@ diesel::table! {
         error_log -> Varchar,
         validation_done -> Bool,
 
-        updated_on -> Timestamp,
-        created_on -> Timestamp,
+        updated_at -> Timestamp,
+        created_at -> Timestamp,
     }
 }

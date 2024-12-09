@@ -33,11 +33,6 @@ services:
       - postgres:/data/postgres
     ports:
       - '5432:5432'
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
   redis:
     image: redis:latest
     restart: always
@@ -45,11 +40,11 @@ services:
       - redis:/data
     ports:
       - '6379:6379'
-  public_server:
-    image: public-server
+  irelia_public:
+    image: irelia-public-server
     build:
       context: ../..
-      target: public-server
+      target: irelia-public-server
     ports:
       - '8000:8000'
     volumes:
@@ -57,15 +52,13 @@ services:
     depends_on:
       - postgres
     restart: on-failure:3
-  public_worker:
-    image: public-worker
+  irelia_worker:
+    image: irelia-worker
     build:
       context: ../..
-      target: public-worker
-    ports:
-      - '8001:8001'
+      target: irelia-worker
     volumes:
-      - ./01_public_worker_custom.toml:/user/01_custom.toml:ro
+      - ./01_worker_custom.toml:/user/01_custom.toml:ro
     depends_on:
       - postgres
     restart: on-failure:3

@@ -65,7 +65,7 @@ jobs:
     name: Build and push docker images to docker hub
     env:
       PKG_NAME: irelia-public-server
-      PKG_NAME_WORKER: irelia-public-worker
+      PKG_NAME_WORKER: irelia-worker
     runs-on: ubuntu-latest
     needs: [cargo-check, fmt-check, test-and-coverage]
     steps:

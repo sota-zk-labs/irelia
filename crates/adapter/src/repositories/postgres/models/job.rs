@@ -6,7 +6,7 @@ use diesel::{AsChangeset, Identifiable, Insertable, Queryable, Selectable};
 use irelia_core::entities::job::{CairoJobStatus, JobEntity, JobId};
 use uuid::Uuid;
 
-#[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable, Clone)]
+#[derive(Debug, Queryable, Insertable, Selectable, AsChangeset, Identifiable)]
 #[diesel(table_name = super::super::schema::jobs)]
 pub struct JobModel {
     pub id: Uuid,
@@ -17,8 +17,10 @@ pub struct JobModel {
     pub error_log: String,
     pub validation_done: bool,
 
-    pub updated_on: SystemTime,
-    pub created_on: SystemTime,
+    #[diesel(skip_insertion)]
+    pub updated_at: SystemTime,
+    #[diesel(skip_insertion)]
+    pub created_at: SystemTime,
 }
 
 impl TryFrom<JobEntity> for JobModel {
@@ -34,8 +36,8 @@ impl TryFrom<JobEntity> for JobModel {
             error_log: entity.error_log,
             validation_done: entity.validation_done,
 
-            updated_on: SystemTime::now(),
-            created_on: SystemTime::now(),
+            updated_at: SystemTime::now(),
+            created_at: SystemTime::now(),
         })
     }
 }

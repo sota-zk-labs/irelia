@@ -21,7 +21,6 @@ pub async fn get_status(
     Query(params): Query<GetStatusParams>,
 ) -> Result<JsonResponse<JobResponse>, AppError> {
     let res = app_state.job_service.get_job_status(params).await?;
-
     Ok(JsonResponse(res))
 }
 

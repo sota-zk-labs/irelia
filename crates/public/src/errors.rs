@@ -17,6 +17,8 @@ pub enum AppError {
     CoreError(#[from] CoreError),
     #[error("io error")]
     IOError(#[from] io::Error),
+    #[error("unknown error")]
+    Unknown(#[from] anyhow::Error),
 }
 
 // Tell axum how `AppError` should be converted into a response.

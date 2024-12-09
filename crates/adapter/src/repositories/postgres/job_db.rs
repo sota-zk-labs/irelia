@@ -15,11 +15,9 @@ use crate::repositories::postgres::schema::jobs::dsl::jobs;
 use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
 
 // NOTE: path relative to Cargo.toml
-
 pub const MIGRATIONS: EmbeddedMigrations =
     embed_migrations!("./src/repositories/postgres/migrations");
 
-#[derive(Clone)]
 pub struct JobDBRepository {
     pub db: Pool,
 }
@@ -52,8 +50,7 @@ impl JobPort for JobDBRepository {
                     .map_err(|err| match err {
                         diesel::result::Error::NotFound => CoreError::NotFound,
                         _ => CoreError::InternalError(err.into()),
-                    })
-                    .unwrap();
+                    })?;
                 Ok(response.into())
             })
             .await

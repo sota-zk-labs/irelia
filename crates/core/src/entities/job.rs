@@ -4,7 +4,7 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[allow(non_camel_case_types)]
 pub enum CairoJobStatus {
     FAILED,      // Stone failed
@@ -46,7 +46,7 @@ impl FromStr for CairoJobStatus {
     }
 }
 
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize, Clone)]
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct JobId(pub Uuid);
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]

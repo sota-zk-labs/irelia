@@ -80,6 +80,8 @@ pub async fn serve(options: Options) {
         })
         .await;
 
+    let job_repository = Arc::new(JobDBRepository::new(pool));
+    let job_service = Arc::new(JobService::new(job_repository));
     // TODO: use the same DB pool for the worker_adapter
     let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
         WorkerAdapter::new(
@@ -89,10 +91,7 @@ pub async fn serve(options: Options) {
         )
         .await,
     );
-    let worker_job_service = Arc::new(WorkerJobService::new(worker_adapter));
-
-    let job_repository = Arc::new(JobDBRepository::new(pool.clone()));
-    let job_service = Arc::new(JobService::new(job_repository));
+    let worker_job_service = Arc::new(WorkerJobService::new(worker_adapter, job_service.clone()));
 
     let routes = routes(AppState::new(worker_job_service, job_service)).layer((
         TraceLayer::new_for_http(),

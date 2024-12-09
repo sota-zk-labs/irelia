@@ -7,6 +7,6 @@ CREATE TABLE jobs (
                             invalid_reason VARCHAR NOT NULL,
                             error_log VARCHAR NOT NULL,
                             validation_done BOOLEAN NOT NULL,
-                            created_on TIMESTAMP NOT NULL DEFAULT NOW(),
-                            updated_on TIMESTAMP NOT NULL DEFAULT NOW()
+                            created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                            updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

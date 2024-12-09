@@ -1,5 +1,5 @@
 exporter_endpoint = "http://quickwit:7281"
-service_name = "public-server-docker"
+service_name = "irelia-public"
 
 [server]
 port = 8000

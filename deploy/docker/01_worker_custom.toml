@@ -1,8 +1,8 @@
 exporter_endpoint = "http://quickwit:7281"
-service_name = "public-worker-docker"
+service_name = "irelia-worker"
 
 [server]
-port = 8001
+port = 8000
 url = "0.0.0.0"
 
 [log]

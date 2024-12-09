@@ -3,7 +3,7 @@ use std::sync::Arc;
 use irelia_core::entities::job::{CairoJobStatus, JobEntity, JobId};
 use irelia_core::ports::job::JobPort;
 use serde::{Deserialize, Serialize};
-use tracing::log::info;
+use tracing::log::debug;
 use uuid::Uuid;
 
 use crate::controllers::job::GetStatusParams;
@@ -29,16 +29,16 @@ impl JobService {
             .job
             .add(JobEntity {
                 id: JobId(Uuid::new_v4()),
-                customer_id: params.clone().customer_id,
-                cairo_job_key: params.clone().cairo_job_key.unwrap(),
+                customer_id: params.customer_id,
+                cairo_job_key: params.cairo_job_key.unwrap(),
                 status: job_status,
-                invalid_reason: "".to_string(),
-                error_log: "".to_string(),
+                invalid_reason: Default::default(),
+                error_log: Default::default(),
                 validation_done: validation_done_value,
             })
             .await
-            .expect("Can't initial job");
-        info!("{:?}", job);
+            .expect("Cannot initial job");
+        debug!("{:?}", job);
         Ok(())
     }
 
@@ -51,7 +51,7 @@ impl JobService {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct JobResponse {
     pub status: String,
     pub invalid_reason: String,

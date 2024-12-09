@@ -11,10 +11,8 @@ opentelemetry = { workspace = true }
 opentelemetry-otlp = { workspace = true, features = ["tonic"] }
 opentelemetry-semantic-conventions = { workspace = true }
 opentelemetry_sdk = { workspace = true, features = ["rt-tokio"] }
-prost = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tokio = { workspace = true }
-tonic = { workspace = true }
 tracing = { workspace = true }
 tracing-bunyan-formatter = { workspace = true }
 tracing-opentelemetry = { workspace = true }
