@@ -1,173 +1,95 @@
 # Irelia
 
-![Logo](./assets/logo.png)
-
-[![License](https://img.shields.io/github/license/sonntuet1997/rust-web-api-microservice-template)](https://github.com/sonntuet1997/rust-web-api-microservice-template/blob/master/LICENSE)
-[![Continuous Integration](https://github.com/sonntuet1997/rust-web-api-microservice-template/actions/workflows/ci.yaml/badge.svg)](https://github.com/sonntuet1997/rust-web-api-microservice-template/actions/workflows/ci.yaml)
-
 ## Introduction
 
-Welcome to the Rust API Server! This server provides a simple REST interface for your applications. This README will
-guide you through setting up and running the server, as well as configuring its various options.
+**Irelia** is a Rust-based [Sharp Prover](https://docs.starknet.io/architecture-and-concepts/provers-overview/)
+equivalent service for generating and submitting verification proofs to the Aptos network. This service is part of
+the [Apstark](https://github.com/sota-zk-labs/apstark) repository. For more information about its purpose, check
+out the repository.
 
-## Deploy
+## How to Run
 
-**Automated Builds:**
-Builds are automatically generated for each commit to the repository in the `main` branch and are subsequently pushed to
-Docker Hub.
-Tags are applied using the commit SHA, branch name, and the latest tag if released on the main branch. You can find a
-list of available
-tags [here](https://hub.docker.com/r/thuan2172001/rust-server/tags).
+### Configurations
 
-**Release Binaries:**
-For every release, separate `cli` binaries are built. These binaries can be downloaded
-from [here](https://github.com/sonntuet1997/rust-web-api-microservice-template/releases) and are available for various
-operating
-systems and architectures. You are welcome to use the automated binaries or build your own.
-
-**Contributions and PRs:**
-If you submit a pull request, please note that images are not built by default. A maintainer will need to retag them for
-the build
-process to take place.
-
-### Docker
-
-1. Pull the docker image
-
-```commit to only the main branch
-docker pull thuan2172001/rust-server:latest
-```
-
-2. Run the image
-
-```
-docker run -d -p 8000:8000 thuan2172001/rust-server:latest
-```
-
-## How To Run
-
-To get started, execute the following command in your terminal:
+First, create an `.env` file in the project's root directory with the following content:
 
 ```shell
-./cli --help
+APTOS_NODE_URL="https://fullnode.testnet.aptoslabs.com" # RPC endpoint for the Aptos network
+APTOS_PRIVATE_KEY="0xabc" # Private key of the signer account
+APTOS_VERIFIER_ADDRESS="abc123" # Address of the Navori contracts
+CHAIN_ID="testnet" # Chain ID of the Aptos network (or mainnet, devnet)
 ```
 
-This will display the available options for running the server:
+Each service requires its own configuration file in TOML format. Below is an example configuration:
 
+```toml
+exporter_endpoint = "http://0.0.0.0:7281" # The endpoint of the telemetry service
+service_name = "irelia-worker" # The name of the current service
+
+[pg]
+max_size = 10 # Maximum number of database connections
+url = "postgres://postgres:changeme@0.0.0.0:5432/postgres" # Database URL
+
+[server]
+port = 8001 # Service port
+url = "0.0.0.0" # Service URL
+
+[log]
+level = "info" # Log level
+
+[worker]
+schema = "schema" # Database schema
+concurrent = 4 # Number of concurrent workers
 ```
-Simple REST server
 
-Usage: cli [OPTIONS] [COMMAND]
+Typically, you only need to update the database URL, server port, and server URL.
 
-Commands:
-  config  Print config
-  help    Print this message or the help of the given subcommand(s)
+### Running the services
 
-Options:
-  -c, --config-path <CONFIG_PATH>  Config file [default: config/default.toml]
-  -v, --version                    Print version
-  -h, --help                       Print help
-```
+#### Running locally
 
-### Example
-
-- Multiple config locations
+To run Irelia locally, update the configuration files `00-default.toml` located in
+the [worker](crates/worker/config/00-default.toml)
+and [public](crates/public/config/00-default.toml) directories. Once the configurations are ready, use the following
+commands:
 
 ```shell
-./cli -c ./config/*.toml -c deploy/local/custom.toml
+cd deploy/local && docker compose up -d # Start the database and additional services
+cd crates/worker && cargo run --release # Start the worker service
+cd crates/public && cargo run --release # Start the public service
 ```
 
-- Pipe the output with [bunyan](https://github.com/trentm/node-bunyan)
+#### Running with Docker
+
+For Docker-based deployment, override the default configurations by editing the
+files [`01_public_server_custom.toml`](deploy/docker/01_public_server_custom.toml)
+and [`01_public_worker_custom.toml`](deploy/docker/01_public_worker_custom.toml). Then, start all services with a single
+command:
 
 ```shell
-cargo install bunyan
-./cli -c ./config/*.toml -c deploy/local/custom.toml | bunyan
+cd deploy/docker && docker compose up -d
 ```
 
-## Configuration
+## APIs
 
-### Order of apply
+For the API documentation of the public service, please refer
+to [this document](https://docs.google.com/document/d/1-9ggQoYmjqAtLBGNNR2Z5eLreBmlckGYjbVl0khtpU0).
 
-Configuration is applied in the following order: config files -> environment variables -> command-line arguments.
+## Project structure
 
-If you use `-c *.toml` to load config files, please be mindful of the order in which the files are applied.
-
-### Environment Variable Examples
-
-The server can be configured using environment variables. Below is a table outlining the available configuration
-options:
-
-Hierarchical child config via env, separated by using `__`. Specify list values by using `,` separator
-
-| ENV                                                                      | DEFAULT VALUE | NOTE      |
-|--------------------------------------------------------------------------|---------------|-----------|
-| [RUST_LOG](https://docs.rs/env_logger/latest/env_logger/) > LOG\_\_LEVEL | "INFO"        | Log level |
-| SERVER\_\_URL                                                            |               |           |
-| SERVER\_\_PORT                                                           |               |           |
-| SERVICE_NAME                                                             |               |           |
-| EXPORTER_ENDPOINT                                                        |               |           |
-| DB\_\_PG\_\_URL                                                          | "localhost"   |           |
-| DB\_\_PG\_\_MAX_SIZE                                                     | 5432          |           |
-| REDIS\_\_HOST                                                            | "localhost"   |           |
-| REDIS\_\_PORT                                                            | 6379          |           |
-
-Make sure to set these environment variables according to your needs before running the server.
-
-## GitHub Flow CI Configuration
-
-1. **Set Docker Hub Secrets:**
-
-    - Go to repository Settings > Secrets.
-    - Add `DOCKER_USERNAME` and `DOCKERHUB_TOKEN`.
-
-2. **Enable Dependabot Alerts:**
-
-    - In repository Insights, enable "Dependabot alerts" and "Security & Analysis".
-
-## Checklist
-
-### Basic Functionalities
-
-Ensure comprehension and implementation of concepts outlined in the book with attention to detail. Key considerations
-include:
-
-1. [x] Incorporating descriptive comments to enhance code readability.
-2. [x] Implementing tracing mechanisms for effective debugging.
-3. [x] Writing comprehensive test cases to validate functionality.
-    1. [x] Using https://testcontainers.com for integration tests.
-4. [x] Utilizing version control with [Git](https://git-scm.com/) for code management.
-5. [x] Structuring code in a logical and maintainable manner.
-6. [x] Containerizing the application using [Docker](https://www.docker.com/) for portability and scalability.
-
-### Advanced Functionalities
-
-Demonstrate proficiency in advanced development practices including:
-
-1. [x] CLI Interface.
-    1. [x] Embed Git Info, Config Tool.
-2. [x] Load Configuration from a File.
-3. [x] Multiple Implementations.
-4. [x] Advanced Tracing.
-5. [x] CI/CD.
-    1. [x] Publish binary artifacts in [Github](https://github.com/).
-    2. [x] Push Docker images.
-    3. [x] Build pipeline on amd arch.
-    4. [ ] Build pipeline on arm arch.
-6. [x] Docker Image Optimization.
-7. [x] Load test using [K6](https://k6.io/).
-    1. [x] Use [Flamegraph](https://github.com/flamegraph-rs/flamegraph) for profiling.
-    2. [ ] [Better UI](https://medium.com/swlh/beautiful-load-testing-with-k6-and-docker-compose-4454edb3a2e3).
-8. [ ] Comprehensive DB query filter for list().
-9. [ ] Optimize release binary performance.
-10. [ ] Docs on how to use this repo, the design behind the scene.
-11. [x] Dependabot
-    1. [x] Update Rust.
-    2. [x] Update Docker image.
-
-Feel free to explore and expand upon these functionalities as needed for your project. Happy coding!
-
-## Load Testing and Profiling
-
-For load testing and profiling your Rust API server, refer to
-the [Load Testing and Profiling with K6 and Flamegraph](./load-tests/README.md) guide. This document provides
-detailed instructions on using K6 and Flamegraph for load testing and profiling purposes.
+```
+irelia/
+├── contracts/
+│   └── navori: Naori contracts, currently using layout 6
+└── crates/
+    ├── adapter: /
+    │   └── src:/
+    │       ├── aptos_writer: Call navori contracts
+    │       ├── prover: Handle Stark proof: generate, parse, split, etc.
+    │       ├── repositories: Database operations
+    │       └── worker: Add worker jobs to the database
+    ├── common: Common components for the services: tracing, CLI args, etc.
+    ├── core: Types, traits, errors
+    ├── public: The entry point for receiving requests from Madara Orchestrator
+    └── worker: The worker service for generating and submitting proofs
+```
