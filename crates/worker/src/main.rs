@@ -1,13 +1,18 @@
 mod options;
 
 use std::str::FromStr;
+use std::sync::Arc;
 use std::time::Duration;
 
 use clap::{Parser, Subcommand};
+use deadpool_diesel::postgres::Pool;
+use deadpool_diesel::{Manager, Runtime};
 use graphile_worker::WorkerOptions;
+use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
 use irelia_common::cli_args::CliArgs;
 use irelia_common::kill_signals;
 use irelia_common::loggers::telemetry::init_telemetry;
+use irelia_worker::app_state::State;
 use irelia_worker::job_worker::JobWorker;
 use irelia_worker::router::routes;
 use opentelemetry::global;
@@ -21,7 +26,6 @@ use crate::options::Options;
 #[tokio::main]
 async fn main() {
     let options: Options = CliArgs::default_run_or_get_options(env!("APP_VERSION"));
-
     init_telemetry(
         options.service_name.as_str(),
         options.exporter_endpoint.as_str(),
@@ -79,8 +83,17 @@ pub async fn serve(options: Options) {
 }
 
 pub async fn run_workers(options: Options) {
-    let pg_options = PgConnectOptions::from_str(&options.pg.url).unwrap();
+    info!("Using postgres database: {}", &options.pg.url);
+    let manager = Manager::new(&options.pg.url, Runtime::Tokio1);
+    let pool = Pool::builder(manager)
+        .max_size(options.pg.max_size.try_into().unwrap())
+        .build()
+        .unwrap();
 
+    let job_port = Arc::new(JobDBRepository::new(pool.clone()));
+    let state = State::new(job_port);
+
+    let pg_options = PgConnectOptions::from_str(&options.pg.url).unwrap();
     let pg_pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(options.pg.max_size)
         .connect_with(pg_options)
@@ -90,6 +103,7 @@ pub async fn run_workers(options: Options) {
     let worker = WorkerOptions::default()
         .concurrency(options.worker.concurrent)
         .schema(options.worker.schema.as_str())
+        .add_extension(state)
         .define_job::<JobWorker>()
         .pg_pool(pg_pool)
         .init()

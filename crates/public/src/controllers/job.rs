@@ -1,39 +1,38 @@
-use std::str;
-
-use axum::body::Bytes;
-use axum::extract::State;
-use irelia_core::entities::job::{JobEntity, JobId, JobResponse};
+use axum::extract::{Query, State};
+use serde::Deserialize;
+use serde_json::{json, Value};
 use tracing::instrument;
 use tracing::log::info;
-use uuid::Uuid;
 
 use crate::app_state::AppState;
 use crate::errors::AppError;
 use crate::json_response::JsonResponse;
+use crate::services::job::JobResponse;
+
+#[derive(Debug, Deserialize)]
+pub struct GetStatusParams {
+    pub customer_id: String,
+    pub cairo_job_key: String,
+}
 
 #[instrument(level = "info", skip(app_state))]
-pub async fn add_job(
+pub async fn get_status(
     State(app_state): State<AppState>,
-    body: Bytes,
-) -> Result<JsonResponse<Vec<JobResponse>>, AppError> {
-    // TODO: Process the data
-    let data = str::from_utf8(&body).unwrap();
-    info!("{}", data);
+    Query(params): Query<GetStatusParams>,
+) -> Result<JsonResponse<JobResponse>, AppError> {
+    let res = app_state.job_service.get_job_status(params).await?;
+    Ok(JsonResponse(res))
+}
 
-    let job_entity = app_state
-        .worker_port
-        .add(JobEntity {
-            id: JobId(Uuid::new_v4()),
-            customer_id: "1".to_string(),
-            cairo_job_key: "1".to_string(),
-            offchain_proof: false,
-            proof_layout: "1".to_string(),
-            cairo_pie: "1".to_string(),
-        })
-        .await?;
-
-    Ok(JsonResponse(vec![JobResponse {
-        code: Some("JOB_RECEIVED_SUCCESSFULLY".to_string()),
-        message: Some(job_entity.id.0.to_string()),
-    }]))
+#[instrument(level = "info", skip(_app_state))]
+pub async fn get_proof(
+    State(_app_state): State<AppState>,
+    Query(params): Query<GetStatusParams>,
+) -> Result<JsonResponse<Value>, AppError> {
+    // TODO: process get proof
+    info!("params: {:?}", params);
+    let res = json!({
+        "code" : "NO_OFFCHAIN_PROOF_FOR_JOB"
+    });
+    Ok(JsonResponse(res))
 }

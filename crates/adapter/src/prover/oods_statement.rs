@@ -16,7 +16,6 @@ use serde_json::json;
 use crate::prover::default_prime;
 
 /// Adapted from https://github.com/zksecurity/stark-evm-adapter/blob/main/src/oods_statement.rs
-
 /// Proof for consistency check for out of domain sampling
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FactTopology {

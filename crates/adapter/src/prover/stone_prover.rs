@@ -11,7 +11,7 @@ use irelia_core::entities::sharp_proof::SharpProof;
 use irelia_core::ports::prover::ProverPort;
 use scopeguard::defer;
 use stone_cli::args::Network::ethereum;
-use stone_cli::args::{LayoutName, SerializeArgs, VerifyArgs};
+use stone_cli::args::{LayoutName, SerializeArgs, StoneVersion, VerifyArgs};
 use stone_cli::bootloader::run_bootloader;
 use stone_cli::prover::run_stone_prover_bootloader;
 use stone_cli::serialize::serialize_proof;
@@ -31,7 +31,6 @@ const SERIALIZED_PROOF_PATH: &str = "bootloader_serialized_proof.json";
 
 /// This code is adapted from: https://github.com/zksecurity/stone-cli/blob/main/src/main.rs
 /// Generate proof from cairo pies or cairo programs
-
 pub struct StoneProver {
     pub cairo_pie: Vec<PathBuf>,
     pub layout: LayoutName,
@@ -104,6 +103,7 @@ impl ProverPort for StoneProver {
             proof: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
             annotation_file: Some(proof_tmp_dir.path().join(ANNOTATION_PATH)),
             extra_output_file: Some(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH)),
+            stone_version: StoneVersion::V5,
         };
         run_stone_verifier(verify_args).map_err(|e| VerifierError(e.to_string()))?;
 
@@ -111,9 +111,12 @@ impl ProverPort for StoneProver {
         let serialize_args = SerializeArgs {
             proof: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
             network: ethereum,
-            output: proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH),
+            output: Option::from(proof_tmp_dir.path().join(SERIALIZED_PROOF_PATH)),
+            output_dir: None,
+            layout: None,
             annotation_file: Some(proof_tmp_dir.path().join(ANNOTATION_PATH)),
             extra_output_file: Some(proof_tmp_dir.path().join(EXTRA_OUTPUT_PATH)),
+            serialization_type: None,
         };
         serialize_proof(serialize_args).map_err(|e| SerializationError(e.to_string()))?;
 
@@ -143,6 +146,5 @@ mod tests {
         let layout = LayoutName::starknet;
         let stone_prover = StoneProver { layout, cairo_pie };
         assert!(stone_prover.generate_proof().await.is_ok());
-        // println!("vjp");
     }
 }

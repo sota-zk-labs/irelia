@@ -1,3 +1,5 @@
+use std::fmt::{Debug, Formatter};
+
 use async_trait::async_trait;
 use deadpool_diesel::postgres::Pool;
 use diesel::{
@@ -10,13 +12,12 @@ use irelia_core::ports::job::JobPort;
 
 use crate::repositories::postgres::models::job::JobModel;
 use crate::repositories::postgres::schema::jobs::dsl::jobs;
-use crate::repositories::postgres::schema::jobs::id;
+use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
 
 // NOTE: path relative to Cargo.toml
 pub const MIGRATIONS: EmbeddedMigrations =
     embed_migrations!("./src/repositories/postgres/migrations");
 
-#[derive(Clone)]
 pub struct JobDBRepository {
     pub db: Pool,
 }
@@ -24,6 +25,12 @@ pub struct JobDBRepository {
 impl JobDBRepository {
     pub fn new(db: Pool) -> Self {
         JobDBRepository { db }
+    }
+}
+
+impl Debug for JobDBRepository {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("JobDBRepository").finish()
     }
 }
 
@@ -35,16 +42,15 @@ impl JobPort for JobDBRepository {
             .await
             .unwrap()
             .interact(move |conn| {
-                let job =
+                let job_model =
                     JobModel::try_from(job).map_err(|err| CoreError::InternalError(err.into()))?;
                 let response = insert_into(jobs)
-                    .values(&job)
+                    .values(&job_model)
                     .get_result::<JobModel>(conn)
                     .map_err(|err| match err {
                         diesel::result::Error::NotFound => CoreError::NotFound,
                         _ => CoreError::InternalError(err.into()),
-                    })
-                    .unwrap();
+                    })?;
                 Ok(response.into())
             })
             .await
@@ -57,10 +63,10 @@ impl JobPort for JobDBRepository {
             .await
             .unwrap()
             .interact(move |conn| {
-                let job =
+                let job_model =
                     JobModel::try_from(job).map_err(|err| CoreError::InternalError(err.into()))?;
-                let response = update(jobs.filter(id.eq(job.id)))
-                    .set(&job)
+                let response = update(jobs.filter(id.eq(job_model.id)))
+                    .set(&job_model)
                     .get_result::<JobModel>(conn)
                     .map_err(|err| match err {
                         diesel::result::Error::NotFound => CoreError::NotFound,
@@ -95,16 +101,20 @@ impl JobPort for JobDBRepository {
             .unwrap()
     }
 
-    async fn get(&self, job_id: &JobId) -> Result<JobEntity, CoreError> {
-        let job_id = job_id.0;
+    async fn get_job(
+        &self,
+        customer_id_value: String,
+        cairo_job_key_value: String,
+    ) -> Result<JobEntity, CoreError> {
         self.db
             .get()
             .await
             .unwrap()
             .interact(move |conn| {
                 let response = jobs
+                    .filter(customer_id.eq(customer_id_value))
+                    .filter(cairo_job_key.eq(cairo_job_key_value))
                     .select(JobModel::as_select())
-                    .find(job_id)
                     .first(conn)
                     .map_err(|err| match err {
                         diesel::result::Error::NotFound => CoreError::NotFound,

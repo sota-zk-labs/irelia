@@ -40,17 +40,28 @@ services:
       - redis:/data
     ports:
       - '6379:6379'
-  public_server:
-    image: rust-api-server
+  irelia_public:
+    image: irelia-public-server
     build:
       context: ../..
-      target: public-dev
+      target: irelia-public-server
     ports:
-      - '8888:8888'
+      - '8000:8000'
     volumes:
-      - ./01_public_custom.toml:/user/01_custom.toml:ro
+      - ./01_public_server_custom.toml:/user/01_custom.toml:ro
     depends_on:
       - postgres
+    restart: on-failure:3
+  irelia_worker:
+    image: irelia-worker
+    build:
+      context: ../..
+      target: irelia-worker
+    volumes:
+      - ./01_worker_custom.toml:/user/01_custom.toml:ro
+    depends_on:
+      - postgres
+    restart: on-failure:3
 volumes:
   postgres:
   redis:

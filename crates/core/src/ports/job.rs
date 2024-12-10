@@ -8,5 +8,9 @@ pub trait JobPort {
     async fn add(&self, job: JobEntity) -> Result<JobEntity, CoreError>;
     async fn update(&self, job: JobEntity) -> Result<JobEntity, CoreError>;
     async fn delete(&self, job_id: &JobId) -> Result<(), CoreError>;
-    async fn get(&self, job_id: &JobId) -> Result<JobEntity, CoreError>;
+    async fn get_job(
+        &self,
+        customer_id: String,
+        cairo_job_key: String,
+    ) -> Result<JobEntity, CoreError>;
 }

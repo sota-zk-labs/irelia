@@ -1,13 +1,16 @@
 exporter_endpoint = "http://quickwit:7281"
-service_name = "irelia"
+service_name = "irelia-public"
 
 [server]
-port = 8888
+port = 8000
 url = "0.0.0.0"
 
 [log]
 level = "info"
 
-[db.pg]
+[pg]
 max_size = 10
 url = "postgres://postgres:changeme@postgres:5432/postgres"
+
+[worker]
+schema = "worker_schema"
