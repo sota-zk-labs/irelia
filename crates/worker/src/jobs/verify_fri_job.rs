@@ -8,7 +8,7 @@ use tracing::log::info;
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-use crate::state::State;
+use crate::app_state::State;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct VerifyFriJob(Worker<PayloadVerifyJob>);

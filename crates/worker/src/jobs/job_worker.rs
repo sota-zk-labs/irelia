@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-use crate::state::State;
+use crate::app_state::State;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct JobWorker(Worker<WorkerJobEntity>);

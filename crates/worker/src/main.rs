@@ -14,9 +14,8 @@ use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
 use irelia_common::kill_signals;
 use irelia_common::loggers::telemetry::init_telemetry;
-use irelia_worker::app_state::State;
-use irelia_worker::job_worker::JobWorker;
 use irelia_core::ports::worker::WorkerPort;
+use irelia_worker::app_state::State;
 use irelia_worker::jobs::job_worker::JobWorker;
 use irelia_worker::jobs::merkle_statement_job::MerkleStatementJob;
 use irelia_worker::jobs::register_continuous_page_job::RegisterContinuousJob;
@@ -103,7 +102,7 @@ pub async fn run_workers(options: Options) {
     let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
         WorkerAdapter::new(
             &options.pg.url,
-            options.pg.max_size as u32,
+            options.pg.max_size,
             options.worker.schema.clone(),
         )
         .await,

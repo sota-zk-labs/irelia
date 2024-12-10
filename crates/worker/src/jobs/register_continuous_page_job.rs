@@ -1,4 +1,3 @@
-use crate::state::State;
 use graphile_worker::{IntoTaskHandlerResult, TaskHandler, WorkerContext};
 use irelia_adapter::aptos_writer::contracts_caller::memory_page_fact_registry::extract_register_memory::extract_register_continuous_page;
 use irelia_adapter::aptos_writer::contracts_caller::memory_page_fact_registry::register_continuous_memory_page::register_continuous_memory_page;
@@ -8,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use tracing::log::info;
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
+use crate::app_state::State;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct RegisterContinuousJob(Worker<PayloadVerifyJob>);

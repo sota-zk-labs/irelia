@@ -58,8 +58,8 @@ tracing = { version = "0.1.40" }
 tracing-bunyan-formatter = { version = "0.3.9" }
 tracing-opentelemetry = { version = "0.27.0" }
 tracing-subscriber = { version = "0.3.18" }
-zip = { version = "0.6.6" }
 uuid = { version = "1.10.0", features = ["v4"] }
+zip = { version = "0.6.6" }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

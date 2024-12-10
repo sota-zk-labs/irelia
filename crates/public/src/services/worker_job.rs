@@ -38,7 +38,6 @@ impl WorkerJobService {
 
     pub async fn add_worker_job(
         &self,
-        job_service: Arc<JobService>,
         params: WorkerJob,
         cairo_pie_req: String,
     ) -> Result<WorkerJobResponse, AppError> {
@@ -52,7 +51,7 @@ impl WorkerJobService {
         }
 
         let cairo_pie = save_cairo_pie(&cairo_pie_req, params.cairo_job_key.as_ref().unwrap())
-            .map_err(|e| Unknown(e))?
+            .map_err(Unknown)?
             .to_string_lossy()
             .to_string();
         let _ = self
@@ -61,7 +60,7 @@ impl WorkerJobService {
                 id: WorkerJobId(Uuid::new_v4()),
                 customer_id: params.customer_id.clone(),
                 cairo_job_key: params.cairo_job_key.clone().unwrap(),
-                offchain_proof: params.offchain_proof.clone(),
+                offchain_proof: params.offchain_proof,
                 proof_layout: params.proof_layout.clone(),
                 cairo_pie,
             })

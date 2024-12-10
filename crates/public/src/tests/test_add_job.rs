@@ -110,7 +110,7 @@ async fn test_successfully(client: Client, base_url: String, cairo_pie: String) 
     let url =
         format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
-        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small"
+        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "starknet"
     );
 
     let correct_body = cairo_pie.to_string();
