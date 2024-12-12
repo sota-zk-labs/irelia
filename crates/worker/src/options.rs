@@ -18,6 +18,8 @@ pub struct Options {
     pub exporter_endpoint: String,
     /// The name of the service.
     pub service_name: String,
+    /// The config for the verifier onchain
+    pub verifier: Verifier,
     /// Configuration for logging, including log level.
     #[serde(default = "default_log")]
     pub log: Log,
@@ -45,4 +47,16 @@ pub struct Worker {
 pub struct DBConfig {
     pub url: String,
     pub max_size: u32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Verifier {
+    /// The URL of the Aptos node.
+    pub aptos_node_url: String,
+    /// The private key of the Aptos account.
+    pub aptos_private_key: String,
+    /// The chain ID of the Aptos network.
+    pub aptos_chain_id: String,
+    /// The address of the Aptos verifier contract.
+    pub aptos_verifier_contract_address: String,
 }

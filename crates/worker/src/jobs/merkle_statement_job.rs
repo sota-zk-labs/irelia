@@ -2,9 +2,10 @@ use graphile_worker::{IntoTaskHandlerResult, TaskHandler, WorkerContext};
 use irelia_adapter::aptos_writer::contracts_caller::verify_merkle::extract_verify_merkle_input::extract_verify_merkle_input;
 use irelia_adapter::aptos_writer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
 use irelia_common::workers::{Worker, MERKLE_STATEMENT_VERIFIER_IDENTIFIER};
+use irelia_core::common::core_error::CoreError;
 use irelia_core::entities::payload_verify_job::PayloadVerifyJob;
 use serde::{Deserialize, Serialize};
-use tracing::{info, Span};
+use tracing::{debug, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::app_state::State;
@@ -24,20 +25,16 @@ impl TaskHandler for MerkleStatementJob {
 
         let state = ctx.extensions().get::<State>().unwrap();
         let verify_merkle_inputs =
-            extract_verify_merkle_input(&self.0.data.sharp_proof.merkle_proofs.clone()).unwrap();
-        info!("VERIFY MERKLE STATEMENT IN PROGRESS");
+            extract_verify_merkle_input(&self.0.data.sharp_proof.merkle_proofs)?;
         for merkle_verify_input in verify_merkle_inputs {
-            info!(
+            debug!(
                 "Verify merkle proof with expected root: {:?}",
                 merkle_verify_input.expected_root
             );
-            verify_merkle(&state.app_config, merkle_verify_input)
-                .await
-                .unwrap();
+            verify_merkle(&state.app_config, merkle_verify_input).await?;
         }
 
-        info!("VERIFY MERKLE STATEMENT SUCCESS");
-
-        state.worker_port.verify_fri(self.0.data).await.unwrap();
+        state.worker_port.verify_fri(self.0.data).await?;
+        Ok::<(), CoreError>(())
     }
 }

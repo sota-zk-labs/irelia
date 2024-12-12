@@ -3,7 +3,7 @@ mod tests {
     use std::collections::HashMap;
     use std::fs;
 
-    use crate::aptos_writer::config::{AppConfig, EnvConfig};
+    use crate::aptos_writer::config::{AppConfig, Config};
     use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::{
         VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
     };
@@ -33,7 +33,7 @@ mod tests {
                 let sender_account_private_key = accounts.get(1).unwrap();
                 let module_address = module_account.address().to_string();
 
-                let config = AppConfig::from(EnvConfig {
+                let config = AppConfig::from(Config {
                     node_url,
                     private_key: sender_account_private_key.to_string(),
                     chain_id: aptos_container.get_chain_id().to_string(),
@@ -141,7 +141,7 @@ mod tests {
 
                 let module_address = module_account.address().to_string();
 
-                let config = AppConfig::from(EnvConfig {
+                let config = AppConfig::from(Config {
                     node_url,
                     private_key: sender_account_private_key.to_string(),
                     aptos_verifier_address: module_address.clone(),

@@ -79,7 +79,7 @@ impl ProverPort for StoneProver {
         let proof_args = stone_cli::args::ProveBootloaderArgs {
             cairo_programs: None,
             cairo_pies: Some(self.cairo_pie.clone()),
-            layout: layout.clone(),
+            layout,
             prover_config_file: Default::default(),
             parameter_file,
             output: proof_tmp_dir.path().join(BOOTLOADER_PROOF_NAME),
