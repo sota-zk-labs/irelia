@@ -7,13 +7,13 @@ members = [
   "crates/core",
   "crates/public",
   "crates/worker",
+  "e2e-tests",
 ]
 
 [workspace.dependencies]
 irelia_adapter = { path = "crates/adapter" }
 irelia_common = { path = "crates/common" }
 irelia_core = { path = "crates/core" }
-
 
 anyhow = { version = "1.0.87" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
@@ -37,11 +37,12 @@ opentelemetry = { version = "0.26.0" }
 opentelemetry-otlp = { version = "0.26.0" }
 opentelemetry-semantic-conventions = { version = "0.26.0" }
 opentelemetry_sdk = { version = "0.26.0" }
+rand = { version = "0.8.5" }
 rand_core = { version = "0.5.1" }
 readonly = { version = "0.2.12" }
 redis-async = { version = "0.17.2" }
 regex = { version = "1.11.0" }
-reqwest = { version = "0.12.9" }
+reqwest = { version = "0.12.9", features = ["json"] }
 scopeguard = { version = "1.2.0" }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = { version = "1.0.128" }
@@ -49,10 +50,10 @@ sqlx = { version = "*" }
 stone-cli = { git = "https://github.com/zksecurity/stone-cli.git", branch = "main" }
 tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
+testcontainers-modules = { version = "0.11.4" }
 thiserror = { version = "1.0.64" }
-tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.39.3", features = ["full"] }
 tokio-postgres = { version = "0.7.12" }
-toml = { version = "0.8.19" }
 tower-http = { version = "0.6.1" }
 tracing = { version = "0.1.40" }
 tracing-bunyan-formatter = { version = "0.3.9" }
