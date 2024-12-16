@@ -43,7 +43,7 @@ impl Program {
     ) -> Self {
         let repository_root = &get_repository_root();
         std::env::set_current_dir(repository_root).expect("Failed to set current directory");
-        let url = "0.0.0.0".to_string();
+        let url = "127.0.0.1".to_string();
         let port_str = format!("{}", port);
 
         let envs = [
