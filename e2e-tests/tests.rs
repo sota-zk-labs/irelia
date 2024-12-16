@@ -2,15 +2,14 @@ use e2e_tests::postgres::Postgres;
 use e2e_tests::program::Program;
 use log::info;
 use testcontainers_modules::testcontainers::runners::AsyncRunner;
+use testcontainers_modules::testcontainers::ContainerAsync;
 
-#[allow(dead_code)]
 /// Initial setup for e2e tests
 struct Setup {
+    #[allow(dead_code)]
     pub postgres_instance: ContainerAsync<Postgres>,
     pub envs: Vec<(String, String)>,
 }
-
-use testcontainers_modules::testcontainers::ContainerAsync;
 
 impl Setup {
     /// Initialise a new setup
@@ -54,9 +53,37 @@ mod tests {
     #[test(tokio::test)]
     async fn test_full_flow() {
         let setup_config = Setup::new().await;
+        // setup irelia worker
+        let mut worker_envs = setup_config.envs.clone();
+        worker_envs.append(&mut vec![
+            ("SERVICE_NAME".to_string(), "irelia-worker".to_string()),
+            ("WORKER__CONCURRENT".to_string(), "4".to_string()),
+            (
+                "EXPORTER_ENDPOINT".to_string(),
+                "127.0.0.1:7281".to_string(),
+            ),
+            (
+                "VERIFIER__APTOS_NODE_URL".to_string(),
+                "https://fullnode.testnet.aptoslabs.com".to_string(),
+            ),
+            (
+                "VERIFIER__APTOS_PRIVATE_KEY".to_string(),
+                "0x3d31ef06ed8003c3a85125b6e6287967a7b80a3e4367ccf2649e7acd574e4261".to_string(),
+            ),
+            (
+                "VERIFIER__APTOS_CHAIN_ID".to_string(),
+                "testnet".to_string(),
+            ),
+            (
+                "VERIFIER__APTOS_VERIFIER_CONTRACT_ADDRESS".to_string(),
+                "852578629621677c02f4b9679622f25cac00b4fe17d1fd8b197ba52a2627ee3b".to_string(),
+            ),
+        ]);
+        let mut worker = Program::run("WORKER".to_string(), "irelia_worker", worker_envs);
+        worker.wait_till_started().await;
 
         // setup irelia server
-        let mut server_envs = setup_config.envs.clone();
+        let mut server_envs = setup_config.envs;
         server_envs.append(&mut vec![
             ("SERVICE_NAME".to_string(), "irelia-server".to_string()),
             (
@@ -71,23 +98,6 @@ mod tests {
         let mut server = Program::run("SERVER".to_string(), "irelia", server_envs.clone());
         server.wait_till_started().await;
         let server_endpoint = format!("http://{}:{}", server.url, server.port);
-
-        // setup irelia worker
-        let mut worker_envs = setup_config.envs;
-        worker_envs.append(&mut vec![
-            ("SERVICE_NAME".to_string(), "irelia-worker".to_string()),
-            ("WORKER__CONCURRENT".to_string(), "4".to_string()),
-            (
-                "EXPORTER_ENDPOINT".to_string(),
-                "127.0.0.1:7281".to_string(),
-            ),
-            ("VERIFIER__APTOS_NODE_URL".to_string(), "https://fullnode.testnet.aptoslabs.com".to_string()),
-            ("VERIFIER__APTOS_PRIVATE_KEY".to_string(), "0x3d31ef06ed8003c3a85125b6e6287967a7b80a3e4367ccf2649e7acd574e4261".to_string()),
-            ("VERIFIER__APTOS_CHAIN_ID".to_string(), "testnet".to_string()),
-            ("VERIFIER__APTOS_VERIFIER_CONTRACT_ADDRESS".to_string(), "852578629621677c02f4b9679622f25cac00b4fe17d1fd8b197ba52a2627ee3b".to_string()),
-        ]);
-        let mut worker = Program::run("WORKER".to_string(), "irelia_worker", worker_envs);
-        worker.wait_till_started().await;
 
         let client = Client::new();
         // test add job
