@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use graphile_worker::{IntoTaskHandlerResult, TaskHandler, WorkerContext};
 use irelia_adapter::prover::stone_prover::StoneProver;
 use irelia_common::workers::{Worker, ADD_JOB_WORKER_IDENTIFIER};
+use irelia_core::common::core_error::CoreError;
 use irelia_core::entities::payload_verify_job::PayloadVerifyJob;
 use irelia_core::entities::worker_job::WorkerJobEntity;
 use irelia_core::ports::prover::ProverPort;
@@ -28,11 +29,10 @@ impl TaskHandler for JobWorker {
 
         let state = ctx.extensions().get::<State>().unwrap();
 
-        let job = state
+        let mut job = state
             .job_port
             .get_job(self.0.data.customer_id, self.0.data.cairo_job_key)
-            .await
-            .unwrap();
+            .await?;
 
         let stone_prover = StoneProver {
             layout: self.0.data.proof_layout,
@@ -40,10 +40,14 @@ impl TaskHandler for JobWorker {
         };
         let proof = stone_prover.generate_proof().await.unwrap();
         let payload = PayloadVerifyJob {
-            job,
+            job: job.clone(),
             sharp_proof: proof,
         };
 
-        state.worker_port.verify_merkle(payload).await.unwrap();
+        job.validation_done = true;
+        state.job_port.update(job).await?;
+
+        state.worker_port.verify_merkle(payload).await?;
+        Ok::<(), CoreError>(())
     }
 }

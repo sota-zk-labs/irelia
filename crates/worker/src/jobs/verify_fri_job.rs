@@ -2,10 +2,10 @@ use graphile_worker::{IntoTaskHandlerResult, TaskHandler, WorkerContext};
 use irelia_adapter::aptos_writer::contracts_caller::verify_fri::extract_verify_fri_input::extract_verify_fri_input;
 use irelia_adapter::aptos_writer::contracts_caller::verify_fri::verify_fri::verify_fri;
 use irelia_common::workers::{Worker, VERIFY_FRI_IDENTIFIER};
+use irelia_core::common::core_error::CoreError;
 use irelia_core::entities::payload_verify_job::PayloadVerifyJob;
 use serde::{Deserialize, Serialize};
-use tracing::log::info;
-use tracing::Span;
+use tracing::{debug, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::app_state::State;
@@ -22,10 +22,8 @@ impl TaskHandler for VerifyFriJob {
         });
 
         span.set_parent(parent_cx);
-        let fri_verify_inputs =
-            extract_verify_fri_input(&self.0.data.sharp_proof.fri_proofs.clone()).unwrap();
+        let fri_verify_inputs = extract_verify_fri_input(&self.0.data.sharp_proof.fri_proofs)?;
 
-        info!("VERIFY FRI IN PROGRESS");
         let state = ctx.extensions().get::<State>().unwrap();
 
         for fri_verify_input in fri_verify_inputs {
@@ -46,15 +44,11 @@ impl TaskHandler for VerifyFriJob {
                 fri_step_size,
                 expected_root.clone(),
             )
-            .await
-            .unwrap();
-            info!("Verify FRI success with expected root {:?}", expected_root);
+            .await?;
+            debug!("Verify FRI success with expected root {:?}", expected_root);
         }
 
-        state
-            .worker_port
-            .register_memory_page(self.0.data)
-            .await
-            .unwrap();
+        state.worker_port.register_memory_page(self.0.data).await?;
+        Ok::<(), CoreError>(())
     }
 }

@@ -12,3 +12,4 @@ pub trait WorkerPort {
     async fn register_memory_page(&self, job: PayloadVerifyJob) -> Result<(), CoreError>;
     async fn verify_proof_and_register(&self, job: PayloadVerifyJob) -> Result<(), CoreError>;
 }
+    

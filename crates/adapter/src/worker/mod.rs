@@ -51,7 +51,7 @@ impl WorkerPort for WorkerAdapter {
         self.worker_utils
             .add_raw_job(ADD_JOB_WORKER_IDENTIFIER, payload, Default::default())
             .await
-            .unwrap();
+            .map_err(|err| CoreError::InternalError(err.into()))?;
         Ok(job)
     }
 
@@ -76,7 +76,7 @@ impl WorkerPort for WorkerAdapter {
                 Default::default(),
             )
             .await
-            .unwrap();
+            .map_err(|err| CoreError::InternalError(err.into()))?;
         Ok(())
     }
 
@@ -97,7 +97,7 @@ impl WorkerPort for WorkerAdapter {
         self.worker_utils
             .add_raw_job(VERIFY_FRI_IDENTIFIER, payload, Default::default())
             .await
-            .unwrap();
+            .map_err(|err| CoreError::InternalError(err.into()))?;
         Ok(())
     }
 
@@ -118,7 +118,7 @@ impl WorkerPort for WorkerAdapter {
         self.worker_utils
             .add_raw_job(REGISTER_CONTINUOUS_IDENTIFIER, payload, Default::default())
             .await
-            .unwrap();
+            .map_err(|err| CoreError::InternalError(err.into()))?;
         Ok(())
     }
 
@@ -143,7 +143,7 @@ impl WorkerPort for WorkerAdapter {
                 Default::default(),
             )
             .await
-            .unwrap();
+            .map_err(|err| CoreError::InternalError(err.into()))?;
         Ok(())
     }
 }

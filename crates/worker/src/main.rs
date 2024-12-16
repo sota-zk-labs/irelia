@@ -8,7 +8,7 @@ use clap::{Parser, Subcommand};
 use deadpool_diesel::postgres::Pool;
 use deadpool_diesel::{Manager, Runtime};
 use graphile_worker::WorkerOptions;
-use irelia_adapter::aptos_writer::config::{AppConfig, EnvConfig};
+use irelia_adapter::aptos_writer::config::{AppConfig, Config};
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
 use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
@@ -99,16 +99,12 @@ pub async fn run_workers(options: Options) {
 
     let job_port = Arc::new(JobDBRepository::new(pool.clone()));
 
-    let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
-        WorkerAdapter::new(
-            &options.pg.url,
-            options.pg.max_size,
-            options.worker.schema.clone(),
-        )
-        .await,
-    );
-
-    let app_config = AppConfig::from(EnvConfig::new());
+    let app_config = AppConfig::from(Config {
+        node_url: options.verifier.aptos_node_url.clone(),
+        private_key: options.verifier.aptos_private_key.clone(),
+        chain_id: options.verifier.aptos_chain_id.clone(),
+        aptos_verifier_address: options.verifier.aptos_verifier_contract_address.clone(),
+    });
 
     let sequence_number = app_config
         .client
@@ -118,6 +114,16 @@ pub async fn run_workers(options: Options) {
         .into_inner()
         .sequence_number;
     app_config.account.set_sequence_number(sequence_number);
+
+    let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
+        WorkerAdapter::new(
+            &options.pg.url,
+            options.pg.max_size,
+            options.worker.schema.clone(),
+        )
+        .await,
+    );
+
     let state = State::new(job_port, worker_adapter, app_config);
 
     let pg_options = PgConnectOptions::from_str(&options.pg.url).unwrap();
