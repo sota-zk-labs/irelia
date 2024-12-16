@@ -6,4 +6,5 @@ pub mod merkle_verifier;
 pub mod register_fact_fri;
 pub mod sample_verify_fri_input;
 pub mod types;
+#[allow(clippy::module_inception)]
 pub mod verify_fri;

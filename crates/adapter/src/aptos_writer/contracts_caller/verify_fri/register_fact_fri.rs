@@ -15,7 +15,7 @@ pub async fn register_fact_fri(
 ) -> anyhow::Result<bool> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
-            config.module_address,
+            config.verifier_address,
             Identifier::new("fri_statement_contract")?,
         ),
         Identifier::new("register_fact_verify_fri")?,

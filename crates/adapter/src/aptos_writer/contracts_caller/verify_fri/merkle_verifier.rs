@@ -16,7 +16,7 @@ pub async fn merkle_verifier(config: &AppConfig, data: &VerifyMerkle) -> anyhow:
         MoveValue::U64(data.n_queries),
     ]);
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
-        ModuleId::new(config.module_address, Identifier::new("merkle_verifier")?),
+        ModuleId::new(config.verifier_address, Identifier::new("merkle_verifier")?),
         Identifier::new("verify_merkle")?,
         vec![],
         params,

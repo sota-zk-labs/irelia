@@ -8,12 +8,19 @@ use clap::{Parser, Subcommand};
 use deadpool_diesel::postgres::Pool;
 use deadpool_diesel::{Manager, Runtime};
 use graphile_worker::WorkerOptions;
+use irelia_adapter::aptos_writer::config::{AppConfig, Config};
 use irelia_adapter::repositories::postgres::job_db::JobDBRepository;
+use irelia_adapter::worker::WorkerAdapter;
 use irelia_common::cli_args::CliArgs;
 use irelia_common::kill_signals;
 use irelia_common::loggers::telemetry::init_telemetry;
+use irelia_core::ports::worker::WorkerPort;
 use irelia_worker::app_state::State;
-use irelia_worker::job_worker::JobWorker;
+use irelia_worker::jobs::job_worker::JobWorker;
+use irelia_worker::jobs::merkle_statement_job::MerkleStatementJob;
+use irelia_worker::jobs::register_continuous_page_job::RegisterContinuousJob;
+use irelia_worker::jobs::verify_fri_job::VerifyFriJob;
+use irelia_worker::jobs::verify_proof_and_register_job::VerifyAndRegisterJob;
 use irelia_worker::router::routes;
 use opentelemetry::global;
 use sqlx::postgres::PgConnectOptions;
@@ -91,7 +98,33 @@ pub async fn run_workers(options: Options) {
         .unwrap();
 
     let job_port = Arc::new(JobDBRepository::new(pool.clone()));
-    let state = State::new(job_port);
+
+    let app_config = AppConfig::from(Config {
+        node_url: options.verifier.aptos_node_url.clone(),
+        private_key: options.verifier.aptos_private_key.clone(),
+        chain_id: options.verifier.aptos_chain_id.clone(),
+        aptos_verifier_address: options.verifier.aptos_verifier_contract_address.clone(),
+    });
+
+    let sequence_number = app_config
+        .client
+        .get_account(app_config.account.address())
+        .await
+        .unwrap()
+        .into_inner()
+        .sequence_number;
+    app_config.account.set_sequence_number(sequence_number);
+
+    let worker_adapter: Arc<dyn WorkerPort + Send + Sync> = Arc::new(
+        WorkerAdapter::new(
+            &options.pg.url,
+            options.pg.max_size,
+            options.worker.schema.clone(),
+        )
+        .await,
+    );
+
+    let state = State::new(job_port, worker_adapter, app_config);
 
     let pg_options = PgConnectOptions::from_str(&options.pg.url).unwrap();
     let pg_pool = sqlx::postgres::PgPoolOptions::new()
@@ -105,6 +138,10 @@ pub async fn run_workers(options: Options) {
         .schema(options.worker.schema.as_str())
         .add_extension(state)
         .define_job::<JobWorker>()
+        .define_job::<MerkleStatementJob>()
+        .define_job::<VerifyFriJob>()
+        .define_job::<RegisterContinuousJob>()
+        .define_job::<VerifyAndRegisterJob>()
         .pg_pool(pg_pool)
         .init()
         .await

@@ -3,9 +3,7 @@ mod tests {
     use std::collections::HashMap;
     use std::fs;
 
-    use aptos_sdk::types::LocalAccount;
-    use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
-    use crate::aptos_writer::config::{AppConfig, EnvConfig};
+    use crate::aptos_writer::config::{AppConfig, Config};
     use crate::aptos_writer::contracts_caller::gps::types::verify_proof_and_register::{
         VerifyProofAndRegisterData, VerifyProofAndRegisterDataJson,
     };
@@ -16,6 +14,8 @@ mod tests {
     use crate::aptos_writer::contracts_caller::verify_fri::verify_fri::verify_fri;
     use crate::aptos_writer::contracts_caller::verify_merkle::sample_verify_merkle_input::sample_verify_merkle_input;
     use crate::aptos_writer::contracts_caller::verify_merkle::verify_merkle::verify_merkle;
+    use aptos_sdk::types::LocalAccount;
+    use aptos_testcontainer::test_utils::aptos_container_test_utils::{lazy_aptos_container, run};
     use log::info;
     use test_log::test;
     use tokio::time::Instant;
@@ -33,11 +33,11 @@ mod tests {
                 let sender_account_private_key = accounts.get(1).unwrap();
                 let module_address = module_account.address().to_string();
 
-                let config = AppConfig::from(EnvConfig {
+                let config = AppConfig::from(Config {
                     node_url,
                     private_key: sender_account_private_key.to_string(),
-                    module_address: module_address.clone(),
                     chain_id: aptos_container.get_chain_id().to_string(),
+                    aptos_verifier_address: "".to_string(),
                 });
 
                 let mut named_addresses = HashMap::new();
@@ -49,7 +49,7 @@ mod tests {
                 let now = Instant::now();
                 aptos_container
                     .upload_contract(
-                        "../contracts/navori",
+                        "../contracts",
                         module_account_private_key,
                         &named_addresses,
                         Some(vec!["libs", "cpu-2", "cpu", "verifier"]),
@@ -80,17 +80,8 @@ mod tests {
                 config.account.set_sequence_number(sequence_number);
 
                 for i in 1..=3 {
-                    let (merkle_view, initial_merkle_queue, height, expected_root) =
-                        sample_verify_merkle_input(i).unwrap();
-                    verify_merkle(
-                        &config,
-                        merkle_view,
-                        initial_merkle_queue,
-                        height,
-                        expected_root,
-                    )
-                    .await
-                    .unwrap();
+                    let merkle_input = sample_verify_merkle_input(i).unwrap();
+                    verify_merkle(&config, merkle_input).await.unwrap();
                     info!("Verify Merkle {} success", i);
                 }
 
@@ -150,10 +141,10 @@ mod tests {
 
                 let module_address = module_account.address().to_string();
 
-                let config = AppConfig::from(EnvConfig {
+                let config = AppConfig::from(Config {
                     node_url,
                     private_key: sender_account_private_key.to_string(),
-                    module_address: module_address.clone(),
+                    aptos_verifier_address: module_address.clone(),
                     chain_id: aptos_container.get_chain_id().to_string(),
                 });
 

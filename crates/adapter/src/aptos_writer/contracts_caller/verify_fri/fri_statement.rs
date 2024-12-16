@@ -21,7 +21,7 @@ pub async fn fri_statement(
 ) -> anyhow::Result<(InitFriGroup, ComputeNextLayer, RegisterFactVerifyFri)> {
     let payload = TransactionPayload::EntryFunction(EntryFunction::new(
         ModuleId::new(
-            config.module_address,
+            config.verifier_address,
             Identifier::new("fri_statement_contract")?,
         ),
         Identifier::new("verify_fri")?,
@@ -39,7 +39,7 @@ pub async fn fri_statement(
 
     let event_type = MoveType::from_str(&format!(
         "{}::fri_statement_contract::FriCtx",
-        config.module_address
+        config.verifier_address
     ))?;
     let fri_ctx_data: InitFriGroup = get_event_from_transaction(&transaction, event_type)?
         .clone()
@@ -47,7 +47,7 @@ pub async fn fri_statement(
 
     let compute_next_layer_event_type = MoveType::from_str(&format!(
         "{}::fri_statement_contract::ComputeNextLayer",
-        config.module_address
+        config.verifier_address
     ))?;
     let compute_next_layer_data: ComputeNextLayer =
         get_event_from_transaction(&transaction, compute_next_layer_event_type)?
@@ -56,7 +56,7 @@ pub async fn fri_statement(
 
     let register_fact_event_type = MoveType::from_str(&format!(
         "{}::fri_statement_contract::RegisterFactVerifyFri",
-        config.module_address
+        config.verifier_address
     ))?;
     let register_fact_data: RegisterFactVerifyFri =
         get_event_from_transaction(&transaction, register_fact_event_type)?

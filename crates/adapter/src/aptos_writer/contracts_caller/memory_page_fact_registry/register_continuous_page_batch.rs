@@ -75,7 +75,7 @@ pub async fn register_continuous_page_batch(
         let (chunk_start_addr, chunk_values): (Vec<_>, Vec<_>) = chunk.into_iter().unzip();
         let payload = TransactionPayload::EntryFunction(EntryFunction::new(
             ModuleId::new(
-                config.module_address,
+                config.verifier_address,
                 Identifier::new("memory_page_fact_registry").unwrap(),
             ),
             Identifier::new("register_continuous_page_batch").unwrap(),

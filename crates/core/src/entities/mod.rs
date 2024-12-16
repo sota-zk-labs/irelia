@@ -4,5 +4,6 @@ pub mod gps_statement;
 pub mod job;
 pub mod memory_statement;
 pub mod merkle_statement;
+pub mod payload_verify_job;
 pub mod sharp_proof;
 pub mod worker_job;

@@ -15,6 +15,7 @@ use crate::repositories::postgres::schema::jobs::dsl::jobs;
 use crate::repositories::postgres::schema::jobs::{cairo_job_key, customer_id, id};
 
 // NOTE: path relative to Cargo.toml
+
 pub const MIGRATIONS: EmbeddedMigrations =
     embed_migrations!("./src/repositories/postgres/migrations");
 

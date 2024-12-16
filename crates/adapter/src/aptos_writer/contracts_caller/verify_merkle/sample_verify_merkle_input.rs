@@ -4,12 +4,11 @@ use std::str::FromStr;
 
 use aptos_sdk::move_types::u256::U256;
 use aptos_sdk::move_types::value::MoveValue;
+use irelia_core::entities::merkle_statement::VerifyMerkleTransactionInput;
 
 use crate::aptos_writer::contracts_caller::verify_merkle::types::verify_merkle_input::MerkleVerifyInput;
 
-pub fn sample_verify_merkle_input(
-    index: isize,
-) -> anyhow::Result<(MoveValue, MoveValue, MoveValue, MoveValue)> {
+pub fn sample_verify_merkle_input(index: isize) -> anyhow::Result<VerifyMerkleTransactionInput> {
     let file_path = format!(
         "./src/test_samples/test_samples/merkle_verify/merkle_verify_{}.json",
         index
@@ -37,5 +36,10 @@ pub fn sample_verify_merkle_input(
     let height = MoveValue::U64(u64::from_str(&merkle_verify_input.height.clone())?);
     let expected_root =
         MoveValue::U256(U256::from_str(&merkle_verify_input.expected_root.clone())?);
-    Ok((merkle_view, initial_merkle_queue, height, expected_root))
+    Ok(VerifyMerkleTransactionInput {
+        merkle_view,
+        initial_merkle_queue,
+        height,
+        expected_root,
+    })
 }

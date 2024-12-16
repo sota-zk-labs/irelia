@@ -27,9 +27,6 @@ async fn test_add_job() {
     test_incorrect_layout(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_incorrect_layout completed");
 
-    test_additional_bad_flag(client.clone(), base_url.clone(), cairo_pie.clone()).await;
-    println!("✅ test_additional_bad_flag completed");
-
     test_no_cairo_job_id(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_no_cairo_job_id completed");
 
@@ -38,6 +35,27 @@ async fn test_add_job() {
 
     test_successfully(client.clone(), base_url.clone(), cairo_pie.clone()).await;
     println!("✅ test_successfully completed");
+}
+
+#[tokio::test]
+async fn test_additional_bad_flag() {
+    let client = Client::new();
+
+    let config_content =
+        fs::read_to_string("./config/00-default.toml").expect("Failed to read config file");
+
+    let options: Options = toml::from_str(&config_content).expect("Failed to parse config file");
+
+    let base_url = format!(
+        "http://{}:{}",
+        options.server.url.as_str(),
+        options.server.port
+    );
+
+    let cairo_pie = fs::read_to_string("./src/assets/test_data/encoded_cairo_pie.txt").unwrap();
+
+    additional_bad_flag(client.clone(), base_url.clone(), cairo_pie.clone()).await;
+    println!("✅ test_additional_bad_flag completed");
 }
 
 async fn test_incorrect_layout(client: Client, base_url: String, cairo_pie: String) {
@@ -57,10 +75,10 @@ async fn test_incorrect_layout(client: Client, base_url: String, cairo_pie: Stri
     assert_eq!(res, expected, "Response did not match expected value");
 }
 
-async fn test_additional_bad_flag(client: Client, base_url: String, cairo_pie: String) {
+async fn additional_bad_flag(client: Client, base_url: String, cairo_pie: String) {
     let url = format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}&bla={}",
-        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small", true
+        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "starknet", true
     );
     let correct_body = cairo_pie.to_string();
     let expected = json!(
@@ -110,7 +128,7 @@ async fn test_successfully(client: Client, base_url: String, cairo_pie: String) 
     let url =
         format!(
         "{}/v1/gateway/add_job?customer_id={}&cairo_job_key={}&offchain_proof={}&proof_layout={}",
-        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "small"
+        base_url, Uuid::new_v4(), Uuid::new_v4(), true, "starknet"
     );
 
     let correct_body = cairo_pie.to_string();

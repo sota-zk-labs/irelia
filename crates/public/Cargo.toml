@@ -14,11 +14,6 @@ axum = { workspace = true, features = ["macros"] }
 base64 = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
-diesel = { workspace = true, features = [
-  "postgres",
-  "postgres_backend",
-  "uuid",
-] }
 diesel_migrations = { workspace = true }
 opentelemetry = { workspace = true }
 readonly = { workspace = true }
