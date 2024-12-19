@@ -1,0 +1,28 @@
+[package]
+build = "build.rs"
+edition = "2021"
+name = "irelia"
+version = "0.0.1"
+
+[dependencies]
+irelia_adapter = { workspace = true }
+irelia_common = { workspace = true }
+irelia_core = { workspace = true }
+
+anyhow = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
+base64 = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
+diesel_migrations = { workspace = true }
+opentelemetry = { workspace = true }
+readonly = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+stone-cli = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tower-http = { workspace = true, features = ["timeout", "trace"] }
+tracing = { workspace = true }
+uuid = { workspace = true }
+zip = { workspace = true }

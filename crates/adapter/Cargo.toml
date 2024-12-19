@@ -1,0 +1,47 @@
+[package]
+edition = "2021"
+name = "irelia_adapter"
+version = "0.0.1"
+
+[dependencies]
+irelia_common = { workspace = true }
+irelia_core = { workspace = true }
+
+anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
+aptos-testcontainer = { workspace = true }
+async-trait = { workspace = true }
+deadpool-diesel = { workspace = true, features = ["postgres", "serde"] }
+diesel = { workspace = true, features = [
+  "postgres",
+  "postgres_backend",
+  "uuid",
+] }
+diesel_migrations = { workspace = true }
+dotenv = { workspace = true }
+ethers = { workspace = true }
+graphile_worker = { workspace = true }
+log = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
+opentelemetry = { workspace = true }
+rand_core = { workspace = true }
+redis-async = { workspace = true }
+regex = { workspace = true }
+scopeguard = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+sqlx = { workspace = true, features = [
+  "chrono",
+  "postgres",
+  "json",
+  "macros",
+  "runtime-tokio",
+] }
+stone-cli = { workspace = true }
+tempfile = { workspace = true }
+test-log = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-opentelemetry = { workspace = true }
+uuid = { workspace = true }

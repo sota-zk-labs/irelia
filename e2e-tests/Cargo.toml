@@ -1,0 +1,21 @@
+[package]
+name = "e2e-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = { workspace = true }
+rand = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+testcontainers-modules = { workspace = true }
+tokio = { workspace = true }
+tokio-postgres = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+test-log = { workspace = true }
+
+[[test]]
+name = "flow_test"
+path = "tests.rs"

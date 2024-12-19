@@ -1,30 +1,66 @@
-[package]
-name = "verifier-onchain-services"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
 
-[dependencies]
-anyhow = { version = "1.0.71" }
+members = [
+  "crates/adapter",
+  "crates/common",
+  "crates/core",
+  "crates/public",
+  "crates/worker",
+  "e2e-tests",
+]
+
+[workspace.dependencies]
+irelia_adapter = { path = "crates/adapter" }
+irelia_common = { path = "crates/common" }
+irelia_core = { path = "crates/core" }
+
+anyhow = { version = "1.0.87" }
 aptos-sdk = { git = "https://github.com/aptos-labs/aptos-core", branch = "mainnet" }
+aptos-testcontainer = { version = "0.1.2", features = ["testing"] }
 async-trait = { version = "0.1.81" }
+axum = { version = "0.8.0-alpha.1" }
+base64 = { version = "0.22.1" }
+clap = { version = "4.5.17" }
+config = { version = "0.14.0" }
+deadpool-diesel = { version = "0.6.1" }
+diesel = { version = "2.2.4", features = ["uuid", "postgres"] }
+diesel_migrations = { version = "2.2.0" }
 dotenv = { version = "0.15.0" }
-itertools = "0.10.5"
-lazy_static = "1.4.0"
+ethers = { version = "2.0.14" }
+glob = { version = "0.3.1" }
+graphile_worker = { version = "0.8.0" }
 log = { version = "0.4.22" }
-once_cell = { version = "1.19.0" }
+num-bigint = { version = "0.4.6" }
+num-traits = { version = "0.2.19" }
+opentelemetry = { version = "0.26.0" }
+opentelemetry-otlp = { version = "0.26.0" }
+opentelemetry-semantic-conventions = { version = "0.26.0" }
+opentelemetry_sdk = { version = "0.26.0" }
+rand = { version = "0.8.5" }
 rand_core = { version = "0.5.1" }
-regex = { version = "1.10.6" }
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = { version = "1.0.120" }
+readonly = { version = "0.2.12" }
+redis-async = { version = "0.17.2" }
+regex = { version = "1.11.0" }
+reqwest = { version = "0.12.9", features = ["json"] }
+scopeguard = { version = "1.2.0" }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = { version = "1.0.128" }
+sqlx = { version = "*" }
+stone-cli = { git = "https://github.com/zksecurity/stone-cli.git", branch = "main" }
+tempfile = { version = "3.13.0" }
 test-log = { version = "0.2.16" }
-thiserror = { version = "1.0.63" }
-tokio = { version = "1.39.3", features = ["macros", "rt-multi-thread"] }
-url = { version = "2.4.0", features = ["serde"] }
-
-[dev-dependencies]
-aptos-testcontainer = { git = "https://github.com/sota-zk-labs/aptos-testcontainer.git", tag = "v0.0.3", features = [
-  "testing",
-] }
+testcontainers-modules = { version = "0.11.4" }
+thiserror = { version = "1.0.64" }
+tokio = { version = "1.39.3", features = ["full"] }
+tokio-postgres = { version = "0.7.12" }
+tower-http = { version = "0.6.1" }
+tracing = { version = "0.1.40" }
+tracing-bunyan-formatter = { version = "0.3.9" }
+tracing-opentelemetry = { version = "0.27.0" }
+tracing-subscriber = { version = "0.3.18" }
+uuid = { version = "1.10.0", features = ["v4"] }
+zip = { version = "0.6.6" }
 
 [patch.crates-io]
 merlin = { git = "https://github.com/aptos-labs/merlin" }

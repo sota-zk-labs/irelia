@@ -1,0 +1,16 @@
+[package]
+edition = "2021"
+name = "irelia_core"
+version = "0.0.1"
+
+[dependencies]
+anyhow = { workspace = true }
+aptos-sdk = { workspace = true }
+async-trait = { workspace = true }
+ethers = { workspace = true }
+num-bigint = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true, features = ["v4", "serde"] }
